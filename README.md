@@ -2,6 +2,6 @@
 
 - Integrante 1: [Facundo Garavagno]
 - Integrante 2: David Schmidt
-- Integrante 3: [Nombre y Apellido]
+- Integrante 3: Ignacio Tomás Vila
 - Integrante 4: [Nombre y Apellido]
 - Integrante 5: [Nombre y Apellido]
