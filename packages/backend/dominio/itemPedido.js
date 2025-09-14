@@ -1,5 +1,5 @@
 
-class ItemPedido {
+export class ItemPedido {
     producto
     cantidad
     precioUnitario

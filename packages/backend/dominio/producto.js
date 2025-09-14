@@ -24,10 +24,8 @@ export class Producto {
     }
     
 	estaDiponible(cantidad) {
-		if(this.stock >= cantidad){
-			return true
-		}else { return false }
-	}
+        this.stock >= cantidad
+    }
 
     reducirStock(cantidad) {
         this.stock -= cantidad

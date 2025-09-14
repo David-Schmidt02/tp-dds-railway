@@ -1,9 +1,9 @@
 export class EstadoPedido {
     nombre;
     destinos;
-    constructor(nombre){ 
+    constructor(nombre, destinos = []){ 
         this.nombre = nombre 
-        this.destinos = new Set();
+        this.destinos = new Set(destinos);
 
     }
 

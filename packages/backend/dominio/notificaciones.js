@@ -1,39 +1,47 @@
 
 export class FactoryNotificacion {
-    static crearSegunEstadoPedido(estadoPedido) {
-        let mensaje;
-        switch (estadoPedido) {
-            case 'pendiente':
-                mensaje = 'Tu pedido está pendiente.';
-                break;
-            case 'enviado':
-                mensaje = 'Tu pedido ha sido enviado.';
-                break;
-            case 'entregado':
-                mensaje = 'Tu pedido ha sido entregado.';
-                break;
-            default:
-                mensaje = 'Estado de pedido actualizado.';
+    // Mapea una instancia de Pedido a un objeto JSON con los campos requeridos
+    static crearSegunEstadoPedido(pedido) {
+        switch (pedido.estado.nombre) {
+            case 'PENDIENTE':
+                return {
+                    comprador: pedido.comprador,
+                    productos: pedido.itemsPedido?.map(item => item.producto?.nombre),
+                    total: pedido.total,
+                    direccionEntrega: pedido.direccionEntrega
+                };
+            case 'ENVIADO':
+                return {
+                    comprador: pedido.comprador,
+                    productos: pedido.itemsPedido?.map(item => item.producto?.nombre),
+                    fechaEntrega: Date.now(),
+                    estado: pedido.estado
+                };
+            case 'CANCELADO':
+                return {
+                    comprador: pedido.comprador,
+                };
         }
-        return mensaje;
     }
 
     static crearSegunPedido(pedido) {
-        const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido.estado);
-        return new Notificaciones(pedido.usuario, mensaje);
+        const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido);
+        //return new Notificaciones(pedido.receptor, mensaje);
+        
     }
 }
 
+
 export class Notificaciones {
     id;
-    usuario;
+    receptor;
     mensaje;
     fechaAlta;
     leida;
     fechaLeida;
 
-    constructor(usuario, mensaje) {
-        this.usuario = usuario;
+    constructor(receptor, mensaje) {
+        this.receptor = usuario;
         this.mensaje = mensaje;
         this.fechaAlta = new Date();
         this.leida = false;

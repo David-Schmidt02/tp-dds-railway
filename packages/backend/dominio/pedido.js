@@ -34,14 +34,9 @@ export class Pedido {
     validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }
 
     obtenerVendedores() { 
-    const vendedores = new Set();
-    for (const item of this.itemsPedido) {
-        if (item.producto && item.producto.vendedor) {
-            vendedores.add(item.producto.vendedor);
+        const vendedores = new Set(this.items.map(i => i.producto.vendedor));
+        return Array.from(vendedores);
         }
-    }
-    return Array.from(vendedores);
-    }
 }
 
 

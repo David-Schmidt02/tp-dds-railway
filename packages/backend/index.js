@@ -1,3 +1,5 @@
+import { PedidoController } from "./controllers/pedidoController.js";
+import { pedidos } from "./controllers/pedidoController.js";
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -15,6 +17,9 @@ app.use(
 app.get("/hello", (req, res) => {
   res.json({ message: "hello world" });
 });
+
+app.get("/pedidos", PedidoController.obtenerPedidos);
+app.post("/pedidos", PedidoController.crearPedido);
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Backend escuchando en puerto ${process.env.SERVER_PORT}`);

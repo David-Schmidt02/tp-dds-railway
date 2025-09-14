@@ -7,6 +7,7 @@ export class CambioEstadoPedido{
 
     constructor(nuevoEstado, pedido, usuario, motivo){
         this.fecha = Date.now();
+        this.nuevoEstado = nuevoEstado
         this.pedido = pedido;
         this.usuario = usuario;
         this.motivo = motivo ?? null;
@@ -16,13 +17,11 @@ export class CambioEstadoPedido{
         }
         this.nuevoEstado = nuevoEstado;
 
-        if(this.nuevoEstado = EstadoPedido.ENVIADO){
+        if(this.nuevoEstado == EstadoPedido.ENVIADO){
             FactoryNotificacion.crearSegunEstadoPedido(this.nuevoEstado, this.usuario)
-        }else if(nuevoEstado = EstadoPedido.CANCELADO){
-            const vendedores = pedido.obtenerVendedores()
-            vendedores.forEach(vendedor => {
-                FactoryNotificacion.crearSegunEstadoPedido(nuevoEstado, vendedor);
-            });
+        }else if(nuevoEstado == EstadoPedido.CANCELADO){
+            const vendedor = pedido.obtenerVendedor()
+            FactoryNotificacion.crearSegunEstadoPedido(nuevoEstado, vendedor);
             vender
             
         }
