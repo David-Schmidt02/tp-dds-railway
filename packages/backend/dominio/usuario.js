@@ -6,7 +6,7 @@ export class Usuario {
     tipoUsuario
     fechaAlta
    
-    constructor(id, nombre, email, telefono, tipo, fechaAlta) {
+    constructor(id, nombre, email, telefono, tipoUsuario ) {
       this.id = id;
       this.nombre = nombre;
       this.email = email;
