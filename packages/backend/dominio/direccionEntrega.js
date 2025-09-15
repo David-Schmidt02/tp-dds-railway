@@ -17,7 +17,7 @@ export class DireccionEntrega {
         this.altura = altura
         this.piso = piso
         this.departamento = departamento
-
+        this.codigoPostal = codigoPostal
     }
 
 }

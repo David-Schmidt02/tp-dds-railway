@@ -20,7 +20,7 @@ export class Pedido {
     constructor(comprador, items, moneda, direccionEntrega) {
         this.id = PedidoRepository.siguienteId(); // TODO: Pedidorepository
         this.comprador = comprador;
-        this.itemsPedido = [];
+        this.itemsPedido = items;
         this.total = 0;
         this.moneda = moneda; 
         this.direccionEntrega = direccionEntrega; 
@@ -37,7 +37,7 @@ export class Pedido {
 
     
     actualizarEstado(nuevoEstado, usuario, motivo ) {
-	    new CambioEstadoPedido(estado, this, usuario, motivo)
+	    new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)
     }
     
     validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }
