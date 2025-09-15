@@ -10,9 +10,16 @@ export class PedidoController {
     static crearPedido(req, res) {
         try{
             const { compradorDTO, itemsDTO, monedaDTO, direccionEntregaDTO } = req.body;
-            const comprador = new Usuario(compradorDTO.id, compradorDTO.nombre, compradorDTO.email);
+            
+            let comprador = this.usuarioRepository.buscarPorEmail(compradorDTO.email);
+            if(!comprador) {
+                this.usuarioRepository.agregarUsuario(compradorDTO.nombre, compradorDTO.email, compradorDTO.telefono, TipoUsuario.COMPRADOR);
+            } // TODO: hacer un service
+
             const items = itemsDTO.map(item => new ItemPedido(item.producto, item.cantidad));
-            const moneda = new Moneda(monedaDTO.codigo, monedaDTO.simbolo);
+            if(esMonedaValida(monedaDTO.nombre)){
+                const moneda = Moneda.deNombre(monedaDTO.nombre);
+            }
             const direccionEntrega = new DireccionEntrega(direccionEntregaDTO.calle, direccionEntregaDTO.ciudad, direccionEntregaDTO.codigoPostal, direccionEntregaDTO.pais);
             const pedido = new Pedido(comprador, items, moneda, direccionEntrega);
             

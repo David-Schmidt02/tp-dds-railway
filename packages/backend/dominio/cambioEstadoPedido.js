@@ -1,3 +1,10 @@
+import{Pedido} from "./pedido.js"
+import{EstadoPedido} from "./estadoPedido.js"
+import{Usuario} from "./usuario.js"
+import{FactoryNotificacion} from "./notificaciones.js"
+
+
+
 export class CambioEstadoPedido{
     fecha
     nuevoEstado
@@ -6,7 +13,7 @@ export class CambioEstadoPedido{
     motivo
 
     constructor(nuevoEstado, pedido, usuario, motivo){
-        this.fecha = Date.now();
+        this.fecha = new Date();
         this.nuevoEstado = nuevoEstado
         this.pedido = pedido;
         this.usuario = usuario;
@@ -16,13 +23,13 @@ export class CambioEstadoPedido{
             throw new Error('Transicion de estado invalida');
         }
         this.nuevoEstado = nuevoEstado;
+        this.pedido.estado() = nuevoEstado;
 
         if(this.nuevoEstado == EstadoPedido.ENVIADO){
-            FactoryNotificacion.crearSegunEstadoPedido(this.nuevoEstado, this.usuario)
+            FactoryNotificacion.crearSegunEstadoPedido(this.nuevoEstado, this.usuario);
         }else if(nuevoEstado == EstadoPedido.CANCELADO){
-            const vendedor = pedido.obtenerVendedor()
+            const vendedor = pedido.obtenerVendedor();
             FactoryNotificacion.crearSegunEstadoPedido(nuevoEstado, vendedor);
-            vender
             
         }
         

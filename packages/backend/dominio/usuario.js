@@ -7,12 +7,12 @@ export class Usuario {
     fechaAlta
    
     constructor(id, nombre, email, telefono, tipo, fechaAlta) {
-    this.id = id;
-    this.nombre = nombre;
-    this.email = email;
-    this.telefono = telefono;
-    this.tipoUsuario = tipoUsuario; 
-    this.fechaAlta = fechaAlta;
+      this.id = id;
+      this.nombre = nombre;
+      this.email = email;
+      this.telefono = telefono;
+      this.tipoUsuario = tipoUsuario; 
+      this.fechaAlta = new Date();
   }
   
 }

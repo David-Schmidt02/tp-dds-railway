@@ -1,7 +1,15 @@
+import { EstadoPedido } from "./estadoPedido"
+import { CambioEstadoPedido } from "./cambioEstadoPedido"
+import { ItemPedido } from "./itemPedido"
+import { DireccionEntrega } from "./direccionEntrega"
+import { Usuario } from "./usuario"
+import { FactoryNotificacion } from "./notificaciones"
+import { NotificacionesRepository } from "../scr/repositories/notificacionRepository"
+
 export class Pedido {
     id
     comprador
-    items
+    itemsPedido
     total
     moneda
     direccionEntrega
@@ -17,8 +25,11 @@ export class Pedido {
         this.moneda = moneda; 
         this.direccionEntrega = direccionEntrega; 
         this.estado = EstadoPedido.PENDIENTE;
-        this.fechaCreacion = Date.now();
+        this.fechaCreacion = new Date();
         this.historialEstados = []; 
+
+        const notificacion = FactoryNotificacion.crearSegunPedido(this);
+        NotificacionesRepository.agregarNotificacion(notificacion);
 
     }
 
@@ -26,8 +37,6 @@ export class Pedido {
 
     
     actualizarEstado(nuevoEstado, usuario, motivo ) {
-        estado = new EstadoPedido.nuevoEstado
-	    this.estado = estado
 	    new CambioEstadoPedido(estado, this, usuario, motivo)
     }
     
@@ -37,6 +46,28 @@ export class Pedido {
         const vendedores = new Set(this.items.map(i => i.producto.vendedor));
         return Array.from(vendedores);
         }
+    
+    ///////////////////CASO SI SE TIENE UN SOLO VENDEDOR POR PEDIDO (AGREGAR ATRIBUTO VENDEDOR A LA CLASE)//////////////////////////////////////////////////////////////
+    agregarItem(item){
+        if(this.itemsPedido = []){
+            this.itemsPedido.push(item);
+            this.vendedor = item.producto.vendedor;
+        }
+        if(this.vendedor != item.producto.vendedor){
+            throw new Error("Todos los items del pedido deben ser del mismo vendedor");
+        }
+        this.itemsPedido.push(item);
+    }
+
+
+    sacarItem(item){
+        this.itemsPedido.pop(item);
+        if(this.itemsPedido = []){
+            this.vendedor = null;
+        }
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 

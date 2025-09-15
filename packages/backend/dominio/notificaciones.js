@@ -1,35 +1,8 @@
-
-export class FactoryNotificacion {
-    // Mapea una instancia de Pedido a un objeto JSON con los campos requeridos
-    static crearSegunEstadoPedido(pedido) {
-        switch (pedido.estado.nombre) {
-            case 'PENDIENTE':
-                return {
-                    comprador: pedido.comprador,
-                    productos: pedido.itemsPedido?.map(item => item.producto?.nombre),
-                    total: pedido.total,
-                    direccionEntrega: pedido.direccionEntrega
-                };
-            case 'ENVIADO':
-                return {
-                    comprador: pedido.comprador,
-                    productos: pedido.itemsPedido?.map(item => item.producto?.nombre),
-                    fechaEntrega: Date.now(),
-                    estado: pedido.estado
-                };
-            case 'CANCELADO':
-                return {
-                    comprador: pedido.comprador,
-                };
-        }
-    }
-
-    static crearSegunPedido(pedido) {
-        const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido);
-        //return new Notificaciones(pedido.receptor, mensaje);
-        
-    }
-}
+import { } from "../scr/excepciones/"
+import{ Pedido } from "./pedido.js"
+import { Producto } from "./producto.js";
+import { EstadoPedido } from "./estadoPedido.js";
+import { NotificacionesRepository } from "../scr/repositories/notificacionRepository.js";
 
 
 export class Notificaciones {
@@ -53,3 +26,70 @@ export class Notificaciones {
         this.fechaLeida = new Date();
     }
 }
+
+
+
+
+export class FactoryNotificacion {
+    // Mapea una instancia de Pedido a un objeto JSON con los campos requeridos
+    static crearSegunEstadoPedido(pedido) {
+        const productos = (pedido.itemsPedido ?? [])
+            .map(item => item?.producto?.nombre)
+            .filter(Boolean);
+
+        switch (pedido?.estado?.nombre) {
+            case 'PENDIENTE':
+                return {
+                    comprador: pedido.comprador,
+                    productos,
+                    total: pedido.total,
+                    direccionEntrega: pedido.direccionEntrega
+                };
+      
+            case 'ENVIADO':
+                 return {
+                    comprador: pedido.comprador,
+                    productos,
+                    fechaEntrega: pedido.fechaEntregaEstimada ?? new Date(),
+                    estado: pedido.estado?.nombre
+                };
+      
+            case 'CANCELADO':
+                return { comprador: pedido.comprador };
+            
+            default:
+                throw new EstadoNoSoportado(pedido?.estado?.nombre);
+        }
+  }
+
+
+
+    static crearSegunPedido(pedido) {
+        const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido);
+        let receptor;
+    
+        switch (pedido.estado.nombre) {
+            case "PENDIENTE":
+                receptor = pedido.vendedor;   // notificar al vendedor
+            break;
+
+            case "ENVIADO":
+                receptor = pedido.comprador;  // notificar al comprador
+            break;
+
+            case "CANCELADO":
+                receptor = pedido.vendedor;   // notificar al vendedor
+            break;
+
+            default:
+                throw new Error(`Estado no soportado: ${pedido.estado.nombre}`);
+        }
+
+        const notificacion = new Notificaciones(receptor, mensaje);
+        NotificacionesRepository.agregarNotificacion(notificacion);
+
+    }
+
+}
+
+

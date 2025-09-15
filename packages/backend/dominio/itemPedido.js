@@ -1,3 +1,4 @@
+import{Producto} from "./producto.js"
 
 export class ItemPedido {
     producto
