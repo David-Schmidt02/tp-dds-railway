@@ -11,6 +11,8 @@ import { PedidoService } from "./services/pedidoService.js";
 import { PedidoRepository } from "./src/repositories/pedidoRepository.js";
 
 const app = express();
+app.use(express.json());
+
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS
@@ -19,8 +21,10 @@ app.use(
   }),
 );
 
-// endpoint de prueba
-app.get("/hello", (req, res) => res.json({ message: "hello world" }));
+
+app.get('/healthCheck', (req, res) => {
+  res.status(200).json({mensaje:'Todo marcha bien!'})
+})
 
 // wiring Repo -> Service -> Controller
 const pedidoRepository = new PedidoRepository();
@@ -31,7 +35,6 @@ const server = new Server(app, process.env.PORT || 3000);
 
 // registrar controller
 server.setController(PedidoController, pedidoController);
-
 server.routes = routes;
 
 // montar y arrancar
