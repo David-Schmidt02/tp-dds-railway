@@ -1,4 +1,4 @@
-import { } from "../excepciones/"
+// import { UsuarioInexistente } from "../excepciones/notificaciones.js" // TODO: crear excepción si no existe
 
 export const UsuariosRepository = {
     usuarios: [],

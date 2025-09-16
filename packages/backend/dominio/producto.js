@@ -1,5 +1,5 @@
 import { Usuario } from "./usuario.js"
-import{Categoria } from "./categoria.js"
+import{ Categoria } from "./categoria.js"
 import { Moneda } from "./moneda.js"
 
 

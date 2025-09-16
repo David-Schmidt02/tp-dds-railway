@@ -1,4 +1,4 @@
-import { } from "../excepciones/"
+import { NotificacionInexistente } from "../excepciones/notificaciones.js"
 
 export const NotificacionesRepository = {
     notificaciones: [],

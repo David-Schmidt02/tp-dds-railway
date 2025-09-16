@@ -1,8 +1,8 @@
-import { } from "../scr/excepciones/"
+import { NotificacionInexistente, EstadoNoSoportado } from "../src/excepciones/notificaciones.js"
 import{ Pedido } from "./pedido.js"
 import { Producto } from "./producto.js";
 import { EstadoPedido } from "./estadoPedido.js";
-import { NotificacionesRepository } from "../scr/repositories/notificacionRepository.js";
+import { NotificacionesRepository } from "../src/repositories/notificacionRepository.js";
 
 
 export class Notificaciones {
@@ -14,7 +14,8 @@ export class Notificaciones {
     fechaLeida;
 
     constructor(receptor, mensaje) {
-        this.receptor = usuario;
+        //this.receptor = usuario; ? No sé de donde salio usuario
+        this.receptor = receptor;
         this.mensaje = mensaje;
         this.fechaAlta = new Date();
         this.leida = false;

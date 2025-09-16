@@ -1,22 +1,23 @@
 export class EstadoPedido {
-    nombre;
-    destinos;
-    constructor(nombre, destinos = []){ 
-        this.nombre = nombre 
-        this.destinos = new Set(destinos);
-
-    }
-
-    puedeTransicionarA(estadoDestino){
-        return this.destinos.has(estadoDestino);
-    }
-    
-
+  nombre; destinos;
+  constructor(nombre, destinos = []) {
+    this.nombre = nombre;
+    this.destinos = new Set(destinos);
+  }
+  puedeTransicionarA(estadoDestino) { return this.destinos.has(estadoDestino); }
 }
 
-EstadoPedido.PENDIENTE = new EstadoPedido("PENDIENTE", [EstadoPedido.CONFIRMADO, EstadoPedido.CANCELADO]);
-EstadoPedido.CONFIRMADO = new EstadoPedido("CONFIRMADO", [EstadoPedido.EN_PREPARACION, EstadoPedido.CANCELADO]);
-EstadoPedido.EN_PREPARACION = new EstadoPedido("EN_PREPARACION", [EstadoPedido.ENVIADO, EstadoPedido.CANCELADO]);
-EstadoPedido.ENVIADO = new EstadoPedido("ENVIADO", [EstadoPedido.ENTREGADO]);
-EstadoPedido.ENTREGADO = new EstadoPedido("ENTREGADO", []);
-EstadoPedido.CANCELADO = new EstadoPedido("CANCELADO", []);
+EstadoPedido.PENDIENTE     = new EstadoPedido("PENDIENTE");
+EstadoPedido.CONFIRMADO    = new EstadoPedido("CONFIRMADO");
+EstadoPedido.EN_PREPARACION= new EstadoPedido("EN_PREPARACION");
+EstadoPedido.ENVIADO       = new EstadoPedido("ENVIADO");
+EstadoPedido.ENTREGADO     = new EstadoPedido("ENTREGADO");
+EstadoPedido.CANCELADO     = new EstadoPedido("CANCELADO");
+
+// Definimos las transiciones posibles entre estados
+EstadoPedido.PENDIENTE.destinos      = new Set([EstadoPedido.CONFIRMADO, EstadoPedido.CANCELADO]);
+EstadoPedido.CONFIRMADO.destinos     = new Set([EstadoPedido.EN_PREPARACION, EstadoPedido.CANCELADO]);
+EstadoPedido.EN_PREPARACION.destinos = new Set([EstadoPedido.ENVIADO, EstadoPedido.CANCELADO]);
+EstadoPedido.ENVIADO.destinos        = new Set([EstadoPedido.ENTREGADO]);
+EstadoPedido.ENTREGADO.destinos      = new Set([]);
+EstadoPedido.CANCELADO.destinos      = new Set([]);

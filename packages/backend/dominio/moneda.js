@@ -20,7 +20,7 @@ Moneda.REAL  = new Moneda("REAL")
 
 // La de arriba es otra opcion, pero como no tiene comportamiento creemos que es mejor esta
 
-const Moneda = Object.freeze({
+export const Moneda = Object.freeze({
   PESO_ARG: "PESO_ARG",
   DOLAR_USA: "DOLAR_USA",
   REAL: "REAL",

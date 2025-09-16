@@ -1,24 +1,24 @@
-import { EstadoPedido } from "./estadoPedido"
-import { CambioEstadoPedido } from "./cambioEstadoPedido"
-import { ItemPedido } from "./itemPedido"
-import { DireccionEntrega } from "./direccionEntrega"
-import { Usuario } from "./usuario"
-import { FactoryNotificacion } from "./notificaciones"
-import { NotificacionesRepository } from "../scr/repositories/notificacionRepository"
+import { EstadoPedido } from "./estadoPedido.js"
+import { CambioEstadoPedido } from "./cambioEstadoPedido.js"
+import { ItemPedido } from "./itemPedido.js"
+import { DireccionEntrega } from "./direccionEntrega.js"
+import { Usuario } from "./usuario.js"
+import { FactoryNotificacion } from "./notificaciones.js"
+import { NotificacionesRepository } from "../src/repositories/notificacionRepository.js"
 
 export class Pedido {
-    id
-    comprador
-    itemsPedido
-    total
-    moneda
-    direccionEntrega
-    estado
-    fechaCreacion
-    historialEstados
+    id;
+    comprador;
+    itemsPedido;
+    total;
+    moneda;
+    direccionEntrega;
+    estado;
+    fechaCreacion;
+    historialEstados;
 
     constructor(comprador, items, moneda, direccionEntrega) {
-        this.id = PedidoRepository.siguienteId(); // TODO: Pedidorepository
+        // El id se asigna en el repository
         this.comprador = comprador;
         this.itemsPedido = items;
         this.total = 0;
@@ -29,8 +29,9 @@ export class Pedido {
         this.historialEstados = []; 
 
         const notificacion = FactoryNotificacion.crearSegunPedido(this);
-        NotificacionesRepository.agregarNotificacion(notificacion);
-
+        if (notificacion) {
+            NotificacionesRepository.agregarNotificacion(notificacion);
+        }
     }
 
     calcularTotal() { return this.itemsPedido.reduce((acc, item) => acc + item.subtotal(), 0) }

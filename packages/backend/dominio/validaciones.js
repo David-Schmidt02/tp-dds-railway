@@ -1,4 +1,21 @@
+
 import { z } from "zod";
+
+export const telefonoSchema = z 
+    .string()
+    .regex(/^\d+$/, { message: "El telefono solo puede contener numeros"})
+    .min(8, { message: "El telefono debe tener minimo 8 numeros"})
+    .max(15, { message: "El telefono debe tener maximo 15 numeros"});
+
+export const monedaSchema = z.enum(["PESO_ARG", "DOLAR_USA", "REAL"]);
+
+export const direccionEntregaSchema = z.object({
+    calle : z.string(),
+    altura : z.number().nonnegative(),
+    piso : z.number(),
+    departamento : z.number().nonnegative(),
+    codigoPostal : z.number()
+})
 
 export const usuarioSchema = z.object({
     nombre: z.string()
@@ -7,26 +24,6 @@ export const usuarioSchema = z.object({
     email: z.string().email({message: "Formato de email invalido"}),
     telefono : telefonoSchema,
     tipoUsuario : z.enum(["COMPRADOR", "VENDEDOR", "ADMIN"])
-})
-
-export const telefonoSchema = z 
-    .string()
-    .regex(/^\d+$/, { message: "El telefono solo puede contener numeros"})
-    .min(8, { message: "El telefono debe tener minimo 8 numeros"})
-    .max(15, { message: "El telefono debe tener maximo 15 numeros"});
-
-
-export const pedidoSchema = z.object({
-    comprador: usuarioSchema,
-    items: z.array(itemPedidoSchema).min(1, {message: "El pedido debe tener al menos 1 item"}),
-    moneda : monedaSchema,
-    direccionEntrega : direccionEntregaSchema
-})
-
-export const itemPedidoSchema = z.object({
-    producto: productoSchema,
-    cantidad: z.number().min(1, {message: "Debe haber al menos 1"}),
-    precioUnitario: z.number().nonnegative()
 })
 
 export const productoSchema = z.object({
@@ -38,15 +35,18 @@ export const productoSchema = z.object({
     moneda: monedaSchema,
     stock: z.number().nonnegative(),
     //fotos:
-    activo: z.bool()
+    activo: z.boolean()
 })
 
-export const monedaSchema = z.enum(["PESO_ARG", "DOLAR_USA", "REAL"]);
+export const itemPedidoSchema = z.object({
+    producto: productoSchema,
+    cantidad: z.number().min(1, {message: "Debe haber al menos 1"}),
+    precioUnitario: z.number().nonnegative()
+})
 
-export const direccionEntregaSchema = z.object({
-    calle : z.string(),
-    altura : z.number().nonnegative(),
-    piso : z.number(),
-    departamento : z.number().nonnegative(),
-    codigoPostal : z.number()
+export const pedidoSchema = z.object({
+    comprador: usuarioSchema,
+    items: z.array(itemPedidoSchema).min(1, {message: "El pedido debe tener al menos 1 item"}),
+    moneda : monedaSchema,
+    direccionEntrega : direccionEntregaSchema
 })

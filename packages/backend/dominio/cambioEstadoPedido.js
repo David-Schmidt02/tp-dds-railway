@@ -23,7 +23,7 @@ export class CambioEstadoPedido{
             throw new Error('Transicion de estado invalida');
         }
         this.nuevoEstado = nuevoEstado;
-        this.pedido.estado() = nuevoEstado;
+        this.pedido.estado = nuevoEstado;
 
         if(this.nuevoEstado == EstadoPedido.ENVIADO){
             FactoryNotificacion.crearSegunEstadoPedido(this.nuevoEstado, this.usuario);
