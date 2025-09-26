@@ -28,8 +28,8 @@ export class Producto {
         this.activo = activo
     }
     
-	estaDiponible(cantidad) {
-        this.stock >= cantidad
+    estaDisponible(cantidad) {
+        return this.stock >= cantidad;
     }
 
     reducirStock(cantidad) {
@@ -38,9 +38,5 @@ export class Producto {
 
     aumentarStock(cantidad) {
         this.stock += cantidad
-    }
-
-    getVendedor() {
-        return this.vendedor
     }
 }

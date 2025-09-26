@@ -43,12 +43,6 @@ export class Pedido {
     
     validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }
 
-    obtenerVendedores() { 
-        const vendedores = new Set(this.items.map(i => i.producto.vendedor));
-        return Array.from(vendedores);
-        }
-    
-    ///////////////////CASO SI SE TIENE UN SOLO VENDEDOR POR PEDIDO (AGREGAR ATRIBUTO VENDEDOR A LA CLASE)//////////////////////////////////////////////////////////////
     agregarItem(item){
         if(this.itemsPedido = []){
             this.itemsPedido.push(item);
@@ -67,7 +61,6 @@ export class Pedido {
             this.vendedor = null;
         }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
 

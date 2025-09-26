@@ -14,18 +14,23 @@ export class PedidoController {
         this.pedidoService = pedidoService;
     }
 
-    crearPedido(req, res) {
+    async crearPedido(req, res) {
+
         const body = req.body;
         const resultBody = pedidoSchema.safeParse(body);
         if(resultBody.error){
             return res.status(400).json({ error: resultBody.error.details[0].message });
         }
         try{
-            const nuevoPedido = this.pedidoService.crearPedido(body);
-            res.status(201).json(nuevoPedido);
+            const nuevoPedido = await this.pedidoService.crearPedido(body);
+            console.log('Nuevo pedido creado:', nuevoPedido);
+            res.status(201).json(pedidoToDTO(nuevoPedido));
         }catch(error){
-                console.log('Error al crear el pedido:', error);
-                return res.status(500).json({ error: 'Error al crear el pedido.' });
+            if(error instanceof PedidoInvalida) {
+             return res.status(422 ).json({ error: 'Error al crear el pedido.' });
+            }
+            if(error instanceof StockInvalido)  
+             return res.status(409).json({ error: 'No hay stock suficiente.' });   
         }
     }
 
@@ -47,6 +52,55 @@ export class PedidoController {
             return res.status(500).json({ error: 'Error al obtener los pedidos.' });
         }
     }   
+}
+
+function pedidoToDTO(pedido) {
+    return {
+        id: pedido.id,
+        comprador: {
+            id: pedido.comprador.id,
+            nombre: pedido.comprador.nombre,
+            email: pedido.comprador.email,
+
+        },
+        items: pedido.itemsPedido.map(item => ({
+            producto: {
+                id: item.producto.id,
+                titulo: item.producto.titulo,
+                descripcion: item.producto.descripcion,
+                precio: item.producto.precio,
+                categoria: item.producto.categoria,
+
+            },
+            cantidad: item.cantidad,
+            precioUnitario: item.precioUnitario,
+            subtotal: item.subtotal
+        })),
+        total: pedido.total,
+        moneda: {
+            codigo: pedido.moneda.codigo,
+            simbolo: pedido.moneda.simbolo,
+            nombre: pedido.moneda.nombre
+        },
+        direccionEntrega: {
+            calle: pedido.direccionEntrega.calle,
+            numero: pedido.direccionEntrega.numero,
+            ciudad: pedido.direccionEntrega.ciudad,
+            provincia: pedido.direccionEntrega.provincia,
+            pais: pedido.direccionEntrega.pais,
+            codigoPostal: pedido.direccionEntrega.codigoPostal
+
+        },
+        estado: {
+            nombre: pedido.estado.nombre,
+            fecha: pedido.estado.fecha
+
+        },
+        fechaCreacion: pedido.fechaCreacion,
+        fechaActualizacion: pedido.fechaActualizacion,
+        observaciones: pedido.observaciones
+
+    };
 }
 
 export default PedidoController;

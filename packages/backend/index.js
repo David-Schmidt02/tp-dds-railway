@@ -9,6 +9,7 @@ import cors from "cors";
 import { PedidoController } from "./controllers/pedidoController.js";
 import { PedidoService } from "./services/pedidoService.js";
 import { PedidoRepository } from "./src/repositories/pedidoRepository.js";
+import { RepositorioProducto } from "./src/repositories/productoRepository.js";
 
 const app = express();
 app.use(express.json());
@@ -21,14 +22,14 @@ app.use(
   }),
 );
 
-
 app.get('/healthCheck', (req, res) => {
   res.status(200).json({mensaje:'Todo marcha bien!'})
 })
 
 // wiring Repo -> Service -> Controller
 const pedidoRepository = new PedidoRepository();
-const pedidoService = new PedidoService(pedidoRepository);
+const productoRepository = RepositorioProducto; // No uses "new"
+const pedidoService = new PedidoService(pedidoRepository, productoRepository);
 const pedidoController = new PedidoController(pedidoService);
 
 const server = new Server(app, process.env.PORT || 3000);
