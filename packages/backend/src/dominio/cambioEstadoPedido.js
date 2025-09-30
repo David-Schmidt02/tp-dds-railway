@@ -19,7 +19,7 @@ export class CambioEstadoPedido{
         this.usuario = usuario;
         this.motivo = motivo ?? null;
 
-        if(!this.pedido.estado.puedeTransicionarA(nuevoEstado)){
+        if(!this.pedido.transicionarA(nuevoEstado)){
             throw new Error('Transicion de estado invalida');
         }
         this.nuevoEstado = nuevoEstado;

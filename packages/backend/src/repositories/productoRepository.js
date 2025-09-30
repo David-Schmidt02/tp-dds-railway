@@ -2,7 +2,7 @@ import {ProductoInexistente} from "../excepciones/notificaciones.js";
 import {ProductoStockInsuficiente} from "../excepciones/notificaciones.js";
 
 
-const RepositorioProducto = {
+const ProductoRepository = {
   productos: [
   {
     id: 1,
@@ -65,4 +65,4 @@ const RepositorioProducto = {
   }
 }
 
-export { RepositorioProducto };
+export { ProductoRepository };

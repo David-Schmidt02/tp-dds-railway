@@ -1,8 +1,8 @@
-import { NotificacionInexistente, EstadoNoSoportado } from "../src/excepciones/notificaciones.js"
+import { NotificacionInexistente, EstadoNoSoportado } from "../excepciones/notificaciones.js"
 import{ Pedido } from "./pedido.js"
 import { Producto } from "./producto.js";
 import { EstadoPedido } from "./estadoPedido.js";
-import { NotificacionesRepository } from "../src/repositories/notificacionRepository.js";
+import { NotificacionesRepository } from "../repositories/notificacionRepository.js";
 
 
 export class Notificaciones {

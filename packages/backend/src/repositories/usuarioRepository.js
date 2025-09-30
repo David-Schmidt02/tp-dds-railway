@@ -12,7 +12,7 @@ export const UsuariosRepository = {
     obtenerPorId(id){
         const usuario = this.id.find(u => u.id === id);
         if(!usuario) {
-            throw new UsuarioInexistente() // TODO: hacer la excepcion
+            //throw new UsuarioInexistente() // TODO: hacer la excepcion
         }
         return usuario;
     },
@@ -20,7 +20,7 @@ export const UsuariosRepository = {
     obtenerPorEmail(email){
         const usuario = this.email.find(u => u.email === email);
         if(!usuario) {
-            throw new UsuarioInexistente()
+            //throw new UsuarioInexistente()
         }
         return usuario;
     },

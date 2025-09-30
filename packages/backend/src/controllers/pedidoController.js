@@ -7,52 +7,6 @@ import { DireccionEntrega } from '../dominio/direccionEntrega.js';
 
 export const pedidos = []
 
-//Versión con Service y Repository
-
-export class PedidoController {
-    constructor(pedidoService){
-        this.pedidoService = pedidoService;
-    }
-
-    async crearPedido(req, res) {
-
-        const body = req.body;
-        const resultBody = pedidoSchema.safeParse(body);
-        if(resultBody.error){
-            return res.status(400).json({ error: resultBody.error.details[0].message });
-        }
-        try{
-            const nuevoPedido = await this.pedidoService.crearPedido(body);
-            console.log('Nuevo pedido creado:', nuevoPedido);
-            res.status(201).json(pedidoToDTO(nuevoPedido));
-        }catch(error){
-            if(error instanceof PedidoInvalida) {
-             return res.status(422 ).json({ error: 'Error al crear el pedido.' });
-            }
-            if(error instanceof StockInvalido)  
-             return res.status(409).json({ error: 'No hay stock suficiente.' });   
-        }
-    }
-
-    obtenerPedido(req, res) {
-        const id = req.params.id;
-        try{
-            const pedido = this.pedidoService.obtenerPedido(id);
-            return res.status(200).json(pedido);
-        }catch(error){
-            return res.status(500).json({ error: 'Error al obtener el pedido.' });
-        }
-    }
-
-    obtenerPedidos(req, res) {
-        try{
-            const pedidos = this.pedidoService.obtenerPedidos();
-            return res.status(200).json(pedidos);
-        }catch(error){
-            return res.status(500).json({ error: 'Error al obtener los pedidos.' });
-        }
-    }   
-}
 
 function pedidoToDTO(pedido) {
     return {
@@ -101,6 +55,58 @@ function pedidoToDTO(pedido) {
         observaciones: pedido.observaciones
 
     };
+}
+
+//Versión con Service y Repository
+
+export class PedidoController {
+    constructor(pedidoService){
+        this.pedidoService = pedidoService;
+    }
+
+    async crearPedido(req, res) {
+
+        const body = req.body;
+        const resultBody = pedidoSchema.safeParse(body);
+        if(resultBody.error){
+            return res.status(400).json({ error: resultBody.error.details[0].message });
+        }
+        try{
+            const nuevoPedido = await this.pedidoService.crearPedido(body);
+            console.log('Nuevo pedido creado:', nuevoPedido);
+            res.status(201).json(pedidoToDTO(nuevoPedido));
+        }catch(error){
+            if(error instanceof PedidoInvalida) {
+             return res.status(422 ).json({ error: 'Error al crear el pedido.' });
+            }
+            if(error instanceof StockInvalido)  
+             return res.status(409).json({ error: 'No hay stock suficiente.' });   
+        }
+    }
+
+    obtenerPedidos(req, res) {
+        try{
+            const pedidos = this.pedidoService.obtenerPedidos();
+            return res.status(200).json(pedidos);
+        }catch(error){
+            return res.status(500).json({ error: 'Error al obtener los pedidos.' });
+        }
+    }
+    
+    async cancelarPedido(req, res) {
+    const { id } = req.params;
+    const { motivo } = req.body;
+  const usuario = req.user; // Si usas autenticación, o lo obtienes del body
+    try {
+        const pedidoCancelado = await this.pedidoService.cancelarPedido(id, motivo, usuario);
+        if (!pedidoCancelado) {
+            return res.status(404).json({ error: 'Pedido no encontrado.' });
+        }
+        res.status(200).json(pedidoToDTO(pedidoCancelado));
+    } catch (error) {
+        return res.status(500).json({ error: 'Error al cancelar el pedido.' });
+    }
+}
 }
 
 export default PedidoController;

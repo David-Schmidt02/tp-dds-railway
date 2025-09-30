@@ -5,7 +5,7 @@
 import { Pedido } from '../dominio/pedido.js';
 import { ItemPedido } from '../dominio/itemPedido.js';
 import { Producto } from '../dominio/producto.js';
-import { PedidoRepository } from '../src/repositories/pedidoRepository.js';
+import { PedidoRepository } from '../repositories/pedidoRepository.js';
 
 export class PedidoService {
     constructor(pedidoRepository, productoRepository) {
@@ -38,26 +38,19 @@ export class PedidoService {
         const pedidoGuardado = this.pedidoRepository.crearPedido(pedidoNuevo);
         return pedidoGuardado;
     }
+
+    async cancelarPedido(id, motivo, usuario) {
+      const pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
+      if (!pedido) {
+        throw new Error('Pedido no encontrado');
+      }
+      pedido.actualizarEstado('CANCELADO', usuario, motivo);
+      const pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido);
+      pedido.items.forEach(async (item) => {
+        await this.productoRepository.cancelarStock(item.producto, item.cantidad);
+      });
+      return pedidoActualizado;
+    }
     
-/*
-     async crearComanda(mesa, platos) {
-    const platosPedidos = await Promise.all(platos.map(async p =>
-      new PlatoPedido(
-        await this.menu.obtenerPlatoPorId(p.idPlato),
-        p.cantidad,
-        p.notas
-      )
-    ));
-    return await this.comandaRepository.agregarComanda(new Comanda(mesa, platosPedidos))
-  }
-*/
-
-    obtenerPedido(id) {
-        return this.pedidoRepository.obtenerPedidoPorId(id);
-    }
-
-    obtenerPedidos() {
-        return this.pedidoRepository.obtenerTodosLosPedidos();
-    }
 
 }
