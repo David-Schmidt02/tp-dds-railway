@@ -4,13 +4,12 @@ import { ItemPedido } from "./itemPedido.js"
 import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
 import { FactoryNotificacion } from "./notificaciones.js"
-import { NotificacionesRepository } from "../src/repositories/notificacionRepository.js"
+import { NotificacionesRepository } from "../repositories/notificacionRepository.js"
 
 export class Pedido {
     id;
     comprador;
     itemsPedido;
-    total;
     moneda;
     direccionEntrega;
     estado;
@@ -40,34 +39,21 @@ export class Pedido {
     actualizarEstado(nuevoEstado, usuario, motivo ) {
 	    new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)
     }
+
+    transicionarA(nuevoEstado) {
+        this.estado.puedeTransicionarA(nuevoEstado)
+    }
     
     validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }
 
-    obtenerVendedores() { 
-        const vendedores = new Set(this.items.map(i => i.producto.vendedor));
-        return Array.from(vendedores);
-        }
-    
-    ///////////////////CASO SI SE TIENE UN SOLO VENDEDOR POR PEDIDO (AGREGAR ATRIBUTO VENDEDOR A LA CLASE)//////////////////////////////////////////////////////////////
     agregarItem(item){
-        if(this.itemsPedido = []){
-            this.itemsPedido.push(item);
-            this.vendedor = item.producto.vendedor;
-        }
-        if(this.vendedor != item.producto.vendedor){
-            throw new Error("Todos los items del pedido deben ser del mismo vendedor");
-        }
         this.itemsPedido.push(item);
     }
 
 
     sacarItem(item){
         this.itemsPedido.pop(item);
-        if(this.itemsPedido = []){
-            this.vendedor = null;
-        }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
 

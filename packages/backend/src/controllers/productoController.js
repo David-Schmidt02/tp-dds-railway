@@ -1,3 +1,4 @@
+/*
 import { Pedido } from '../dominio/pedido.js';
 import { pedidoSchema } from '../dominio/validaciones.js';
 import { Usuario } from '../dominio/usuario.js';
@@ -7,7 +8,7 @@ import { DireccionEntrega } from '../dominio/direccionEntrega.js';
 
 export const pedidos = []
 
-//Versión con Service y Repository
+//Version con Service y Repository
 
 export class PedidoController {
     constructor(pedidoService){
@@ -50,3 +51,4 @@ export class PedidoController {
 }
 
 export default PedidoController;
+*/
