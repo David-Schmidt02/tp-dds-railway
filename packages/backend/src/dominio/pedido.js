@@ -16,8 +16,8 @@ export class Pedido {
     fechaCreacion;
     historialEstados;
 
-    constructor(comprador, items, moneda, direccionEntrega) {
-        // El id se asigna en el repository
+    constructor(id, comprador, items, moneda, direccionEntrega) {
+        this.id = id;
         this.comprador = comprador;
         this.itemsPedido = items;
         this.total = 0;
@@ -37,7 +37,13 @@ export class Pedido {
 
     
     actualizarEstado(nuevoEstado, usuario, motivo ) {
-	    new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)
+	    this.estado = new CambioEstadoPedido(nuevoEstado, this, usuario, motivo);
+        this.historialEstados.push(this.estado)
+
+        if (this.transicionarA(nuevoEstado)){ // Puede ser una excepcion.
+            this.historialEstados.push(new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)) // Revisar
+            this.estado = nuevoEstado;
+        }
     }
 
     transicionarA(nuevoEstado) {
@@ -50,9 +56,37 @@ export class Pedido {
         this.itemsPedido.push(item);
     }
 
-
     sacarItem(item){
         this.itemsPedido.pop(item);
+    }
+
+    obtenerCantidadItem(productoId) {
+        const item = this.itemsPedido.find(item => item.getId() === productoId);
+        return item ? item.cantidad : null;
+    }
+
+    puedeModificarItems() {
+        // Solo se puede modificar si no ha sido enviado
+        return this.estado.nombre !== 'ENVIADO' && this.estado.nombre !== 'ENTREGADO' && this.estado.nombre !== 'CANCELADO';
+    }
+
+    modificarCantidadItem(productoId, nuevaCantidad) {
+        if (!this.puedeModificarItems()) {
+            throw new Error('No se puede modificar un pedido que ya ha sido enviado');
+        }
+
+        const item = this.itemsPedido.find(item => item.getId() === productoId);
+        if (!item) {
+            throw new Error('Producto no encontrado en el pedido');
+        }
+        
+        item.cambiarCantidad(nuevaCantidad);
+        
+    }
+
+    
+    perteneceAUsuario(usuarioId) {
+        return this.comprador.getId() === usuarioId;
     }
 
 }

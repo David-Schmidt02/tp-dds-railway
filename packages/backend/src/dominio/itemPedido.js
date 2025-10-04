@@ -18,4 +18,17 @@ export class ItemPedido {
     obtenerVendedor(){
         return this.producto.getVendedor();
     }
+
+    getId() {
+        return this.producto.id;
+    }
+
+
+    cambiarCantidad(nuevaCantidad) {
+        if (nuevaCantidad <= 0) {
+            throw new Error('La cantidad debe ser mayor a 0');
+        }
+        
+        this.cantidad = nuevaCantidad;
+    }
 }

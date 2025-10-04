@@ -29,46 +29,14 @@ export class Notificaciones {
 }
 
 
-
-
 export class FactoryNotificacion {
     // Mapea una instancia de Pedido a un objeto JSON con los campos requeridos
-    static crearSegunEstadoPedido(pedido) {
-        const productos = (pedido.itemsPedido ?? [])
-            .map(item => item?.producto?.nombre)
-            .filter(Boolean);
-
-        switch (pedido?.estado?.nombre) {
-            case 'PENDIENTE':
-                return {
-                    comprador: pedido.comprador,
-                    productos,
-                    total: pedido.total,
-                    direccionEntrega: pedido.direccionEntrega
-                };
-      
-            case 'ENVIADO':
-                 return {
-                    comprador: pedido.comprador,
-                    productos,
-                    fechaEntrega: pedido.fechaEntregaEstimada ?? new Date(),
-                    estado: pedido.estado?.nombre
-                };
-      
-            case 'CANCELADO':
-                return { comprador: pedido.comprador };
-            
-            default:
-                throw new EstadoNoSoportado(pedido?.estado?.nombre);
-        }
-  }
-
-
 
     static crearSegunPedido(pedido) {
         const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido);
         let receptor;
     
+            // Ver si el switch se debe usar
         switch (pedido.estado.nombre) {
             case "PENDIENTE":
                 receptor = pedido.vendedor;   // notificar al vendedor
@@ -88,9 +56,38 @@ export class FactoryNotificacion {
 
         const notificacion = new Notificaciones(receptor, mensaje);
         NotificacionesRepository.agregarNotificacion(notificacion);
-
     }
 
+    // Método interno que se llama en la otra funcion
+    static crearSegunEstadoPedido(pedido) {
+    const productos = (pedido.itemsPedido ?? [])
+        .map(item => item?.producto?.nombre)
+        .filter(Boolean);
+
+    switch (pedido?.estado?.nombre) {
+        case 'PENDIENTE':
+            return {
+                comprador: pedido.comprador,
+                productos,
+                total: pedido.total,
+                direccionEntrega: pedido.direccionEntrega
+            };
+    
+        case 'ENVIADO':
+                return {
+                comprador: pedido.comprador,
+                productos,
+                fechaEntrega: pedido.fechaEntregaEstimada ?? new Date(),
+                estado: pedido.estado?.nombre
+            };
+    
+        case 'CANCELADO':
+            return { comprador: pedido.comprador };
+        
+        default:
+            throw new EstadoNoSoportado(pedido?.estado?.nombre);
+    }
+  }
 }
 
 

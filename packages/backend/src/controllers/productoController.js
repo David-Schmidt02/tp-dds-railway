@@ -1,4 +1,3 @@
-/*
 import { Pedido } from '../dominio/pedido.js';
 import { pedidoSchema } from '../dominio/validaciones.js';
 import { Usuario } from '../dominio/usuario.js';
@@ -6,49 +5,41 @@ import { ItemPedido } from '../dominio/itemPedido.js';
 import { Moneda } from '../dominio/moneda.js';
 import { DireccionEntrega } from '../dominio/direccionEntrega.js';
 
-export const pedidos = []
+export const producto = []
 
 //Version con Service y Repository
 
-export class PedidoController {
-    constructor(pedidoService){
-        this.pedidoService = pedidoService;
+export class ProductoController {
+    constructor(productoService) {
+        this.productoService = productoService;
     }
 
-    crearPedido(req, res) {
-        const body = req.body;
-        const resultBody = pedidoSchema.safeParse(body);
-        if(resultBody.error){
-            return res.status(400).json({ error: resultBody.error.details[0].message });
-        }
-        try{
-            const nuevoPedido = this.pedidoService.crearPedido(body);
-            res.status(201).json(nuevoPedido);
-        }catch(error){
-                console.log('Error al crear el pedido:', error);
-                return res.status(500).json({ error: 'Error al crear el pedido.' });
-        }
-    }
-
-    obtenerPedido(req, res) {
-        const id = req.params.id;
-        try{
-            const pedido = this.pedidoService.obtenerPedido(id);
-            return res.status(200).json(pedido);
-        }catch(error){
-            return res.status(500).json({ error: 'Error al obtener el pedido.' });
+    obtenerProductos(req, res) {
+        try {
+            // Por ahora devolvemos productos mock
+            const productos = [
+                { id: 1, nombre: "Producto 1", precio: 100 },
+                { id: 2, nombre: "Producto 2", precio: 200 },
+                { id: 3, nombre: "Producto 3", precio: 300 }
+            ];
+            return res.status(200).json(productos);
+        } catch (error) {
+            console.error('Error al obtener productos:', error);
+            return res.status(500).json({ error: 'Error al obtener los productos.' });
         }
     }
 
-    obtenerPedidos(req, res) {
-        try{
-            const pedidos = this.pedidoService.obtenerPedidos();
-            return res.status(200).json(pedidos);
-        }catch(error){
-            return res.status(500).json({ error: 'Error al obtener los pedidos.' });
+    obtenerProducto(req, res) {
+        const id = parseInt(req.params.id);
+        try {
+            // Mock de un producto específico
+            const producto = { id: id, nombre: `Producto ${id}`, precio: id * 100 };
+            return res.status(200).json(producto);
+        } catch (error) {
+            console.error('Error al obtener producto:', error);
+            return res.status(500).json({ error: 'Error al obtener el producto.' });
         }
-    }   
+    }
 }
 
-export default PedidoController;
-*/
+export default ProductoController;

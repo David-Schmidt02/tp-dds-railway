@@ -1,36 +1,37 @@
 import {ProductoInexistente} from "../excepciones/notificaciones.js";
 import {ProductoStockInsuficiente} from "../excepciones/notificaciones.js";
 
-
-const ProductoRepository = {
-  productos: [
-  {
-    id: 1,
-    vendedor: {
-      nombre: "Vendedor 1",
-      email: "vendedor@mail.com",
-      telefono: "87654321",
-      tipoUsuario: "VENDEDOR"
-    },
-    titulo: "Producto 1",
-    descripcion: "Descripción del producto",
-    categorias: ["cat1"],
-    precio: 100,
-    moneda: "PESO_ARG",
-    stock: 10,
-    activo: true
+export class ProductoRepository {
+  constructor() {
+    this.productos = [
+      {
+        id: 1,
+        vendedor: {
+          nombre: "Vendedor 1",
+          email: "vendedor@mail.com",
+          telefono: "87654321",
+          tipoUsuario: "VENDEDOR"
+        },
+        titulo: "Producto 1",
+        descripcion: "Descripción del producto",
+        categorias: ["cat1"],
+        precio: 100,
+        moneda: "PESO_ARG",
+        stock: 10,
+        activo: true
+      }
+    ];
   }
-],
 
   agregarProducto(producto){
     producto.id = this.obtenerSiguienteId();
     this.productos.push(producto);
     return producto;
-  },
+  }
 
   listar(){
     return this.productos;
-  },
+  }
 
   obtenerProductoPorId(id){
     const producto = this.productos.find(p => p.id === id);
@@ -38,31 +39,41 @@ const ProductoRepository = {
       throw new ProductoInexistente(id);
     }
     return producto;
-  },
+  }
 
   guardarProducto(productoActualizado){
-    remove(this.productos, p => p.id === productoActualizado.id);
+    // Necesitarás importar remove de lodash o implementar la función
+    this.productos = this.productos.filter(p => p.id !== productoActualizado.id);
     this.productos.push(productoActualizado);
     return productoActualizado;
-  },
+  }
 
   borrar(producto){
-    remove(this.productos, p => p.nombre === producto.nombre);
-  },
+    this.productos = this.productos.filter(p => p.nombre !== producto.nombre);
+  }
 
-  obtenerSiguienteId() {//TODO en una DB real no es necesario
+  obtenerSiguienteId() {
     return (this.productos[this.productos.length - 1]?.id || 0) + 1;
-  },
+  }
 
   reservarStock(idProducto, cantidad) {
     const producto = this.obtenerProductoPorId(idProducto);
     if (!producto.estaDisponible(cantidad)) {
-      throw new Error(new ProductoStockInsuficiente(id));
-    }else{
-        producto.reducirStock(cantidad)
+      throw new Error(new ProductoStockInsuficiente(idProducto));
+    } else {
+      producto.reducirStock(cantidad);
     }
     return cantidad;
   }
-}
 
-export { ProductoRepository };
+  cancelarStock(idProducto, cantidad) {
+    const producto = this.obtenerProductoPorId(idProducto); {
+    if (typeof producto.incrementarStock === 'function') {
+      producto.incrementarStock(cantidad);
+    } else {
+      producto.stock += cantidad;
+    }
+    return cantidad;
+    }
+  }
+}

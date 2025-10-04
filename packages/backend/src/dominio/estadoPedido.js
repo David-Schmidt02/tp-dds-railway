@@ -4,7 +4,8 @@ export class EstadoPedido {
     this.nombre = nombre;
     this.destinos = new Set(destinos);
   }
-  puedeTransicionarA(estadoDestino) { return this.destinos.has(estadoDestino); }
+  // Verifica si el EstadoPedido tiene en sus posibles destinos al estadoDestino
+  puedeTransicionarA(estadoDestino) { return this.destinos.has(estadoDestino); } 
 }
 
 EstadoPedido.PENDIENTE     = new EstadoPedido("PENDIENTE");

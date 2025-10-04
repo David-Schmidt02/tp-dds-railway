@@ -76,10 +76,10 @@ export class PedidoController {
             console.log('Nuevo pedido creado:', nuevoPedido);
             res.status(201).json(pedidoToDTO(nuevoPedido));
         }catch(error){
-            if(error instanceof PedidoInvalida) {
+            if(error instanceof ProductoInexistente) {
              return res.status(422 ).json({ error: 'Error al crear el pedido.' });
             }
-            if(error instanceof StockInvalido)  
+            if(error instanceof ProductoStockInsuficiente)  
              return res.status(409).json({ error: 'No hay stock suficiente.' });   
         }
     }
@@ -94,19 +94,35 @@ export class PedidoController {
     }
     
     async cancelarPedido(req, res) {
-    const { id } = req.params;
-    const { motivo } = req.body;
-  const usuario = req.user; // Si usas autenticación, o lo obtienes del body
+        const { id } = req.params;
+        const { motivo } = req.body;
+        const usuario = req.user; // Si usas autenticación, o lo obtienes del body
+        try{
+            const pedidoCancelado = await this.pedidoService.cancelarPedido(id, motivo, usuario);
+            res.status(200).json((pedidoCancelado));
+        }catch(error){
+            if(error instanceof PedidoInexistente) {
+             return res.status(422).json({ error: 'Error al cancelar el pedido.' });
+            }
+        }
+    }
+
+async cambiarCantidadItem(req, res) {
+    const { idPedido } = req.params;
+    const { idItem } = req.params.idItem;
+    const { nuevaCantidad } = req.body.cantidad;
     try {
-        const pedidoCancelado = await this.pedidoService.cancelarPedido(id, motivo, usuario);
-        if (!pedidoCancelado) {
+        const pedidoActualizado = await this.pedidoService.cambiarCantidadItem(idPedido, idItem, nuevaCantidad);
+        if (!pedidoActualizado) {
             return res.status(404).json({ error: 'Pedido no encontrado.' });
         }
-        res.status(200).json(pedidoToDTO(pedidoCancelado));
+        res.status(200).json(pedidoToDTO(pedidoActualizado));
     } catch (error) {
-        return res.status(500).json({ error: 'Error al cancelar el pedido.' });
+            if(error instanceof ProductoStockInsuficiente) {
+                return res.status(409).json({ error: 'Error al cambiar la cantidad del item.' });
+            }
     }
-}
+    }
 }
 
 export default PedidoController;

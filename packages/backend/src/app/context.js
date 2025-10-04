@@ -12,7 +12,7 @@ import { PedidoService } from "../services/pedidoService.js";
 
 // Controllers
 import { PedidoController } from "../controllers/pedidoController.js";
-// import { ProductoController } from "../controllers/productoController.js";
+import { ProductoController } from "../controllers/productoController.js";
 // import { UsuarioController } from "../controllers/usuarioController.js";
 // import { NotificacionController } from "../controllers/notificacionController.js";
 
@@ -22,14 +22,16 @@ const DB_NAME = "pedidosDelSol"
 export const buildAppContext = (DB_CLIENT) => {
     const db = DB_CLIENT.db(DB_NAME)
     const pedidoRepository = new PedidoRepository();
-    const productoRepository = ProductoRepository;
+    const productoRepository = new ProductoRepository(); // Crear instancia, no usar la clase directamente
     const pedidoService = new PedidoService(pedidoRepository, productoRepository);
     const pedidoController = new PedidoController(pedidoService);
+    const productoController = new ProductoController(); // Agregar el controlador que falta
 
   return {
     pedidoRepository,
     productoRepository,
     pedidoService,
-    pedidoController
+    pedidoController,
+    productoController // Agregar al contexto
   };
 };

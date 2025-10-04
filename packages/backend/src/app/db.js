@@ -12,7 +12,7 @@ export const connectToDB = async (dbUri) => {
 
   await client.connect();
 
-  await client.db("").command({ping: 1});
+  await client.db("admin").command({ping: 1});
 
   console.log("Pinged your deployment. You successfully connected to MongoDB!");
 

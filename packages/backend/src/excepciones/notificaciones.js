@@ -22,4 +22,10 @@ export class ProductoStockInsuficiente extends Error {
   }
 }
 
+export class PedidoInexistente extends Error {
+  constructor(id){
+    super(`El Pedido con id: ${id}, no existe`)
+  }
+}
+
 // Esto no es necesario ahora pero si cuando se exponga la api
