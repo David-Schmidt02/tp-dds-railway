@@ -21,8 +21,8 @@ const DB_NAME = "pedidosDelSol"
 
 export const buildAppContext = (DB_CLIENT) => {
     const db = DB_CLIENT.db(DB_NAME)
-    const pedidoRepository = new PedidoRepository();
-    const productoRepository = new ProductoRepository(); // Crear instancia, no usar la clase directamente
+    const pedidoRepository = new PedidoRepository(db);
+    const productoRepository = new ProductoRepository(db);
     const pedidoService = new PedidoService(pedidoRepository, productoRepository);
     const pedidoController = new PedidoController(pedidoService);
     const productoController = new ProductoController(); // Agregar el controlador que falta

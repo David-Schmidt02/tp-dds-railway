@@ -1,20 +1,19 @@
-import {MongoClient, ServerApiVersion} from "mongodb";
+import mongoose from 'mongoose';
 
 export const connectToDB = async (dbUri) => {
-  const client = new MongoClient(dbUri, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      }
+  const options = {
+    serverApi: {
+      version: '1',
+      strict: true,
+      deprecationErrors: true,
     }
-  );
+  };
 
-  await client.connect();
+  await mongoose.connect(dbUri, options);
 
-  await client.db("admin").command({ping: 1});
+  await mongoose.connection.db.admin().ping();
 
   console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-  return client
-}
+  return mongoose.connection;
+};

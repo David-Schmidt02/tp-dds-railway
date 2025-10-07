@@ -1,79 +1,101 @@
+import { Collection } from "mongodb";
 import {ProductoInexistente} from "../excepciones/notificaciones.js";
 import {ProductoStockInsuficiente} from "../excepciones/notificaciones.js";
+import { id } from "zod/locales";
 
 export class ProductoRepository {
-  constructor() {
-    this.productos = [
-      {
-        id: 1,
-        vendedor: {
-          nombre: "Vendedor 1",
-          email: "vendedor@mail.com",
-          telefono: "87654321",
-          tipoUsuario: "VENDEDOR"
-        },
-        titulo: "Producto 1",
-        descripcion: "Descripción del producto",
-        categorias: ["cat1"],
-        precio: 100,
-        moneda: "PESO_ARG",
-        stock: 10,
-        activo: true
-      }
-    ];
+  constructor(db) {
+    this.productos = db.collection("productos");
   }
 
-  agregarProducto(producto){
-    producto.id = this.obtenerSiguienteId();
-    this.productos.push(producto);
-    return producto;
+  aProductoDB(producto) {
+    const productoDB = {
+      ...producto,
+      vendedor: producto.vendedor.nombre, // Solo el identificador
+      categorias: producto.categorias.map(cat => cat.nombre), // Solo nombres de categorías
+      moneda: producto.moneda.nombre // Solo nombre de moneda
+    };
+    delete productoDB.id; // MongoDB usa _id
+    return productoDB;
   }
 
-  listar(){
-    return this.productos;
+  // Y el inverso para leer de DB
+  deProductoDB(productoDB) {
+    return new Producto(
+      productoDB.vendedor,
+      productoDB.titulo,
+      productoDB.descripcion,
+      productoDB.categorias, // Aquí tendrías que reconstruir objetos Categoria si es necesario
+      productoDB.precio,
+      productoDB.moneda,
+      productoDB.stock,
+      productoDB.fotos,
+      productoDB.activo
+    );
   }
 
-  obtenerProductoPorId(id){
-    const producto = this.productos.find(p => p.id === id);
-    if(!producto){
+  async agregarProducto(producto) {
+    const productoDB = this.aProductoDB(producto);
+    const result = await this.productos.insertOne(productoDB);
+    return {
+      ...producto,
+      id: result.insertedId.toString()
+    };
+  }
+
+  async listar() {
+    const cursor = await this.productos.find();
+    const productos = [];
+    for await (const doc of cursor) {
+      productos.push(this.deProductoDB(doc));
+    }
+    return productos;
+  }
+
+  async obtenerProductoPorId(id) {
+    const producto = await this.productos.findOne({ _id: new ObjectId(id) });
+    if (!producto) {
       throw new ProductoInexistente(id);
     }
-    return producto;
+    return this.deProductoDB(producto);
   }
 
-  guardarProducto(productoActualizado){
-    // Necesitarás importar remove de lodash o implementar la función
-    this.productos = this.productos.filter(p => p.id !== productoActualizado.id);
-    this.productos.push(productoActualizado);
+  async guardarProducto(productoActualizado) {
+    await this.productos.updateOne(
+      { _id: new ObjectId(productoActualizado.id) },
+      {
+        $set: this.aProductoDB(productoActualizado),
+      }
+    );
     return productoActualizado;
   }
 
-  borrar(producto){
-    this.productos = this.productos.filter(p => p.nombre !== producto.nombre);
+  async borrar(producto) {
+    const result = await this.productos.deleteOne({ _id: new ObjectId(producto.id) });
+    return result.deletedCount > 0;
   }
 
-  obtenerSiguienteId() {
-    return (this.productos[this.productos.length - 1]?.id || 0) + 1;
-  }
-
-  reservarStock(idProducto, cantidad) {
+  reservarStock(idProducto, cantidad) { // No es async porque no hacemos operaciones de DB aquí(Lo hace guardarProducto)
     const producto = this.obtenerProductoPorId(idProducto);
+
     if (!producto.estaDisponible(cantidad)) {
-      throw new Error(new ProductoStockInsuficiente(idProducto));
-    } else {
-      producto.reducirStock(cantidad);
+      throw new ProductoStockInsuficiente(idProducto);
     }
+
+    // Actualizar el stock en el objeto producto y guardar usando guardarProducto
+    producto.reducirStock(cantidad);
+    this.guardarProducto(producto);
     return cantidad;
   }
 
-  cancelarStock(idProducto, cantidad) {
-    const producto = this.obtenerProductoPorId(idProducto); {
-    if (typeof producto.incrementarStock === 'function') {
-      producto.incrementarStock(cantidad);
-    } else {
-      producto.stock += cantidad;
-    }
+  async cancelarStock(idProducto, cantidad) {
+    const producto = await this.obtenerProductoPorId(idProducto);
+
+    await this.productos.updateOne(
+      { _id: new ObjectId(idProducto) }, // Busca por ID
+      { $inc: { stock: cantidad } }      // Suma cantidad al stock actual
+    );
+
     return cantidad;
-    }
   }
 }
