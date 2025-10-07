@@ -1,71 +1,12 @@
 import mongoose from 'mongoose';
-
-const itemPedidoSchema = new mongoose.Schema({
-  productoId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Producto',
-    required: true
-  },
-  cantidad: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  precioUnitario: {
-    valor: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    moneda: {
-      type: String,
-      required: true,
-      enum: ['ARS', 'USD', 'EUR'],
-      default: 'ARS'
-    }
-  },
-  subtotal: {
-    valor: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    moneda: {
-      type: String,
-      required: true,
-      enum: ['ARS', 'USD', 'EUR'],
-      default: 'ARS'
-    }
-  }
-}, { _id: false });
-
-const cambioEstadoSchema = new mongoose.Schema({
-  estadoAnterior: {
-    type: String,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
-  },
-  estadoNuevo: {
-    type: String,
-    required: true,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
-  },
-  fecha: {
-    type: Date,
-    default: Date.now
-  },
-  motivo: {
-    type: String,
-    trim: true
-  }
-}, { _id: false });
-
+    itemsPedido;
+    moneda;
+    direccionEntrega;
+    estado;
+    fechaCreacion;
+    historialEstados;
 const pedidoSchema = new mongoose.Schema({
-  numero: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  usuarioId: {
+  compradorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true
@@ -82,7 +23,6 @@ const pedidoSchema = new mongoose.Schema({
   estado: {
     type: String,
     required: true,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO'],
     default: 'PENDIENTE'
   },
   historialEstados: [cambioEstadoSchema],
@@ -114,6 +54,53 @@ const pedidoSchema = new mongoose.Schema({
   timestamps: true,
   collection: 'pedidos'
 });
+
+
+const itemPedidoSchema = new mongoose.Schema({
+  productoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Producto',
+    required: true
+  },
+  cantidad: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  precioUnitario: {
+    valor: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    moneda: {
+      type: String,
+      required: true,
+      enum: ['ARS', 'USD', 'EUR'],
+      default: 'ARS'
+    }
+  },
+}, { _id: false });
+
+const cambioEstadoSchema = new mongoose.Schema({
+  estadoAnterior: {
+    type: String,
+    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+  },
+  estadoNuevo: {
+    type: String,
+    required: true,
+    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+  },
+  fecha: {
+    type: Date,
+    default: Date.now
+  },
+  motivo: {
+    type: String,
+    trim: true
+  }
+}, { _id: false });
 
 // Middleware para generar número de pedido automáticamente
 pedidoSchema.pre('save', async function(next) {

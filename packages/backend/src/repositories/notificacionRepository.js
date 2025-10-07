@@ -11,6 +11,7 @@ export class NotificacionRepository {
         const nuevaNotificacion = new this.model(notificacion);
         const resultado = await nuevaNotificacion.save();
         return {
+            
             ...resultado.toObject(),
             id: resultado._id.toString()
         };

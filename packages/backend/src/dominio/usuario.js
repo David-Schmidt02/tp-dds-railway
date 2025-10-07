@@ -22,7 +22,6 @@ export class TipoUsuario {
     constructor(nombre){ this.nombre = nombre }
 }
 
-
 TipoUsuario.COMPRADOR = new TipoUsuario("COMPRADOR")
 TipoUsuario.VENDEDOR = new TipoUsuario("VENDEDOR")
 TipoUsuario.ADMIN = new TipoUsuario("ADMIN")

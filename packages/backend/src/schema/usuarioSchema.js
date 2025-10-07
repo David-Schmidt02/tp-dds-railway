@@ -18,25 +18,17 @@ const usuarioSchema = new mongoose.Schema({
     required: false,
     trim: true
   },
-  direcciones: [{
-    calle: { type: String, required: true },
-    numero: { type: String, required: true },
-    ciudad: { type: String, required: true },
-    codigoPostal: { type: String, required: true },
-    provincia: { type: String, required: true },
-    esPrincipal: { type: Boolean, default: false }
-  }],
+  tipo: {
+    type: String,
+    required: true
+  },
   fechaRegistro: {
     type: Date,
     default: Date.now
-  },
-  activo: {
-    type: Boolean,
-    default: true
   }
 }, {
   timestamps: true,
   collection: 'usuarios'
 });
-
-export const Usuario = mongoose.model('Usuario', usuarioSchema);
+Usuario.loadClassc(class Usuario{}); 
+export const UsuarioModel = mongoose.model('Usuario', usuarioSchema);

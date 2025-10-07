@@ -1,18 +1,33 @@
 import mongoose from 'mongoose';
 
 const productoSchema = new mongoose.Schema({
-  nombre: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  descripcion: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  precio: {
-    valor: {
+    vendedor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Usuario',
+      required: true
+    },
+    titulo: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    descripcion: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    // Lista de categorías (array de strings)
+    categorias: {
+      type: [String],
+      required: true,
+      validate: {
+        validator: function(v) {
+          return v && v.length > 0;
+        },
+        message: 'Debe tener al menos una categoría'
+      }
+    },
+    precio: {
       type: Number,
       required: true,
       min: 0
@@ -20,41 +35,25 @@ const productoSchema = new mongoose.Schema({
     moneda: {
       type: String,
       required: true,
-      enum: ['ARS', 'USD', 'EUR'],
       default: 'ARS'
-    }
-  },
-  categoria: {
-    type: String,
-    required: true,
-    enum: ['ELECTRONICA', 'ROPA', 'HOGAR', 'DEPORTES', 'LIBROS', 'OTROS']
-  },
-  stock: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0
-  },
-  imagenes: [{
-    url: String,
-    alt: String
-  }],
-  disponible: {
-    type: Boolean,
-    default: true
-  },
-  fechaCreacion: {
-    type: Date,
-    default: Date.now
-  }
-}, {
+    },
+    stock: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    fotos: [{
+      url: String,
+      required: true
+    }], 
+    activo:{
+      type: Boolean,
+      required: true
+    },
+},{
   timestamps: true,
   collection: 'productos'
 });
 
-// Índices para mejorar las consultas
-productoSchema.index({ nombre: 'text', descripcion: 'text' });
-productoSchema.index({ categoria: 1 });
-productoSchema.index({ 'precio.valor': 1 });
-
-export const Producto = mongoose.model('Producto', productoSchema);
+productoSchema.loadClassc(class Producto{}); // le avisa a mongoose que use la clase producto que le corresponde a este schema
+export const ProductoModel = mongoose.model('Producto', productoSchema); // Exporta el modelo de Mongoose

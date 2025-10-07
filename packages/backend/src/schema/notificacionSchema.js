@@ -1,25 +1,10 @@
 import mongoose from 'mongoose';
 
 const notificacionSchema = new mongoose.Schema({
-  usuarioId: {
+  receptorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true
-  },
-  pedidoId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Pedido',
-    required: false
-  },
-  tipo: {
-    type: String,
-    required: true,
-    enum: ['PEDIDO_CONFIRMADO', 'CAMBIO_ESTADO', 'PEDIDO_ENTREGADO', 'PEDIDO_CANCELADO', 'PROMOCION', 'SISTEMA']
-  },
-  titulo: {
-    type: String,
-    required: true,
-    trim: true
   },
   mensaje: {
     type: String,
@@ -36,19 +21,15 @@ const notificacionSchema = new mongoose.Schema({
   },
   fechaLeida: {
     type: Date
-  },
-  metadatos: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
   }
 }, {
   timestamps: true,
   collection: 'notificaciones'
 });
 
-notificacionSchema.loadClass(class Notificacion{}); // le avisa a mongoose que use la clase Notificacion le corresponde a este schema
+notificacionSchema.loadClassc(class Notificacion{});
+export const NotificacionModel = mongoose.model('Notificacion', notificacionSchema);
 
-// Middleware para actualizar fechaLeida cuando se marca como leída
 notificacionSchema.pre('save', function(next) {
   if (this.isModified('leida') && this.leida && !this.fechaLeida) {
     this.fechaLeida = new Date();
@@ -56,9 +37,4 @@ notificacionSchema.pre('save', function(next) {
   next();
 });
 
-// Índices para mejorar las consultas
-notificacionSchema.index({ usuarioId: 1, leida: 1 });
-notificacionSchema.index({ fechaCreacion: -1 });
-notificacionSchema.index({ tipo: 1 });
 
-export const NotificacionModel = mongoose.model('Notificacion', notificacionSchema); // Exporta el modelo de Mongoose
