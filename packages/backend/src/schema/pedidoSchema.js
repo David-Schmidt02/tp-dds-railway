@@ -1,10 +1,46 @@
 import mongoose from 'mongoose';
-    itemsPedido;
-    moneda;
-    direccionEntrega;
-    estado;
-    fechaCreacion;
-    historialEstados;
+
+// Schema para cambio de estado
+const cambioEstadoSchema = new mongoose.Schema({
+  estadoAnterior: {
+    type: String,
+    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+  },
+  estadoNuevo: {
+    type: String,
+    required: true,
+    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+  },
+  fecha: {
+    type: Date,
+    default: Date.now
+  },
+  motivo: {
+    type: String,
+    trim: true
+  }
+}, { _id: false });
+
+// Schema para items del pedido
+const itemPedidoSchema = new mongoose.Schema({
+  productoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Producto',
+    required: true
+  },
+  cantidad: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  precioUnitario: {
+    type: Number,
+    required: true,
+    min: 0
+  }
+}, { _id: false });
+
+// Schema principal del pedido
 const pedidoSchema = new mongoose.Schema({
   compradorId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -27,17 +63,9 @@ const pedidoSchema = new mongoose.Schema({
   },
   historialEstados: [cambioEstadoSchema],
   total: {
-    valor: {
       type: Number,
       required: true,
       min: 0
-    },
-    moneda: {
-      type: String,
-      required: true,
-      enum: ['ARS', 'USD', 'EUR'],
-      default: 'ARS'
-    }
   },
   fechaPedido: {
     type: Date,
@@ -55,53 +83,6 @@ const pedidoSchema = new mongoose.Schema({
   collection: 'pedidos'
 });
 
-
-const itemPedidoSchema = new mongoose.Schema({
-  productoId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Producto',
-    required: true
-  },
-  cantidad: {
-    type: Number,
-    required: true,
-    min: 1
-  },
-  precioUnitario: {
-    valor: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    moneda: {
-      type: String,
-      required: true,
-      enum: ['ARS', 'USD', 'EUR'],
-      default: 'ARS'
-    }
-  },
-}, { _id: false });
-
-const cambioEstadoSchema = new mongoose.Schema({
-  estadoAnterior: {
-    type: String,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
-  },
-  estadoNuevo: {
-    type: String,
-    required: true,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
-  },
-  fecha: {
-    type: Date,
-    default: Date.now
-  },
-  motivo: {
-    type: String,
-    trim: true
-  }
-}, { _id: false });
-
 // Middleware para generar número de pedido automáticamente
 pedidoSchema.pre('save', async function(next) {
   if (this.isNew && !this.numero) {
@@ -112,10 +93,13 @@ pedidoSchema.pre('save', async function(next) {
 });
 
 // Índices para mejorar las consultas
-pedidoSchema.index({ usuarioId: 1 });
+pedidoSchema.index({ compradorId: 1 });
 pedidoSchema.index({ estado: 1 });
 pedidoSchema.index({ fechaPedido: -1 });
 pedidoSchema.index({ numero: 1 });
 
-pedidoSchema.loadClass(class Pedido{})
+// Crear el modelo
 export const PedidoModel = mongoose.model('Pedido', pedidoSchema);
+
+// Exportar también como Pedido para compatibilidad
+export const Pedido = PedidoModel;

@@ -6,65 +6,96 @@ import { Pedido } from '../dominio/pedido.js';
 import { ItemPedido } from '../dominio/itemPedido.js';
 import { Producto } from '../dominio/producto.js';
 import { PedidoRepository } from '../repositories/pedidoRepository.js';
+import { ProductoInexistente, ProductoStockInsuficiente, PedidoInexistente } from '../excepciones/notificaciones.js';
 
 export class PedidoService {
-    constructor(pedidoRepository, productoRepository) {
+    constructor(pedidoRepository, productoRepository, db) {
         this.pedidoRepository = pedidoRepository;
-        this.productoRepository = productoRepository
+        this.productoRepository = productoRepository;
+        this.db = db; // Para manejo de transacciones
     }
 
+    /**
+     * Crea un pedido con manejo de transacciones para garantizar consistencia
+     * Implementa control de concurrencia para evitar overselling
+     */
     async crearPedido(pedidoJSON) {
-      const { comprador, items, moneda, direccionEntrega } = pedidoJSON;
-      console.log('Comprador:', comprador);
-      console.log('Items:', items);
-      console.log('Moneda:', moneda);
-      console.log('Direccion de Entrega:', direccionEntrega);
+        const { comprador, items, moneda, direccionEntrega } = pedidoJSON;
+        const session = this.db.startSession();
         
-       const itemsPedidos = await Promise.all(items.map(async it =>
-       new ItemPedido(
-       await this.productoRepository.obtenerProductoPorId(it.producto.id),
-       await this.productoRepository.reservarStock(it.producto.id),
-
-        // alternativa: usar el atributo "Stock" del producto para validar la cantidad. 
-        // Desventaja: Es complicada despues saber el stock real porque quedaria cada item con su propio stock
-
-        await this.productoRepository.obtenerPrecioUnitario(it.producto.id)
-      )
-    ));
-        const pedidoNuevo = new Pedido(comprador, items, moneda, direccionEntrega);
-        const pedidoGuardado = this.pedidoRepository.crearPedido(pedidoNuevo);
+        let pedidoGuardado;
+        
+        await session.withTransaction(async () => {
+            const itemsPedidos = [];
+            
+            // Reservar stock de todos los productos
+            for (const itemData of items) {
+                const { producto: productInfo, cantidad } = itemData;
+                
+                const producto = await this.productoRepository.obtenerProductoPorId(productInfo.id);
+                await this.productoRepository.reservarStock(productInfo.id, cantidad);
+                const precioUnitario = await this.productoRepository.obtenerPrecioUnitario(productInfo.id);
+                
+                const itemPedido = new ItemPedido(producto, cantidad, precioUnitario);
+                itemsPedidos.push(itemPedido);
+            }
+            
+            const pedidoNuevo = new Pedido(comprador, itemsPedidos, moneda, direccionEntrega);
+            pedidoGuardado = await this.pedidoRepository.crearPedido(pedidoNuevo);
+        });
+        
+        await session.endSession();
         return pedidoGuardado;
     }
 
+    /**
+     * Cancela un pedido y devuelve el stock reservado
+     */
     async cancelarPedido(id, motivo, usuario) {
-      const pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
-      const pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido.id, 'CANCELADO');
-      pedido.items.forEach(async (item) => {
-        await this.productoRepository.cancelarStock(item.producto.id, item.cantidad);
-      });
-      return pedidoActualizado;
+        const session = this.db.startSession();
+        let pedidoActualizado;
+        
+        await session.withTransaction(async () => {
+            const pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
+            
+            pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido.id, 'CANCELADO');
+            
+            for (const item of pedido.itemsPedido) {
+                await this.productoRepository.cancelarStock(item.producto.id, item.cantidad);
+            }
+        });
+        
+        await session.endSession();
+        return pedidoActualizado;
     }
 
+    /**
+     * Cambia la cantidad de un item del pedido con validación de stock
+     */
     async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
-      const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
-      if (!pedido) {
-          throw new Error('Pedido no encontrado'); // tiene que haber una excepcion
-      }
-      cantidadPrevia = pedido.obtenerCantidadItem(idItem)
-      diferencia = nuevaCantidad - cantidadPrevia
-      // Una diferencia negativa reservar Stock no debe tener problemas nunca, se piden menos items
-      // Una diferencia positiva implica mayores items
-      
-      // Que el repository tenga stock y que el pedido este antes del estado 'ENVIADO' 2 verificaciones.
-      if (pedido.puedeModificarItems() && this.productoRepository.tieneStock(idItem, diferencia)) {
-          if(diferencia > 0)
-               await this.productoRepository.reservarStock(idItem, diferencia);
-          else
-               await this.productoRepository.cancelarStock(idItem, -diferencia);
-          
-          pedido.modificarCantidadItem(idItem, nuevaCantidad);
-          return pedido;
-      }
-      throw new Error('No se puede modificar la cantidad del item');
+        const session = this.db.startSession();
+        let pedidoActualizado;
+        
+        await session.withTransaction(async () => {
+            const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
+            const cantidadPrevia = pedido.obtenerCantidadItem(idItem);
+            const diferencia = nuevaCantidad - cantidadPrevia;
+            
+            if (diferencia > 0) {
+                await this.productoRepository.reservarStock(idItem, diferencia);
+            } else if (diferencia < 0) {
+                await this.productoRepository.cancelarStock(idItem, -diferencia);
+            }
+            
+            pedido.modificarCantidadItem(idItem, nuevaCantidad);
+            pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido.id, pedido);
+        });
+        
+        await session.endSession();
+        return pedidoActualizado;
+    }
+
+    obtenerPedidos() {
+        return this.pedidoRepository.obtenerTodos();
     }
 }

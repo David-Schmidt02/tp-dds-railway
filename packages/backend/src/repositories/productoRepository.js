@@ -1,7 +1,7 @@
-import { Collection } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import {ProductoInexistente} from "../excepciones/notificaciones.js";
 import {ProductoStockInsuficiente} from "../excepciones/notificaciones.js";
-import { id } from "zod/locales";
+import { Producto } from "../dominio/producto.js";
 
 export class ProductoRepository {
   constructor(db) {
@@ -75,27 +75,70 @@ export class ProductoRepository {
     return result.deletedCount > 0;
   }
 
-  reservarStock(idProducto, cantidad) { // No es async porque no hacemos operaciones de DB aquí(Lo hace guardarProducto)
-    const producto = this.obtenerProductoPorId(idProducto);
+  /**
+   * Reserva stock de manera atómica para evitar condiciones de carrera
+   * Utiliza findOneAndUpdate con filtro de stock suficiente
+   */
+  async reservarStock(idProducto, cantidad) {
+    const result = await this.productos.findOneAndUpdate(
+      { 
+        _id: new ObjectId(idProducto),
+        stock: { $gte: cantidad }, // cosa de mongo: Pregunta si stock >= cantidad
+        activo: true
+      },
+      { $inc: { stock: -cantidad } }, // Reduce el stock atómicamente
+      { 
+        returnDocument: 'after', // Retorna el documento actualizado
+        upsert: false  // No crear si no existe
+      }
+    );
 
-    if (!producto.estaDisponible(cantidad)) {
+    if (!result) {
+      // Verificamos si el producto existe pero no tiene stock suficiente
+      const producto = await this.productos.findOne({ _id: new ObjectId(idProducto) });
+      if (!producto) {
+        throw new ProductoInexistente(idProducto);
+      }
       throw new ProductoStockInsuficiente(idProducto);
     }
 
-    // Actualizar el stock en el objeto producto y guardar usando guardarProducto
-    producto.reducirStock(cantidad);
-    this.guardarProducto(producto);
     return cantidad;
   }
 
+  /**
+   * Devuelve stock al producto (para cancelaciones)
+   */
   async cancelarStock(idProducto, cantidad) {
-    const producto = await this.obtenerProductoPorId(idProducto);
-
-    await this.productos.updateOne(
-      { _id: new ObjectId(idProducto) }, // Busca por ID
-      { $inc: { stock: cantidad } }      // Suma cantidad al stock actual
+    const result = await this.productos.findOneAndUpdate(
+      { _id: new ObjectId(idProducto) },
+      { $inc: { stock: cantidad } },
+      { returnDocument: 'after' }
     );
 
+    if (!result) {
+      throw new ProductoInexistente(idProducto);
+    }
+
     return cantidad;
+  }
+
+  /**
+   * Verifica si hay stock disponible sin reservarlo
+   */
+  async tieneStock(idProducto, cantidad) {
+    const producto = await this.productos.findOne({
+      _id: new ObjectId(idProducto),
+      stock: { $gte: cantidad },
+      activo: true
+    });
+    return producto !== null;
+  }
+
+  /**
+   * Obtiene el precio unitario actual del producto
+   */
+  async obtenerPrecioUnitario(idProducto) {
+    const producto = await this.obtenerProductoPorId(idProducto);
+    return producto.precio;
   }
 }

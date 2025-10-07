@@ -16,11 +16,10 @@ export class Pedido {
     fechaCreacion;
     historialEstados;
 
-    constructor(id, comprador, items, moneda, direccionEntrega) {
+    constructor(comprador, items, moneda, direccionEntrega, id = null) {
         this.id = id;
         this.comprador = comprador;
         this.itemsPedido = items;
-        this.total = 0;
         this.moneda = moneda; 
         this.direccionEntrega = direccionEntrega; 
         this.estado = EstadoPedido.PENDIENTE;
