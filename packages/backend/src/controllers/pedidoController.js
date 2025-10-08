@@ -1,60 +1,44 @@
 import { Pedido } from '../dominio/pedido.js';
-import { pedidoSchema } from '../dominio/validaciones.js';
+import { pedidoRequestSchema } from '../dominio/validaciones.js'; // Cambiar import
 import { Usuario } from '../dominio/usuario.js';
 import { ItemPedido } from '../dominio/itemPedido.js';
 import { Moneda } from '../dominio/moneda.js';
 import { DireccionEntrega } from '../dominio/direccionEntrega.js';
-import { ProductoInexistente, ProductoStockInsuficiente, PedidoInexistente } from '../excepciones/notificaciones.js';
+import { PedidoInexistente } from '../excepciones/pedido.js';
+import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/producto.js';
 
 export const pedidos = []
 
 
 function pedidoToDTO(pedido) {
+    console.log('Pedido recibido en DTO:', JSON.stringify(pedido, null, 2)); // Debug temporal
+    
     return {
-        id: pedido.id,
+        id: pedido._id || pedido.id,
         comprador: {
-            id: pedido.comprador.id,
-            nombre: pedido.comprador.nombre,
-            email: pedido.comprador.email,
-
+            id: pedido.comprador?.id || pedido.usuarioId,
+            nombre: pedido.comprador?.nombre || 'N/A',
+            email: pedido.comprador?.email || 'N/A'
         },
-        items: pedido.itemsPedido.map(item => ({
+        items: pedido.items?.map(item => ({
             producto: {
-                id: item.producto.id,
-                titulo: item.producto.titulo,
-                descripcion: item.producto.descripcion,
-                precio: item.producto.precio,
-                categoria: item.producto.categoria,
-
+                id: item.producto?.id || item.productoId,
+                titulo: item.producto?.titulo || 'N/A',
+                descripcion: item.producto?.descripcion || 'N/A',
+                precio: item.producto?.precio || item.precioUnitario,
+                categoria: item.producto?.categoria || 'N/A'
             },
             cantidad: item.cantidad,
-            precioUnitario: item.precioUnitario,
-            subtotal: item.subtotal
-        })),
-        total: pedido.total,
-        moneda: {
-            codigo: pedido.moneda.codigo,
-            simbolo: pedido.moneda.simbolo,
-            nombre: pedido.moneda.nombre
-        },
-        direccionEntrega: {
-            calle: pedido.direccionEntrega.calle,
-            numero: pedido.direccionEntrega.numero,
-            ciudad: pedido.direccionEntrega.ciudad,
-            provincia: pedido.direccionEntrega.provincia,
-            pais: pedido.direccionEntrega.pais,
-            codigoPostal: pedido.direccionEntrega.codigoPostal
-
-        },
-        estado: {
-            nombre: pedido.estado.nombre,
-            fecha: pedido.estado.fecha
-
-        },
-        fechaCreacion: pedido.fechaCreacion,
-        fechaActualizacion: pedido.fechaActualizacion,
-        observaciones: pedido.observaciones
-
+            precioUnitario: item.precioUnitario || item.producto?.precio,
+            subtotal: item.subtotal || (item.cantidad * (item.precioUnitario || item.producto?.precio))
+        })) || [],
+        total: pedido.total || 0,
+        moneda: pedido.moneda || 'PESO_ARG',
+        direccionEntrega: pedido.direccionEntrega || {},
+        estado: pedido.estado || { nombre: 'PENDIENTE', fecha: new Date() },
+        fechaCreacion: pedido.createdAt || pedido.fechaCreacion || new Date(),
+        fechaActualizacion: pedido.updatedAt || pedido.fechaActualizacion || new Date(),
+        observaciones: pedido.comentarios || pedido.observaciones || ''
     };
 }
 
@@ -68,9 +52,11 @@ export class PedidoController {
     async crearPedido(req, res) {
         const body = req.body;
         
-        // Validar estructura del request
-        const resultBody = pedidoSchema.safeParse(body);
+        const resultBody = pedidoRequestSchema.safeParse(body);
+        console.log('Body recibido:', JSON.stringify(body, null, 2));
+        
         if(resultBody.error){
+            console.log('Errores de validación:', resultBody.error.errors);
             return res.status(400).json({ 
                 error: 'Datos de entrada inválidos', 
                 details: resultBody.error.errors 
@@ -78,12 +64,24 @@ export class PedidoController {
         }
         
         try {
-            const nuevoPedido = await this.pedidoService.crearPedido(body);
-            console.log('Nuevo pedido creado:', nuevoPedido.id);
-            res.status(201).json(pedidoToDTO(nuevoPedido));
+            console.log('Llamando al service con:', JSON.stringify(resultBody.data, null, 2));
+            
+            const nuevoPedido = await this.pedidoService.crearPedido(resultBody.data);
+            
+            console.log('Respuesta del service:', nuevoPedido);
+            console.log('Tipo de respuesta:', typeof nuevoPedido);
+            console.log('¿Es null/undefined?:', nuevoPedido == null);
+            
+            if (!nuevoPedido) {
+                throw new Error('El servicio no devolvió un pedido válido');
+            }
+            
+            const pedidoDTO = pedidoToDTO(nuevoPedido);
+            res.status(201).json(pedidoDTO);
             
         } catch(error) {
             console.error('Error al crear pedido:', error.message);
+            console.error('Stack trace:', error.stack);
             
             if(error instanceof ProductoInexistente) {
                 return res.status(422).json({ 
@@ -99,7 +97,6 @@ export class PedidoController {
                 });
             }
             
-            // Error genérico del servidor
             return res.status(500).json({ 
                 error: 'Error interno del servidor al crear el pedido',
                 message: error.message 

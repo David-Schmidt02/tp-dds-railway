@@ -3,8 +3,8 @@ import { CambioEstadoPedido } from "./cambioEstadoPedido.js"
 import { ItemPedido } from "./itemPedido.js"
 import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
-import { FactoryNotificacion } from "./notificaciones.js"
-import { NotificacionesRepository } from "../repositories/notificacionRepository.js"
+import { FactoryNotificacion } from "./notificacion.js"
+import { NotificacionRepository } from "../repositories/notificacionRepository.js"
 
 export class Pedido {
     id;

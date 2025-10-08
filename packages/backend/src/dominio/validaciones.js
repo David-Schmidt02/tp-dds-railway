@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 export const telefonoSchema = z 
@@ -35,11 +34,11 @@ export const productoSchema = z.object({
     moneda: monedaSchema,
     stock: z.number().nonnegative(),
     //fotos:
-    activo: z.boolean()
+    activo: z.boolean().optional()
 })
 
 export const itemPedidoSchema = z.object({
-    producto: productoSchema,
+    producto: z.string(),
     cantidad: z.number().min(1, {message: "Debe haber al menos 1"}),
     precioUnitario: z.number().nonnegative()
 })
@@ -49,4 +48,21 @@ export const pedidoSchema = z.object({
     items: z.array(itemPedidoSchema).min(1, {message: "El pedido debe tener al menos 1 item"}),
     moneda : monedaSchema,
     direccionEntrega : direccionEntregaSchema
+})
+
+export const pedidoRequestSchema = z.object({
+    usuarioId: z.string(),
+    items: z.array(z.object({
+        productoId: z.string(),
+        cantidad: z.number().min(1)
+    })).min(1),
+    metodoPago: monedaSchema,
+    direccionEntrega: z.object({
+        calle: z.string(),
+        numero: z.string(),
+        ciudad: z.string(),
+        codigoPostal: z.string(),
+        provincia: z.string().optional()
+    }),
+    comentarios: z.string().optional()
 })

@@ -16,7 +16,6 @@ const productoSchema = new mongoose.Schema({
       required: true,
       trim: true
     },
-    // Lista de categorías (array de strings)
     categorias: {
       type: [String],
       required: true,
@@ -43,17 +42,20 @@ const productoSchema = new mongoose.Schema({
       min: 0
     },
     fotos: [{
-      url: String,
-      required: true
+      url: {
+        type: String,
+        required: true
+      }
     }], 
     activo:{
       type: Boolean,
       required: true
     },
 },{
+
   timestamps: true,
   collection: 'productos'
 });
 
-productoSchema.loadClassc(class Producto{}); // le avisa a mongoose que use la clase producto que le corresponde a este schema
-export const ProductoModel = mongoose.model('Producto', productoSchema); // Exporta el modelo de Mongoose
+productoSchema.loadClass(class Producto{});
+export const ProductoModel = mongoose.model('Producto', productoSchema);

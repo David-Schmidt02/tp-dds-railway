@@ -1,7 +1,7 @@
 import{Pedido} from "./pedido.js"
 import{EstadoPedido} from "./estadoPedido.js"
 import{Usuario} from "./usuario.js"
-import{FactoryNotificacion} from "./notificaciones.js"
+import{FactoryNotificacion} from "./notificacion.js"
 
 
 export class CambioEstadoPedido{

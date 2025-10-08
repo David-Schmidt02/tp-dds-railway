@@ -1,68 +1,37 @@
 import mongoose from "mongoose";
-import { NotificacionInexistente } from "../excepciones/notificaciones.js";
-import { NotificacionModel } from "../schema/notificacionSchema.js";
+import { NotificacionInexistente } from "../excepciones/notificacion.js";
+import { NotificacionModel } from '../schema/notificacionSchema.js';
 
 export class NotificacionRepository {
     constructor() {
-        this.model = NotificacionModel;
+        // No necesitas db con Mongoose
     }
 
-    async agregarNotificacion(notificacion) {
-        const nuevaNotificacion = new this.model(notificacion);
-        const resultado = await nuevaNotificacion.save();
-        return {
-            
-            ...resultado.toObject(),
-            id: resultado._id.toString()
-        };
+    async crear(notificacion) {
+        return await NotificacionModel.create(notificacion);
     }
 
-    async obtenerPorId(id) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new NotificacionInexistente(id);
-        }
-        
-        const notificacion = await this.model.findById(id);
-        if (!notificacion) {
-            throw new NotificacionInexistente(id);
-        }
-        
-        return {
-            ...notificacion.toObject(),
-            id: notificacion._id.toString()
-        };
-    }
-
-    async obtenerNoLeidas() {
-        const notificaciones = await this.model.find({ leida: false });
-        return notificaciones.map(notificacion => ({
-            ...notificacion.toObject(),
-            id: notificacion._id.toString()
-        }));
+    async obtenerPorUsuario(usuarioId) {
+        return await NotificacionModel.find({ receptorId: usuarioId });
     }
 
     async marcarComoLeida(id) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new NotificacionInexistente(id);
-        }
-        
-        await this.model.findByIdAndUpdate(id, { leida: true });
+        return await NotificacionModel.findByIdAndUpdate(
+            id, 
+            { leida: true, fechaLeida: new Date() }, 
+            { new: true }
+        );
     }
 
-    async obtenerTodasLasNotificaciones() {
-        const notificaciones = await this.model.find();
-        return notificaciones.map(notificacion => ({
-            ...notificacion.toObject(),
-            id: notificacion._id.toString()
-        }));
+    async obtenerTodos() {
+        return await NotificacionModel.find();
     }
 
-    async eliminarNotificacion(id) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return false;
+    async agregarNotificacion(usuarioId, notificacion) {
+        const notificacionExistente = await NotificacionModel.findOne({ receptorId: usuarioId });
+        if (notificacionExistente) {
+            throw new NotificacionInexistente("Ya existe una notificación para este usuario");
         }
-        
-        const resultado = await this.model.findByIdAndDelete(id);
-        return resultado !== null;
+        return await NotificacionModel.create({ receptorId: usuarioId, ...notificacion });
     }
 }

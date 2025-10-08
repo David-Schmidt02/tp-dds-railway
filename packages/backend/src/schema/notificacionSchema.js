@@ -27,7 +27,7 @@ const notificacionSchema = new mongoose.Schema({
   collection: 'notificaciones'
 });
 
-notificacionSchema.loadClassc(class Notificacion{});
+notificacionSchema.loadClass(class Notificacion{});
 export const NotificacionModel = mongoose.model('Notificacion', notificacionSchema);
 
 notificacionSchema.pre('save', function(next) {

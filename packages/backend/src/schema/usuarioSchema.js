@@ -30,5 +30,5 @@ const usuarioSchema = new mongoose.Schema({
   timestamps: true,
   collection: 'usuarios'
 });
-Usuario.loadClassc(class Usuario{}); 
+usuarioSchema.loadClass(class Usuario {});
 export const UsuarioModel = mongoose.model('Usuario', usuarioSchema);

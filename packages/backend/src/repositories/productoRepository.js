@@ -1,144 +1,92 @@
-import { Collection, ObjectId } from "mongodb";
-import {ProductoInexistente} from "../excepciones/notificaciones.js";
-import {ProductoStockInsuficiente} from "../excepciones/notificaciones.js";
-import { Producto } from "../dominio/producto.js";
+import { ProductoModel } from '../schema/productoSchema.js';
+import { ProductoInexistente, ProductoStockInsuficiente } from "../excepciones/producto.js";
 
 export class ProductoRepository {
-  constructor(db) {
-    this.productos = db.collection("productos");
-  }
-
-  aProductoDB(producto) {
-    const productoDB = {
-      ...producto,
-      vendedor: producto.vendedor.nombre, // Solo el identificador
-      categorias: producto.categorias.map(cat => cat.nombre), // Solo nombres de categorías
-      moneda: producto.moneda.nombre // Solo nombre de moneda
-    };
-    delete productoDB.id; // MongoDB usa _id
-    return productoDB;
-  }
-
-  // Y el inverso para leer de DB
-  deProductoDB(productoDB) {
-    return new Producto(
-      productoDB.vendedor,
-      productoDB.titulo,
-      productoDB.descripcion,
-      productoDB.categorias, // Aquí tendrías que reconstruir objetos Categoria si es necesario
-      productoDB.precio,
-      productoDB.moneda,
-      productoDB.stock,
-      productoDB.fotos,
-      productoDB.activo
-    );
-  }
-
-  async agregarProducto(producto) {
-    const productoDB = this.aProductoDB(producto);
-    const result = await this.productos.insertOne(productoDB);
-    return {
-      ...producto,
-      id: result.insertedId.toString()
-    };
-  }
-
-  async listar() {
-    const cursor = await this.productos.find();
-    const productos = [];
-    for await (const doc of cursor) {
-      productos.push(this.deProductoDB(doc));
-    }
-    return productos;
-  }
-
-  async obtenerProductoPorId(id) {
-    const producto = await this.productos.findOne({ _id: new ObjectId(id) });
-    if (!producto) {
-      throw new ProductoInexistente(id);
-    }
-    return this.deProductoDB(producto);
-  }
-
-  async guardarProducto(productoActualizado) {
-    await this.productos.updateOne(
-      { _id: new ObjectId(productoActualizado.id) },
-      {
-        $set: this.aProductoDB(productoActualizado),
-      }
-    );
-    return productoActualizado;
-  }
-
-  async borrar(producto) {
-    const result = await this.productos.deleteOne({ _id: new ObjectId(producto.id) });
-    return result.deletedCount > 0;
-  }
-
-  /**
-   * Reserva stock de manera atómica para evitar condiciones de carrera
-   * Utiliza findOneAndUpdate con filtro de stock suficiente
-   */
-  async reservarStock(idProducto, cantidad) {
-    const result = await this.productos.findOneAndUpdate(
-      { 
-        _id: new ObjectId(idProducto),
-        stock: { $gte: cantidad }, // cosa de mongo: Pregunta si stock >= cantidad
-        activo: true
-      },
-      { $inc: { stock: -cantidad } }, // Reduce el stock atómicamente
-      { 
-        returnDocument: 'after', // Retorna el documento actualizado
-        upsert: false  // No crear si no existe
-      }
-    );
-
-    if (!result) {
-      // Verificamos si el producto existe pero no tiene stock suficiente
-      const producto = await this.productos.findOne({ _id: new ObjectId(idProducto) });
-      if (!producto) {
-        throw new ProductoInexistente(idProducto);
-      }
-      throw new ProductoStockInsuficiente(idProducto);
+    constructor() {
+        // No necesitas inicializar nada con Mongoose
     }
 
-    return cantidad;
-  }
-
-  /**
-   * Devuelve stock al producto (para cancelaciones)
-   */
-  async cancelarStock(idProducto, cantidad) {
-    const result = await this.productos.findOneAndUpdate(
-      { _id: new ObjectId(idProducto) },
-      { $inc: { stock: cantidad } },
-      { returnDocument: 'after' }
-    );
-
-    if (!result) {
-      throw new ProductoInexistente(idProducto);
+    async obtenerProductoPorId(id) {
+        console.log('=== DEBUG ProductoRepository ===');
+        console.log('ID buscado:', id);
+        console.log('Tipo de ID:', typeof id);
+        console.log('Longitud del ID:', id.length);
+        
+        try {
+            const producto = await ProductoModel.findById(id);
+            console.log('Resultado de findById:', producto);
+            console.log('¿Es null?:', producto === null);
+            
+            if (!producto) {
+                console.log('Producto no encontrado, lanzando excepción');
+                throw new ProductoInexistente(id);
+            }
+            
+            console.log('Producto encontrado exitosamente');
+            return producto;
+        } catch (error) {
+            console.log('Error en findById:', error.message);
+            throw error;
+        }
     }
 
-    return cantidad;
-  }
+    async reservarStock(idProducto, cantidad) {
+        const result = await ProductoModel.findOneAndUpdate(
+            { 
+                _id: idProducto,
+                stock: { $gte: cantidad },
+                activo: true
+            },
+            { $inc: { stock: -cantidad } },
+            { 
+                new: true,
+                runValidators: true
+            }
+        );
 
-  /**
-   * Verifica si hay stock disponible sin reservarlo
-   */
-  async tieneStock(idProducto, cantidad) {
-    const producto = await this.productos.findOne({
-      _id: new ObjectId(idProducto),
-      stock: { $gte: cantidad },
-      activo: true
-    });
-    return producto !== null;
-  }
+        if (!result) {
+            const producto = await ProductoModel.findById(idProducto);
+            if (!producto) {
+                throw new ProductoInexistente(idProducto);
+            }
+            throw new ProductoStockInsuficiente(idProducto);
+        }
 
-  /**
-   * Obtiene el precio unitario actual del producto
-   */
-  async obtenerPrecioUnitario(idProducto) {
-    const producto = await this.obtenerProductoPorId(idProducto);
-    return producto.precio;
-  }
+        return cantidad;
+    }
+
+    async cancelarStock(idProducto, cantidad) {
+        const result = await ProductoModel.findByIdAndUpdate(
+            idProducto,
+            { $inc: { stock: cantidad } },
+            { new: true }
+        );
+
+        if (!result) {
+            throw new ProductoInexistente(idProducto);
+        }
+
+        return cantidad;
+    }
+
+    async obtenerPrecioUnitario(idProducto) {
+        const producto = await this.obtenerProductoPorId(idProducto);
+        return producto.precio;
+    }
+
+    async obtenerTodos() {
+        console.log('=== DEBUG obtenerTodos ===');
+        console.log('Colección de ProductoModel:', ProductoModel.collection.name);
+        
+        // Buscar TODOS los productos sin filtro
+        const todosLosProductos = await ProductoModel.find({});
+        console.log('TODOS los productos encontrados:', todosLosProductos.length);
+        console.log('IDs de todos los productos:', todosLosProductos.map(p => ({
+            id: p._id.toString(),
+            titulo: p.titulo || p.nombre, // Por si acaso tiene 'nombre' en lugar de 'titulo'
+            activo: p.activo || p.disponible // Por si acaso tiene 'disponible' en lugar de 'activo'
+        })));
+        
+        return todosLosProductos;
+    }
 }

@@ -10,22 +10,19 @@ export const producto = []
 //Version con Service y Repository
 
 export class ProductoController {
-    constructor(productoService) {
-        this.productoService = productoService;
+    constructor(productoRepository) {
+        this.productoRepository = productoRepository;
     }
 
-    obtenerProductos(req, res) {
+    async obtenerProductos(req, res) {
         try {
-            // Por ahora devolvemos productos mock
-            const productos = [
-                { id: 1, nombre: "Producto 1", precio: 100 },
-                { id: 2, nombre: "Producto 2", precio: 200 },
-                { id: 3, nombre: "Producto 3", precio: 300 }
-            ];
-            return res.status(200).json(productos);
+            console.log('=== DEBUG GET /productos ===');
+            const productos = await this.productoRepository.obtenerTodos();
+            console.log('Productos devueltos:', productos.length);
+            res.status(200).json(productos);
         } catch (error) {
-            console.error('Error al obtener productos:', error);
-            return res.status(500).json({ error: 'Error al obtener los productos.' });
+            console.error('Error en GET productos:', error);
+            res.status(500).json({ error: error.message });
         }
     }
 

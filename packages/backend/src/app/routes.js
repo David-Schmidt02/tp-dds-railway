@@ -1,5 +1,5 @@
 export const configureRoutes = (app, {pedidoController, productoController}) => {
-    app.post('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController))
+    app.get('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController))
     app.post('/pedidos', pedidoController.crearPedido.bind(pedidoController))
     app.patch('/pedidos/:id', pedidoController.cancelarPedido.bind(pedidoController))
     //app.get('/pedidos/:id', pedidoController.consultarHistorialPedido.bind(pedidoController)) -> Terminar

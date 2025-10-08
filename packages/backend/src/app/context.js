@@ -1,8 +1,8 @@
 // Repositorios
-import { NotificacionesRepository } from "../repositories/notificacionRepository.js";
+import { NotificacionRepository } from "../repositories/notificacionRepository.js";
 import { PedidoRepository } from "../repositories/pedidoRepository.js";
 import { ProductoRepository } from "../repositories/productoRepository.js";
-import { UsuariosRepository } from "../repositories/usuarioRepository.js";
+import { UsuarioRepository } from "../repositories/usuarioRepository.js";
 
 // Services
 import { PedidoService } from "../services/pedidoService.js";
@@ -16,22 +16,28 @@ import { ProductoController } from "../controllers/productoController.js";
 // import { UsuarioController } from "../controllers/usuarioController.js";
 // import { NotificacionController } from "../controllers/notificacionController.js";
 
+import mongoose from 'mongoose';
 
-const DB_NAME = "pedidosDelSol"
+const DB_NAME = "local"
 
-export const buildAppContext = (DB_CLIENT) => {
-    const db = DB_CLIENT.db(DB_NAME)
-    const pedidoRepository = new PedidoRepository(db);
-    const productoRepository = new ProductoRepository(db);
-    const pedidoService = new PedidoService(pedidoRepository, productoRepository);
+export const buildAppContext = () => {
+    const pedidoRepository = new PedidoRepository();
+    const productoRepository = new ProductoRepository();
+    const usuarioRepository = new UsuarioRepository();
+    const notificacionRepository = new NotificacionRepository();
+    
+    // Pasar notificacionRepository como tercer parámetro
+    const pedidoService = new PedidoService(pedidoRepository, productoRepository, notificacionRepository);
     const pedidoController = new PedidoController(pedidoService);
-    const productoController = new ProductoController(); // Agregar el controlador que falta
+    const productoController = new ProductoController(productoRepository);
 
-  return {
-    pedidoRepository,
-    productoRepository,
-    pedidoService,
-    pedidoController,
-    productoController // Agregar al contexto
-  };
+    return {
+        pedidoRepository,
+        productoRepository,
+        usuarioRepository,
+        notificacionRepository,
+        pedidoService,
+        pedidoController,
+        productoController
+    };
 };

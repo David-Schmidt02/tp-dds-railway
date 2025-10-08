@@ -1,11 +1,11 @@
-import { NotificacionInexistente, EstadoNoSoportado } from "../excepciones/notificaciones.js"
+import { NotificacionInexistente, EstadoNoSoportado } from "../excepciones/notificacion.js"
 import{ Pedido } from "./pedido.js"
 import { Producto } from "./producto.js";
 import { EstadoPedido } from "./estadoPedido.js";
-import { NotificacionesRepository } from "../repositories/notificacionRepository.js";
+import { NotificacionRepository } from "../repositories/notificacionRepository.js";
 
 
-export class Notificaciones {
+export class Notificacion{
     id;
     receptor;
     mensaje;
@@ -14,7 +14,6 @@ export class Notificaciones {
     fechaLeida;
 
     constructor(receptor, mensaje) {
-        //this.receptor = usuario; ? No sé de donde salio usuario
         this.receptor = receptor;
         this.mensaje = mensaje;
         this.fechaAlta = new Date();
@@ -30,13 +29,10 @@ export class Notificaciones {
 
 
 export class FactoryNotificacion {
-    // Mapea una instancia de Pedido a un objeto JSON con los campos requeridos
-
     static crearSegunPedido(pedido) {
         const mensaje = FactoryNotificacion.crearSegunEstadoPedido(pedido);
         let receptor;
     
-            // Ver si el switch se debe usar
         switch (pedido.estado.nombre) {
             case "PENDIENTE":
                 receptor = pedido.vendedor;   // notificar al vendedor
@@ -54,11 +50,10 @@ export class FactoryNotificacion {
                 throw new Error(`Estado no soportado: ${pedido.estado.nombre}`);
         }
 
-        const notificacion = new Notificaciones(receptor, mensaje);
-        NotificacionesRepository.agregarNotificacion(notificacion);
+        const notificacion = new Notificacion(receptor, mensaje);
+        NotificacionRepository.agregarNotificacion(notificacion);
     }
 
-    // Método interno que se llama en la otra funcion
     static crearSegunEstadoPedido(pedido) {
     const productos = (pedido.itemsPedido ?? [])
         .map(item => item?.producto?.nombre)

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PedidoInexistente } from "../excepciones/notificaciones.js";
+import { PedidoInexistente } from "../excepciones/pedido.js";
 import { Pedido, PedidoModel } from "../schema/pedidoSchema.js";
 
 export class PedidoRepository {
