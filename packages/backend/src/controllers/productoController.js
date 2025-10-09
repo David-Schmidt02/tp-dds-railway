@@ -41,7 +41,7 @@ export class ProductoController {
      async obtenerProductosOrdenados(req, res) {
         try {
           const { orden = 'precioAsc' } = req.query;
-          const resultado = await productoService.obtenerProductosOrdenados(orden);
+          const resultado = await this.productoRepository.obtenerProductosOrdenados(orden);
           res.status(200).json(resultado);
         } catch (error) {
           console.error('Error en obtenerProductosOrdenados:', error);

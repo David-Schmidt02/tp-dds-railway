@@ -92,7 +92,7 @@ export class PedidoRepository {
         };
     }
 
-    async crearPedido(pedidoData) {
+    async guardarPedido(pedidoData) {
         const pedidoDB = this.aPedidoDB(pedidoData);  // Convierte a formato de DB
         const nuevoPedido = new this.model(pedidoDB); // Usa el modelo de Mongoose
         const resultado = await nuevoPedido.save();   // Guarda en la base de datos

@@ -30,7 +30,8 @@ export class ProductoRepository {
         }
     }
 
-    async reservarStock(idProducto, cantidad) {
+   async reservarStock(idProducto, cantidad) {
+    try {
         const result = await ProductoModel.findOneAndUpdate(
             { 
                 _id: idProducto,
@@ -45,16 +46,30 @@ export class ProductoRepository {
         );
 
         if (!result) {
+            // Buscar el producto para obtener información detallada
             const producto = await ProductoModel.findById(idProducto);
+            
             if (!producto) {
                 throw new ProductoInexistente(idProducto);
             }
-            throw new ProductoStockInsuficiente(idProducto);
+
+            // Verificar si el producto está activo
+            if (!producto.activo) {
+                throw new Error(`El producto con id ${idProducto} no está activo`);
+            }
+
+            // Verificar stock específicamente
+            console.log(`Stock insuficiente - ID: ${idProducto}, Disponible: ${producto.stock}, Solicitado: ${cantidad}`);
+            throw new Error(`Stock insuficiente para el producto con id: ${idProducto}. Disponible: ${producto.stock}, Solicitado: ${cantidad}`);
         }
 
+        console.log(`Stock reservado exitosamente - ID: ${idProducto}, Cantidad: ${cantidad}, Stock restante: ${result.stock}`);
         return cantidad;
+    } catch (error) {
+        console.error('Error en reservarStock:', error);
+        throw error;
     }
-
+}
     async cancelarStock(idProducto, cantidad) {
         const result = await ProductoModel.findByIdAndUpdate(
             idProducto,

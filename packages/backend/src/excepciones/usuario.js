@@ -1,18 +1,24 @@
-export class UsuarioInexistente extends Error {
-  constructor(id) {
-    super(`El usuario con id: ${id}, no existe`);
-  }
-}
-
 export class UsuarioYaExiste extends Error {
   constructor(email) {
     super(`Ya existe un usuario con el email: ${email}`);
   }
 }
 
+export class UsuarioInexistente extends Error {
+  constructor(id) {
+    super(`El usuario con id: ${id}, no existe`);
+  }
+}
+
 export class EmailInvalido extends Error {
   constructor(email) {
     super(`El email ${email} no tiene un formato válido`);
+  }
+}
+
+export class DatosUsuarioInvalidos extends Error {
+  constructor(mensaje) {
+    super(`Datos de usuario inválidos: ${mensaje}`);
   }
 }
 

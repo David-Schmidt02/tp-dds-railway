@@ -28,7 +28,7 @@ export class Pedido {
 
         const notificacion = FactoryNotificacion.crearSegunPedido(this);
         if (notificacion) {
-            NotificacionesRepository.agregarNotificacion(notificacion);
+            NotificacionRepository.agregarNotificacion(comprador.id, notificacion);
         }
     }
 

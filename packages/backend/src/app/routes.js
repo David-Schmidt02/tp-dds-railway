@@ -1,4 +1,4 @@
-export const configureRoutes = (app, {pedidoController, productoController, notificacionesController}) => {
+export const configureRoutes = (app, {pedidoController, productoController, notificacionController}) => {
     app.get('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController))
     app.post('/pedidos', pedidoController.crearPedido.bind(pedidoController))
     app.patch('/pedidos/:id', pedidoController.cancelarPedido.bind(pedidoController))
@@ -8,6 +8,8 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
     app.get('/productos', productoController.obtenerProductos.bind(productoController))
     app.get('/productos/ordenados', productoController.obtenerProductosOrdenados.bind(productoController));
 
-    app.get('/notificaciones', notificacionesController.obtenerNotificacionesDeUnUsuario.bind(notificacionesController));
-    app.patch('notificaciones', notificacionesController.marcarNotificacionComoLeida.bind(notificacionesController));
+    app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController));
+    app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController));
+
+    app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController));
 }

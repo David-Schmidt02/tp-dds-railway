@@ -10,9 +10,10 @@ import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/p
 import mongoose from 'mongoose';
 
 export class PedidoService {
-    constructor(pedidoRepository, productoRepository) {
+    constructor(pedidoRepository, productoRepository, notificacionRepository) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
+        this.notificacionRepository = notificacionRepository;
         // No necesitas db con Mongoose
     }
 
@@ -43,7 +44,7 @@ export class PedidoService {
             }
 
             const pedidoNuevo = new Pedido(usuarioId, itemsPedidos, metodoPago, direccionEntrega, comentarios);
-            pedidoGuardado = await this.pedidoRepository.crearPedido(pedidoNuevo);
+            pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
         });
         
         await session.endSession();
