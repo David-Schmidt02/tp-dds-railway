@@ -6,4 +6,5 @@ export const configureRoutes = (app, {pedidoController, productoController}) => 
     app.patch('/pedidos/:idPedido/itemsPedidos/:idItem', pedidoController.cambiarCantidadItem.bind(pedidoController))
 
     app.get('/productos', productoController.obtenerProductos.bind(productoController))
+    app.get('/productos/ordenados', productoController.obtenerProductosOrdenados.bind(productoController));
 }

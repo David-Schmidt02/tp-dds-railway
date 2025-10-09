@@ -51,6 +51,12 @@ const productoSchema = new mongoose.Schema({
       type: Boolean,
       required: true
     },
+    //TODO Revisar este vendidos
+    vendidos: {
+      type: Number,
+      required: true,
+      default: 0
+    }
 },{
 
   timestamps: true,

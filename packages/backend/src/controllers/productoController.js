@@ -37,6 +37,17 @@ export class ProductoController {
             return res.status(500).json({ error: 'Error al obtener el producto.' });
         }
     }
+
+     async obtenerProductosOrdenados(req, res) {
+        try {
+          const { orden = 'precioAsc' } = req.query;
+          const resultado = await productoService.obtenerProductosOrdenados(orden);
+          res.status(200).json(resultado);
+        } catch (error) {
+          console.error('Error en obtenerProductosOrdenados:', error);
+          res.status(500).json({ mensaje: 'Error al obtener los productos ordenados' });
+        }
+      }
 }
 
 export default ProductoController;

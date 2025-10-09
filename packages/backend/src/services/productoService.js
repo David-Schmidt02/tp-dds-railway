@@ -32,3 +32,24 @@ obtenerProductos(vendedorId, filtros) {
 
 }
 */
+
+async obtenerProductosOrdenados(orden) {
+    let sortOption = {};
+
+    switch (orden) {
+      case 'precioAsc':
+        sortOption = { precio: 1 }; // El 1 significa ascendente
+        break;
+      case 'precioDesc':
+        sortOption = { precio: -1 }; // El -1 significa descendente
+        break;
+      case 'masVendido':
+        sortOption = { vendidos: -1 };
+        break;
+      default:
+        sortOption = { createdAt: -1 }; // por defecto, los más nuevos
+    }
+
+    const productos = await productoRepository.obtenerProductosOrdenados(sortOption);
+    return productos;
+};

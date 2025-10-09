@@ -89,4 +89,9 @@ export class ProductoRepository {
         
         return todosLosProductos;
     }
+
+      async obtenerProductosOrdenados(sortOption) {
+        // Mongoose se encarga del ordenamiento directamente
+        return await ProductoModel.find().sort(sortOption).exec();
+      }
 }
