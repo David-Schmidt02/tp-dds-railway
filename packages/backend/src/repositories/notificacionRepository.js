@@ -34,4 +34,12 @@ export class NotificacionRepository {
         }
         return await NotificacionModel.create({ receptorId: usuarioId, ...notificacion });
     }
+
+    async obtenerNotificacionesDeUnUsuario(usuarioId, leida) {
+         const filtro = { usuarioId };
+         if (leida !== undefined) {
+            filtro.leida = leida; // true o false
+         }
+         return await NotificacionModel.find(filtro);
+    }
 }
