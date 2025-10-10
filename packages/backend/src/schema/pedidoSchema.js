@@ -42,7 +42,7 @@ const itemPedidoSchema = new mongoose.Schema({
 
 // Schema principal del pedido
 const pedidoSchema = new mongoose.Schema({
-  compradorId: {
+  usuarioId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true
@@ -71,13 +71,6 @@ const pedidoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  fechaEntregaEstimada: {
-    type: Date
-  },
-  observaciones: {
-    type: String,
-    trim: true
-  }
 }, {
   timestamps: true,
   collection: 'pedidos'
@@ -93,7 +86,7 @@ pedidoSchema.pre('save', async function(next) {
 });
 
 // Índices para mejorar las consultas
-pedidoSchema.index({ compradorId: 1 });
+pedidoSchema.index({ usuarioId: 1 });
 pedidoSchema.index({ estado: 1 });
 pedidoSchema.index({ fechaPedido: -1 });
 pedidoSchema.index({ numero: 1 });

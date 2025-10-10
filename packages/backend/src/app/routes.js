@@ -7,6 +7,7 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
 
     app.get('/productos', productoController.obtenerProductos.bind(productoController))
     app.get('/productos/ordenados', productoController.obtenerProductosOrdenados.bind(productoController));
+    app.get('/productos/vendedor', productoController.listarProductosVendedorConFiltros.bind(productoController));
 
     app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController));
     app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController));

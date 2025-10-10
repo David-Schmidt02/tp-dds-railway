@@ -5,7 +5,7 @@ import {buildAppContext} from "./src/app/context.js";
 
 const app = express()
 const PORT = 3000
-const DB_URI = "mongodb://localhost:27017/local";
+const DB_URI = "mongodb://localhost:27017/desarrollo?replicaSet=rs0";
 
 let appContext = {};
 try {

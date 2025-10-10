@@ -3,8 +3,6 @@ import { CambioEstadoPedido } from "./cambioEstadoPedido.js"
 import { ItemPedido } from "./itemPedido.js"
 import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
-import { FactoryNotificacion } from "./notificacion.js"
-import { NotificacionRepository } from "../repositories/notificacionRepository.js"
 import { PedidoNoModificable } from "../excepciones/pedido.js"
 
 export class Pedido {
@@ -32,17 +30,13 @@ export class Pedido {
 
     
     actualizarEstado(nuevoEstado, usuario, motivo ) {
-	    this.estado = new CambioEstadoPedido(nuevoEstado, this, usuario, motivo);
         this.historialEstados.push(this.estado)
 
-        if (this.transicionarA(nuevoEstado)){ // Puede ser una excepcion.
+        if (this.estado.puedeTransicionarA(nuevoEstado)){ // Puede ser una excepcion.
+            this.estado = new CambioEstadoPedido(nuevoEstado, this, usuario, motivo);
             this.historialEstados.push(new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)) // Revisar
             this.estado = nuevoEstado;
         }
-    }
-
-    transicionarA(nuevoEstado) {
-        this.estado.puedeTransicionarA(nuevoEstado)
     }
     
     validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }

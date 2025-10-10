@@ -18,11 +18,11 @@ const usuarioSchema = new mongoose.Schema({
     required: false,
     trim: true
   },
-  tipo: {
+  tipoUsuario: {
     type: String,
     required: true
   },
-  fechaRegistro: {
+  fechaAlta: {
     type: Date,
     default: Date.now
   }

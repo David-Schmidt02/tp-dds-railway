@@ -13,7 +13,10 @@ export const pedidos = []
 
 function pedidoToDTO(pedido) {
     console.log('Pedido recibido en DTO:', JSON.stringify(pedido, null, 2)); // Debug temporal
-    
+
+    // Manejar items de dominio (itemsPedido) o de DB (items)
+    const items = pedido.itemsPedido || pedido.items || [];
+
     return {
         id: pedido._id || pedido.id,
         comprador: {
@@ -21,25 +24,24 @@ function pedidoToDTO(pedido) {
             nombre: pedido.comprador?.nombre || 'N/A',
             email: pedido.comprador?.email || 'N/A'
         },
-        items: pedido.items?.map(item => ({
+        items: items.map(item => ({
             producto: {
                 id: item.producto?.id || item.productoId,
                 titulo: item.producto?.titulo || 'N/A',
                 descripcion: item.producto?.descripcion || 'N/A',
                 precio: item.producto?.precio || item.precioUnitario,
-                categoria: item.producto?.categoria || 'N/A'
+                categoria: item.producto?.categorias?.[0] || item.producto?.categoria || 'N/A'
             },
             cantidad: item.cantidad,
             precioUnitario: item.precioUnitario || item.producto?.precio,
-            subtotal: item.subtotal || (item.cantidad * (item.precioUnitario || item.producto?.precio))
-        })) || [],
-        total: pedido.total || 0,
+            subtotal: typeof item.subtotal === 'function' ? item.subtotal() : (item.subtotal || (item.cantidad * (item.precioUnitario || item.producto?.precio)))
+        })),
+        total: typeof pedido.calcularTotal === 'function' ? pedido.calcularTotal() : (pedido.total || 0),
         moneda: pedido.moneda || 'PESO_ARG',
         direccionEntrega: pedido.direccionEntrega || {},
-        estado: pedido.estado || { nombre: 'PENDIENTE', fecha: new Date() },
+        estado: typeof pedido.estado === 'string' ? pedido.estado : (pedido.estado?.nombre || 'PENDIENTE'),
         fechaCreacion: pedido.createdAt || pedido.fechaCreacion || new Date(),
-        fechaActualizacion: pedido.updatedAt || pedido.fechaActualizacion || new Date(),
-        observaciones: pedido.comentarios || pedido.observaciones || ''
+        fechaActualizacion: pedido.updatedAt || pedido.fechaActualizacion || new Date()
     };
 }
 

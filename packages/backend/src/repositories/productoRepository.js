@@ -7,28 +7,21 @@ export class ProductoRepository {
     }
 
     async obtenerProductoPorId(id, session = null) {
-        console.log('=== DEBUG ProductoRepository ===');
-        console.log('ID buscado:', id);
-        console.log('Tipo de ID:', typeof id);
-        console.log('Longitud del ID:', id.length);
 
         try {
             let query = ProductoModel.findById(id);
 
             if (session) {
                 query = query.session(session);
+                console.log('Session añadida a la query');
             }
 
             const producto = await query;
-            console.log('Resultado de findById:', producto);
-            console.log('¿Es null?:', producto === null);
 
             if (!producto) {
                 console.log('Producto no encontrado, lanzando excepción');
                 throw new ProductoInexistente(id);
             }
-
-            console.log('Producto encontrado exitosamente');
             return producto;
         } catch (error) {
             console.log('Error en findById:', error.message);
@@ -66,12 +59,9 @@ export class ProductoRepository {
 
             // Verificar si el producto está activo
             if (!producto.activo) {
-                throw new Error(`El producto con id ${idProducto} no está activo`);
+               throw new PrecioInvalido(idProducto);
             }
 
-            // Verificar stock específicamente
-            console.log(`Stock insuficiente - ID: ${idProducto}, Disponible: ${producto.stock}, Solicitado: ${cantidad}`);
-            throw new Error(`Stock insuficiente para el producto con id: ${idProducto}. Disponible: ${producto.stock}, Solicitado: ${cantidad}`);
         }
 
         console.log(`Stock reservado exitosamente - ID: ${idProducto}, Cantidad: ${cantidad}, Stock restante: ${result.stock}`);
@@ -95,8 +85,8 @@ export class ProductoRepository {
         return cantidad;
     }
 
-    async obtenerPrecioUnitario(idProducto) {
-        const producto = await this.obtenerProductoPorId(idProducto);
+    async obtenerPrecioUnitario(idProducto, session = null) {
+        const producto = await this.obtenerProductoPorId(idProducto, session);
         return producto.precio;
     }
 

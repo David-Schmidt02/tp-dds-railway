@@ -15,7 +15,7 @@ const notificacionSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  fechaCreacion: {
+  fechaAlta: {
     type: Date,
     default: Date.now
   },
