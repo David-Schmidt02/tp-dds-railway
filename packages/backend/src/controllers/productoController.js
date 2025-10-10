@@ -26,19 +26,7 @@ export class ProductoController {
         }
     }
 
-    obtenerProducto(req, res) {
-        const id = parseInt(req.params.id);
-        try {
-            // Mock de un producto específico
-            const producto = { id: id, nombre: `Producto ${id}`, precio: id * 100 };
-            return res.status(200).json(producto);
-        } catch (error) {
-            console.error('Error al obtener producto:', error);
-            return res.status(500).json({ error: 'Error al obtener el producto.' });
-        }
-    }
-
-     async obtenerProductosOrdenados(req, res) {
+    async obtenerProductosOrdenados(req, res) {
         try {
           const { orden = 'precioAsc' } = req.query;
           const resultado = await this.productoRepository.obtenerProductosOrdenados(orden);
@@ -48,6 +36,64 @@ export class ProductoController {
           res.status(500).json({ mensaje: 'Error al obtener los productos ordenados' });
         }
       }
+
+    async listarProductosVendedorConFiltros(req, res) {
+        try {
+            const {
+                vendedorId,
+                min,
+                max,
+                nombre,
+                descripcion,
+                categorias,
+                page = 1,
+                limit = 10,
+                orden
+            } = req.query;
+
+            if (!vendedorId){
+                return res.status(400).json({ error: "Debe indicar el vendedor" });
+            }
+
+            const filters = {vendedor: vendedorId};
+            
+            if (min && max) {
+                filters.precio = { $gte: parseFloat(min), $lte: parseFloat(max) };
+            } else if (min) {
+                filters.precio = { $gte: parseFloat(min) };
+            } else if (max) {
+                filters.precio = { $lte: parseFloat(max) };
+            }
+
+            if (nombre) {
+                filters.nombre = new RegExp(nombre.trim(), "i");
+            }
+
+            if (descripcion) {
+                filters.descripcion = new RegExp(descripcion.trim(), "i");
+            }
+
+            if (categorias) {
+                const categoriasArray = typeof categorias === "string"
+                ? categorias.split(",")
+                : categorias;
+                //suponiendo que se requieren todas las categorias
+                filters.categorias = { $all: categoriasArray };
+            }
+
+            const result = await this.productoService.listarProductosVendedorConFiltros(
+                filters,
+                parseInt(page),
+                parseInt(limit),
+                orden
+            );
+
+            res.status(200).json(result);
+        }catch(error){
+            res.status(500).json({ mensaje: "Error al listar productos del vendedor" });
+        }
+        
+    }
 }
 
 export default ProductoController;

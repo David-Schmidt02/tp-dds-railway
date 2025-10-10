@@ -109,4 +109,40 @@ export class ProductoRepository {
         // Mongoose se encarga del ordenamiento directamente
         return await ProductoModel.find().sort(sortOption).exec();
       }
+
+    async obtenerStockDisponible(idProducto, session = null) {
+        let query = ProductoModel.findById(idProducto);
+        
+        if (session) {
+            query = query.session(session);
+        }
+        
+        const producto = await query;
+        
+        if (!producto) {
+            throw new ProductoInexistente(idProducto);
+        }
+        return producto.stock;
+    }
+
+async findByFilters(filters, page, limit, sort) {
+    const skip = (page - 1) * limit;
+
+    const totalItems = await this.productoModel.countDocuments(filters);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const items = await this.productoModel
+      .find(filters)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    return {
+      page,
+      limit,
+      totalItems,
+      totalPages,
+      items
+    }
+  }
 }

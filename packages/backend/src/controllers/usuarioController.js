@@ -1,12 +1,15 @@
-import { UsuarioService } from '../services/usuarioService.js';
 import { UsuarioYaExiste, EmailInvalido, DatosUsuarioInvalidos } from '../excepciones/usuario.js';
 
 export class UsuarioController {
-  static async crearUsuario(req, res) {
+  constructor(usuarioService) {
+    this.usuarioService = usuarioService;
+  }
+
+  async crearUsuario(req, res) {
     try {
       const datosUsuario = req.body;
       
-      const nuevoUsuario = await UsuarioService.crearUsuario(datosUsuario);
+      const nuevoUsuario = await this.usuarioService.crearUsuario(datosUsuario);
       
       res.status(201).json({
         success: true,

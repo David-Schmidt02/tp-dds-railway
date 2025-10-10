@@ -6,7 +6,6 @@ import { NotificacionRepository } from "../repositories/notificacionRepository.j
 
 
 export class Notificacion{
-    id;
     receptor;
     mensaje;
     fechaAlta;
@@ -51,7 +50,7 @@ export class FactoryNotificacion {
         }
 
         const notificacion = new Notificacion(receptor, mensaje);
-        NotificacionRepository.agregarNotificacion(notificacion);
+        return notificacion;
     }
 
     static crearSegunEstadoPedido(pedido) {
@@ -84,5 +83,4 @@ export class FactoryNotificacion {
     }
   }
 }
-
 

@@ -1,13 +1,11 @@
 export class Usuario {
-    id
     nombre
     email
     telefono
     tipoUsuario
     fechaAlta
    
-    constructor(id, nombre, email, telefono, tipoUsuario ) {
-      this.id = id;
+    constructor(nombre, email, telefono, tipoUsuario ) {
       this.nombre = nombre;
       this.email = email;
       this.telefono = telefono;

@@ -25,11 +25,6 @@ export class Pedido {
         this.estado = EstadoPedido.PENDIENTE;
         this.fechaCreacion = new Date();
         this.historialEstados = []; 
-
-        const notificacion = FactoryNotificacion.crearSegunPedido(this);
-        if (notificacion) {
-            NotificacionRepository.agregarNotificacion(comprador.id, notificacion);
-        }
     }
 
     calcularTotal() { return this.itemsPedido.reduce((acc, item) => acc + item.subtotal(), 0) }
