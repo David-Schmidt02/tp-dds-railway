@@ -50,6 +50,7 @@ export const pedidoSchema = z.object({
     direccionEntrega : direccionEntregaSchema
 })
 
+// Chequear
 export const pedidoRequestSchema = z.object({
     usuarioId: z.string(),
     items: z.array(z.object({

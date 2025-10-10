@@ -5,6 +5,7 @@ import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
 import { FactoryNotificacion } from "./notificacion.js"
 import { NotificacionRepository } from "../repositories/notificacionRepository.js"
+import { PedidoNoModificable } from "../excepciones/pedido.js"
 
 export class Pedido {
     id;
@@ -64,18 +65,23 @@ export class Pedido {
         return this.estado.nombre !== 'ENVIADO' && this.estado.nombre !== 'ENTREGADO' && this.estado.nombre !== 'CANCELADO';
     }
 
+    puedeCancelarse() {
+        // Solo se puede cancelar si no ha sido enviado ni entregado, y tampoco si ya está cancelado
+        return this.estado !== 'ENVIADO' && this.estado !== 'ENTREGADO' && this.estado !== 'CANCELADO';
+    }
+
     modificarCantidadItem(productoId, nuevaCantidad) {
         if (!this.puedeModificarItems()) {
-            throw new Error('No se puede modificar un pedido que ya ha sido enviado');
+            throw new PedidoNoModificable(this.estado);
         }
 
         const item = this.itemsPedido.find(item => item.getId() === productoId);
         if (!item) {
             throw new Error('Producto no encontrado en el pedido');
         }
-        
+
         item.cambiarCantidad(nuevaCantidad);
-        
+
     }
 
     

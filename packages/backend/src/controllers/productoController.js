@@ -10,14 +10,15 @@ export const producto = []
 //Version con Service y Repository
 
 export class ProductoController {
-    constructor(productoRepository) {
-        this.productoRepository = productoRepository;
+    constructor(productoService) {
+        this.productoService = productoService;
     }
 
     async obtenerProductos(req, res) {
         try {
             console.log('=== DEBUG GET /productos ===');
-            const productos = await this.productoRepository.obtenerTodos();
+            // Llamar al service sin filtros (devuelve todos los productos)
+            const productos = await this.productoService.obtenerProductos();
             console.log('Productos devueltos:', productos.length);
             res.status(200).json(productos);
         } catch (error) {
@@ -29,7 +30,7 @@ export class ProductoController {
     async obtenerProductosOrdenados(req, res) {
         try {
           const { orden = 'precioAsc' } = req.query;
-          const resultado = await this.productoRepository.obtenerProductosOrdenados(orden);
+          const resultado = await this.productoService.obtenerProductosOrdenados(orden);
           res.status(200).json(resultado);
         } catch (error) {
           console.error('Error en obtenerProductosOrdenados:', error);

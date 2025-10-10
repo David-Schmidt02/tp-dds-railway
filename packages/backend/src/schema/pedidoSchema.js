@@ -4,12 +4,12 @@ import mongoose from 'mongoose';
 const cambioEstadoSchema = new mongoose.Schema({
   estadoAnterior: {
     type: String,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+    enum: ['PENDIENTE', 'CONFIRMADO', 'EN_PREPARACION', 'ENVIADO', 'ENTREGADO', 'CANCELADO']
   },
   estadoNuevo: {
     type: String,
     required: true,
-    enum: ['PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'CANCELADO']
+    enum: ['PENDIENTE', 'CONFIRMADO', 'EN_PREPARACION', 'ENVIADO', 'ENTREGADO', 'CANCELADO']
   },
   fecha: {
     type: Date,

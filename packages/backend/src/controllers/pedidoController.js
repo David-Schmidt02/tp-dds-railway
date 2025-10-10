@@ -4,8 +4,9 @@ import { Usuario } from '../dominio/usuario.js';
 import { ItemPedido } from '../dominio/itemPedido.js';
 import { Moneda } from '../dominio/moneda.js';
 import { DireccionEntrega } from '../dominio/direccionEntrega.js';
-import { PedidoInexistente } from '../excepciones/pedido.js';
+import { PedidoInexistente, PedidoNoCancelable, PedidoNoModificable } from '../excepciones/pedido.js';
 import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/producto.js';
+import { UsuarioInexistente } from '../excepciones/usuario.js';
 
 export const pedidos = []
 
@@ -82,34 +83,69 @@ export class PedidoController {
         } catch(error) {
             console.error('Error al crear pedido:', error.message);
             console.error('Stack trace:', error.stack);
-            
+
+            if(error instanceof UsuarioInexistente) {
+                return res.status(404).json({
+                    error: 'Usuario no encontrado',
+                    message: error.message
+                });
+            }
+
             if(error instanceof ProductoInexistente) {
-                return res.status(422).json({ 
-                    error: 'Producto no encontrado', 
-                    message: error.message 
+                return res.status(422).json({
+                    error: 'Producto no encontrado',
+                    message: error.message
                 });
             }
-            
+
             if(error instanceof ProductoStockInsuficiente) {
-                return res.status(409).json({ 
-                    error: 'Stock insuficiente', 
-                    message: error.message 
+                return res.status(409).json({
+                    error: 'Stock insuficiente',
+                    message: error.message
                 });
             }
-            
-            return res.status(500).json({ 
+
+            return res.status(500).json({
                 error: 'Error interno del servidor al crear el pedido',
-                message: error.message 
+                message: error.message
             });
         }
     }
 
-    obtenerPedidos(req, res) {
+    async obtenerPedidos(req, res) {
         try{
-            const pedidos = this.pedidoService.obtenerPedidos();
+            const pedidos = await this.pedidoService.obtenerPedidos();
             return res.status(200).json(pedidos);
         }catch(error){
             return res.status(500).json({ error: 'Error al obtener los pedidos.' });
+        }
+    }
+
+    async consultarHistorialPedido(req, res) {
+        const { usuarioId } = req.query;
+
+        if (!usuarioId) {
+            return res.status(400).json({ error: 'El parámetro usuarioId es requerido' });
+        }
+
+        try {
+            const pedidos = await this.pedidoService.obtenerPedidosPorUsuario(usuarioId);
+            const pedidosDTO = pedidos.map(pedidoToDTO);
+            res.status(200).json(pedidosDTO);
+        } catch(error) {
+            console.error('Error al consultar historial de pedidos:', error.message);
+
+            if(error instanceof UsuarioInexistente) {
+                return res.status(404).json({
+                    error: 'Usuario no encontrado',
+                    message: error.message
+                });
+            }
+
+            return res.status(500).json({
+                error: 'Error interno del servidor al consultar el historial',
+                message: error.message
+            });
         }
     }
     
@@ -117,24 +153,31 @@ export class PedidoController {
         const { id } = req.params;
         const { motivo } = req.body;
         const usuario = req.user; // Si usas autenticación, o lo obtienes del body
-        
+
         try {
             const pedidoCancelado = await this.pedidoService.cancelarPedido(id, motivo, usuario);
             res.status(200).json(pedidoToDTO(pedidoCancelado));
-            
+
         } catch(error) {
             console.error('Error al cancelar pedido:', error.message);
-            
+
             if(error instanceof PedidoInexistente) {
-                return res.status(404).json({ 
-                    error: 'Pedido no encontrado', 
-                    message: error.message 
+                return res.status(404).json({
+                    error: 'Pedido no encontrado',
+                    message: error.message
                 });
             }
-            
-            return res.status(500).json({ 
+
+            if(error instanceof PedidoNoCancelable) {
+                return res.status(422).json({
+                    error: 'Pedido no cancelable',
+                    message: error.message
+                });
+            }
+
+            return res.status(500).json({
                 error: 'Error interno del servidor al cancelar el pedido',
-                message: error.message 
+                message: error.message
             });
         }
     }
@@ -142,37 +185,44 @@ export class PedidoController {
     async cambiarCantidadItem(req, res) {
         const { idPedido, idItem } = req.params;
         const { cantidad: nuevaCantidad } = req.body;
-        
+
         if (!nuevaCantidad || nuevaCantidad <= 0) {
-            return res.status(400).json({ 
-                error: 'La cantidad debe ser un número positivo' 
+            return res.status(400).json({
+                error: 'La cantidad debe ser un número positivo'
             });
         }
-        
+
         try {
             const pedidoActualizado = await this.pedidoService.cambiarCantidadItem(idPedido, idItem, nuevaCantidad);
             res.status(200).json(pedidoToDTO(pedidoActualizado));
-            
+
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
-            
+
             if(error instanceof PedidoInexistente) {
-                return res.status(404).json({ 
-                    error: 'Pedido no encontrado', 
-                    message: error.message 
+                return res.status(404).json({
+                    error: 'Pedido no encontrado',
+                    message: error.message
                 });
             }
-            
+
+            if(error instanceof PedidoNoModificable) {
+                return res.status(422).json({
+                    error: 'Pedido no modificable',
+                    message: error.message
+                });
+            }
+
             if(error instanceof ProductoStockInsuficiente) {
-                return res.status(409).json({ 
-                    error: 'Stock insuficiente para la nueva cantidad', 
-                    message: error.message 
+                return res.status(409).json({
+                    error: 'Stock insuficiente para la nueva cantidad',
+                    message: error.message
                 });
             }
-            
-            return res.status(500).json({ 
+
+            return res.status(500).json({
                 error: 'Error interno del servidor al modificar el item',
-                message: error.message 
+                message: error.message
             });
         }
     }

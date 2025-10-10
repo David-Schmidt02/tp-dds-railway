@@ -6,22 +6,28 @@ export class ProductoRepository {
         // No necesitas inicializar nada con Mongoose
     }
 
-    async obtenerProductoPorId(id) {
+    async obtenerProductoPorId(id, session = null) {
         console.log('=== DEBUG ProductoRepository ===');
         console.log('ID buscado:', id);
         console.log('Tipo de ID:', typeof id);
         console.log('Longitud del ID:', id.length);
-        
+
         try {
-            const producto = await ProductoModel.findById(id);
+            let query = ProductoModel.findById(id);
+
+            if (session) {
+                query = query.session(session);
+            }
+
+            const producto = await query;
             console.log('Resultado de findById:', producto);
             console.log('¿Es null?:', producto === null);
-            
+
             if (!producto) {
                 console.log('Producto no encontrado, lanzando excepción');
                 throw new ProductoInexistente(id);
             }
-            
+
             console.log('Producto encontrado exitosamente');
             return producto;
         } catch (error) {
@@ -30,25 +36,30 @@ export class ProductoRepository {
         }
     }
 
-   async reservarStock(idProducto, cantidad) {
+   async reservarStock(idProducto, cantidad, session = null) {
     try {
         const result = await ProductoModel.findOneAndUpdate(
-            { 
+            {
                 _id: idProducto,
                 stock: { $gte: cantidad },
                 activo: true
             },
             { $inc: { stock: -cantidad } },
-            { 
+            {
                 new: true,
-                runValidators: true
+                runValidators: true,
+                session
             }
         );
 
         if (!result) {
             // Buscar el producto para obtener información detallada
-            const producto = await ProductoModel.findById(idProducto);
-            
+            let query = ProductoModel.findById(idProducto);
+            if (session) {
+                query = query.session(session);
+            }
+            const producto = await query;
+
             if (!producto) {
                 throw new ProductoInexistente(idProducto);
             }
@@ -70,11 +81,11 @@ export class ProductoRepository {
         throw error;
     }
 }
-    async cancelarStock(idProducto, cantidad) {
+    async cancelarStock(idProducto, cantidad, session = null) {
         const result = await ProductoModel.findByIdAndUpdate(
             idProducto,
             { $inc: { stock: cantidad } },
-            { new: true }
+            { new: true, session }
         );
 
         if (!result) {

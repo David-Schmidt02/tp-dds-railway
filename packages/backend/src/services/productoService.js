@@ -9,13 +9,18 @@ export class ProductoService {
     }
 
     /**
-     * Obtiene productos con filtros (sin session - operación de solo lectura)
+     * Obtiene productos con filtros opcionales (sin session - operación de solo lectura)
      */
     async obtenerProductos(vendedorId = null, filtros = {}) {
         try {
+            // Si no hay filtros ni vendedorId, devolver todos los productos directamente
+            if (!vendedorId && Object.keys(filtros).length === 0) {
+                return await this.productoRepository.obtenerTodos();
+            }
+
             // Si hay vendedorId específico, filtrar por vendedor
             let queryFilters = {};
-            
+
             if (vendedorId) {
                 queryFilters.vendedor = vendedorId;
             }
@@ -37,10 +42,8 @@ export class ProductoService {
                 if (filtros.maxPrice) queryFilters.precio.$lte = Number(filtros.maxPrice);
             }
 
-            // Usar el repository para obtener productos
+            // Obtener todos los productos y aplicar filtros
             const productos = await this.productoRepository.obtenerTodos();
-            
-            // Aplicar filtros en memoria (mejorar esto moviendo la lógica al repository)
             return this.aplicarFiltrosEnMemoria(productos, queryFilters);
 
         } catch (error) {

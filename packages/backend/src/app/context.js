@@ -26,7 +26,7 @@ export const buildAppContext = () => {
     const notificacionRepository = new NotificacionRepository();
     
     // Services
-    const pedidoService = new PedidoService(pedidoRepository, productoRepository, notificacionRepository);
+    const pedidoService = new PedidoService(pedidoRepository, productoRepository, notificacionRepository, usuarioRepository);
     const productoService = new ProductoService(productoRepository);
     const usuarioService = new UsuarioService(usuarioRepository);
     
