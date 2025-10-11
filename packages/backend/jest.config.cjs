@@ -1,13 +1,7 @@
+// jest.config.cjs
 module.exports = {
-  // Configuración para módulos ES6
-  preset: '@babel/preset-env',
   testEnvironment: 'node',
-  
-  // Transformaciones
-  transform: {
-    '^.+\\.js$': 'babel-jest'
-  },
-  
+
   // Patrones de archivos de test
   testMatch: [
     '**/test/**/*.test.js',
@@ -18,7 +12,7 @@ module.exports = {
 
   // Setup antes de todos los tests
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
-  
+
   // Cobertura de código
   collectCoverageFrom: [
     'src/**/*.js',
@@ -27,7 +21,7 @@ module.exports = {
     '!src/ejemplos/**',
     '!src/demo/**'
   ],
-  
+
   // Thresholds de cobertura
   coverageThreshold: {
     global: {
@@ -37,13 +31,10 @@ module.exports = {
       statements: 80
     }
   },
-  
-  // Timeout para tests (importante para concurrencia)
+
+  // Timeout para tests (importante para algunos casos de IO/concurrencia)
   testTimeout: 30000,
-  
-  // Configuración específica para concurrencia
-  maxConcurrency: 1, // Tests de concurrencia deben ejecutarse en serie
-  
+
   // Reporters
   reporters: [
     'default',
@@ -52,27 +43,22 @@ module.exports = {
       filename: 'report.html'
     }]
   ],
-  
-  // Configuración para tests específicos
+
+  // Proyectos (suites) específicos
   projects: [
     {
       displayName: 'Concurrencia',
-      testMatch: ['**/test/concurrencia.test.js', '**/__tests__/concurrencia.test.js'],
-      maxConcurrency: 1
+      testMatch: ['**/test/concurrencia.test.js', '**/__tests__/concurrencia.test.js']
+      // Si querés correr esta suite en serie: `npx jest --runInBand --selectProjects Concurrencia`
     },
     {
       displayName: 'HTTP',
-      testMatch: ['**/test/http.test.js', '**/__tests__/http.test.js']
+      testMatch: ['**/test/integration/**/*.test.js', '**/__tests__/integration/**/*.test.js']
     },
     {
       displayName: 'Unit',
-      testMatch: ['**/test/*.test.js', '**/__tests__/*.test.js'],
-      testPathIgnorePatterns: [
-        '**/test/concurrencia.test.js',
-        '**/test/http.test.js',
-        '**/__tests__/concurrencia.test.js',
-        '**/__tests__/http.test.js'
-      ]
+      // Enfocamos solo a unit para evitar ignores con regex
+      testMatch: ['**/test/unit/**/*.test.js', '**/__tests__/unit/**/*.test.js']
     }
   ]
 };
