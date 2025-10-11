@@ -5,22 +5,18 @@ export class NotificacionController {
         this.notificacionRepository = notificacionRepository;
     }
 
-    async obtenerNotificacionesDeUnUsuario(req, res) {
+    async obtenerNotificacionesDeUnUsuario(req, res, next) {
         try {
             const { usuarioId, leida } = req.query;
             const filtroLeida = leida === undefined ? undefined : leida === 'true';
             const notificaciones = await this.notificacionRepository.obtenerNotificacionesDeUnUsuario(usuarioId, filtroLeida);
             return res.status(200).json(notificacionesToDTO(notificaciones));
         } catch(error) {
-            console.error('Error al obtener notificaciones:', error);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 
-    async marcarNotificacionComoLeida(req, res) {
+    async marcarNotificacionComoLeida(req, res, next) {
         try {
             const { notificacionId } = req.body;
             if (!notificacionId) {
@@ -30,11 +26,7 @@ export class NotificacionController {
             await this.notificacionRepository.marcarComoLeida(notificacionId);
             res.status(200).json({ message: 'Notificación marcada como leída' });
         } catch (error) {
-            console.error('Error al marcar notificación como leída:', error);
-            res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 }

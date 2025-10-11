@@ -9,34 +9,26 @@ export class ProductoController {
         this.productoService = productoService;
     }
 
-    async obtenerProductos(req, res) {
+    async obtenerProductos(req, res, next) {
         try {
             const productos = await this.productoService.obtenerProductos();
             res.status(200).json(productosToDTO(productos));
         } catch (error) {
-            console.error('Error en GET productos:', error);
-            res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 
-    async obtenerProductosOrdenados(req, res) {
+    async obtenerProductosOrdenados(req, res, next) {
         try {
           const { orden = 'precioAsc' } = req.query;
           const resultado = await this.productoService.obtenerProductosOrdenados(orden);
           res.status(200).json(productosToDTO(resultado));
         } catch (error) {
-          console.error('Error en obtenerProductosOrdenados:', error);
-          res.status(500).json({
-              error: error.name || 'Error',
-              message: error.message
-          });
+          next(error);
         }
       }
 
-    async listarProductosVendedorConFiltros(req, res) {
+    async listarProductosVendedorConFiltros(req, res, next) {
         try {
             const {
                 vendedorId,
@@ -55,7 +47,7 @@ export class ProductoController {
             }
 
             const filters = {vendedor: vendedorId};
-            
+
             if (min && max) {
                 filters.precio = { $gte: parseFloat(min), $lte: parseFloat(max) };
             } else if (min) {
@@ -89,11 +81,7 @@ export class ProductoController {
 
             res.status(200).json(result);
         }catch(error){
-            console.error('Error al listar productos del vendedor:', error);
-            res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
 
     }

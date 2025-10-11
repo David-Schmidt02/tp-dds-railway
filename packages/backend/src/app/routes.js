@@ -1,16 +1,21 @@
+import { pedidoErrorHandler } from '../middlewares/pedidoErrorHandler.js';
+import { productoErrorHandler } from '../middlewares/productoErrorHandler.js';
+import { notificacionErrorHandler } from '../middlewares/notificacionErrorHandler.js';
+import { usuarioErrorHandler } from '../middlewares/usuarioErrorHandler.js';
+
 export const configureRoutes = (app, {pedidoController, productoController, notificacionController, usuarioController}) => {
-    app.get('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController))
-    app.post('/pedidos', pedidoController.crearPedido.bind(pedidoController))
-    app.get('/pedidos/historial', pedidoController.consultarHistorialPedido.bind(pedidoController))
-    app.patch('/pedidos/:id', pedidoController.cancelarPedido.bind(pedidoController))
-    app.patch('/pedidos/:idPedido/itemsPedidos/:idItem', pedidoController.cambiarCantidadItem.bind(pedidoController))
+    app.get('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController), pedidoErrorHandler)
+    app.post('/pedidos', pedidoController.crearPedido.bind(pedidoController), pedidoErrorHandler)
+    app.get('/pedidos/historial', pedidoController.consultarHistorialPedido.bind(pedidoController), pedidoErrorHandler)
+    app.patch('/pedidos/:id', pedidoController.cancelarPedido.bind(pedidoController), pedidoErrorHandler)
+    app.patch('/pedidos/:idPedido/itemsPedidos/:idItem', pedidoController.cambiarCantidadItem.bind(pedidoController), pedidoErrorHandler)
 
-    app.get('/productos', productoController.obtenerProductos.bind(productoController))
-    app.get('/productos/ordenados', productoController.obtenerProductosOrdenados.bind(productoController));
-    app.get('/productos/vendedor', productoController.listarProductosVendedorConFiltros.bind(productoController));
+    app.get('/productos', productoController.obtenerProductos.bind(productoController), productoErrorHandler)
+    app.get('/productos/ordenados', productoController.obtenerProductosOrdenados.bind(productoController), productoErrorHandler);
+    app.get('/productos/vendedor', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
 
-    app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController));
-    app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController));
+    app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController), notificacionErrorHandler);
+    app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController), notificacionErrorHandler);
 
-    app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController));
+    app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController), usuarioErrorHandler);
 }

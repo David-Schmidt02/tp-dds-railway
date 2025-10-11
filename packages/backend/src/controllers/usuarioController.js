@@ -5,7 +5,7 @@ export class UsuarioController {
     this.usuarioService = usuarioService;
   }
 
-  async crearUsuario(req, res) {
+  async crearUsuario(req, res, next) {
     try {
       const datosUsuario = req.body;
 
@@ -13,11 +13,7 @@ export class UsuarioController {
 
       res.status(201).json(usuarioToDTO(nuevoUsuario));
     } catch (error) {
-      console.error('Error al crear usuario:', error);
-      res.status(500).json({
-        error: error.name || 'Error',
-        message: error.message
-      });
+      next(error);
     }
   }
 }

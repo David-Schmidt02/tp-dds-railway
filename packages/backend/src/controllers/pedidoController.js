@@ -10,7 +10,7 @@ export class PedidoController {
         this.pedidoService = pedidoService;
     }
 
-    async crearPedido(req, res) {
+    async crearPedido(req, res, next) {
         const body = req.body;
 
         const resultBody = pedidoRequestSchema.safeParse(body);
@@ -31,30 +31,22 @@ export class PedidoController {
 
             const pedidoDTO = pedidoToDTO(nuevoPedido);
             res.status(201).json(pedidoDTO);
-            
+
         } catch(error) {
-            console.error('Error al crear pedido:', error.message);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 
-    async obtenerPedidos(req, res) {
+    async obtenerPedidos(req, res, next) {
         try{
             const pedidos = await this.pedidoService.obtenerPedidos();
             return res.status(200).json(pedidos);
         }catch(error){
-            console.error('Error al obtener pedidos:', error.message);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 
-    async consultarHistorialPedido(req, res) {
+    async consultarHistorialPedido(req, res, next) {
         const { usuarioId } = req.query;
 
         if (!usuarioId) {
@@ -66,15 +58,11 @@ export class PedidoController {
             const pedidosDTO = pedidos.map(pedidoToDTO);
             res.status(200).json(pedidosDTO);
         } catch(error) {
-            console.error('Error al consultar historial de pedidos:', error.message);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
     
-    async cancelarPedido(req, res) {
+    async cancelarPedido(req, res, next) {
         const { id } = req.params;
         const { motivo } = req.body;
         const usuario = req.user; // Si usas autenticación, o lo obtienes del body
@@ -84,15 +72,11 @@ export class PedidoController {
             res.status(200).json(pedidoToDTO(pedidoCancelado));
 
         } catch(error) {
-            console.error('Error al cancelar pedido:', error.message);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 
-    async cambiarCantidadItem(req, res) {
+    async cambiarCantidadItem(req, res, next) {
         const { idPedido, idItem } = req.params;
         const { cantidad: nuevaCantidad } = req.body;
 
@@ -107,11 +91,7 @@ export class PedidoController {
             res.status(200).json(pedidoToDTO(pedidoActualizado));
 
         } catch (error) {
-            console.error('Error al cambiar cantidad de item:', error.message);
-            return res.status(500).json({
-                error: error.name || 'Error',
-                message: error.message
-            });
+            next(error);
         }
     }
 }
