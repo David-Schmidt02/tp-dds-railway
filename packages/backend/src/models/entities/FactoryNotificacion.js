@@ -9,7 +9,7 @@ export let factoryNotificacionPedidos = {
         const total = pedido.calcularTotal();
         const direccionEntrega = pedido.direccionEntrega;
         const vendedor = pedido.vendedor || pedido.itemsPedido[0]?.producto?.vendedor;
-        
+
         const datosMensaje = {
             titulo: "Nuevo pedido recibido!",
             comprador: comprador,
@@ -17,10 +17,12 @@ export let factoryNotificacionPedidos = {
             total: total,
             direccionEntrega: direccionEntrega,
         };
-        
+
         const mensaje = formatearMensajeNotificacion(datosMensaje);
-        
-        return new Notificacion(vendedor, mensaje);
+
+        // El receptor debe ser el id del vendedor, no el objeto completo
+        const receptorId = vendedor?.id || vendedor?._id;
+        return new Notificacion({ id: receptorId }, mensaje);
     },
 
     pedidoEnviado(pedido) {
@@ -38,15 +40,18 @@ export let factoryNotificacionPedidos = {
             direccionEntrega: direccionEntrega,
             vendedor: vendedor
         };
-        
+
         const mensaje = formatearMensajeNotificacion(datosMensaje);
-        
-        return new Notificacion(comprador, mensaje);
+
+        // El receptor debe ser el id del comprador, no el objeto completo
+        const receptorId = pedido.comprador?.id || pedido.comprador?._id;
+        return new Notificacion({ id: receptorId }, mensaje);
     },
 
     cancelarPedido(pedido,) {
         const comprador = pedido.comprador.nombre;
         const productos = pedido.itemsPedido.map(item => item.producto.titulo).join(', ');
+        const total = pedido.calcularTotal();
         const direccionEntrega = pedido.direccionEntrega;
         const vendedor = pedido.vendedor || pedido.itemsPedido[0]?.producto?.vendedor;
 
@@ -58,10 +63,12 @@ export let factoryNotificacionPedidos = {
             total: total,
             direccionEntrega: direccionEntrega,
         };
-        
+
         const mensaje = formatearMensajeNotificacion(datosMensaje);
-        
-        return new Notificacion(vendedor, mensaje);
+
+        // El receptor debe ser el id del vendedor, no el objeto completo
+        const receptorId = vendedor?.id || vendedor?._id;
+        return new Notificacion({ id: receptorId }, mensaje);
     },
 
    confirmarPedido(pedido) {
@@ -69,17 +76,19 @@ export let factoryNotificacionPedidos = {
        const productos = pedido.itemsPedido.map(item => item.producto.titulo).join(', ');
        const estado = pedido.estado.nombre;
        const direccionEntrega = pedido.direccionEntrega;
-       
+
        const datosMensaje = {
            titulo: "Tu pedido fue confirmado",
            productos: productos,
            estado: estado,
            direccionEntrega: direccionEntrega,
         };
-        
+
         const mensaje = formatearMensajeNotificacion(datosMensaje);
-        
-        return new Notificacion(comprador, mensaje);
+
+        // El receptor debe ser el id del comprador, no el objeto completo
+        const receptorId = comprador?.id || comprador?._id;
+        return new Notificacion({ id: receptorId }, mensaje);
     }
 };
 

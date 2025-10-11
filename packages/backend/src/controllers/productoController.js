@@ -1,9 +1,4 @@
-import { Pedido } from '../dominio/pedido.js';
-import { pedidoSchema } from '../dominio/validaciones.js';
-import { Usuario } from '../dominio/usuario.js';
-import { ItemPedido } from '../dominio/itemPedido.js';
-import { Moneda } from '../dominio/moneda.js';
-import { DireccionEntrega } from '../dominio/direccionEntrega.js';
+import { productosToDTO } from '../dto/productoDTO.js';
 
 export const producto = []
 
@@ -16,14 +11,14 @@ export class ProductoController {
 
     async obtenerProductos(req, res) {
         try {
-            console.log('=== DEBUG GET /productos ===');
-            // Llamar al service sin filtros (devuelve todos los productos)
             const productos = await this.productoService.obtenerProductos();
-            console.log('Productos devueltos:', productos.length);
-            res.status(200).json(productos);
+            res.status(200).json(productosToDTO(productos));
         } catch (error) {
             console.error('Error en GET productos:', error);
-            res.status(500).json({ error: error.message });
+            res.status(500).json({
+                error: error.name || 'Error',
+                message: error.message
+            });
         }
     }
 
@@ -31,10 +26,13 @@ export class ProductoController {
         try {
           const { orden = 'precioAsc' } = req.query;
           const resultado = await this.productoService.obtenerProductosOrdenados(orden);
-          res.status(200).json(resultado);
+          res.status(200).json(productosToDTO(resultado));
         } catch (error) {
           console.error('Error en obtenerProductosOrdenados:', error);
-          res.status(500).json({ mensaje: 'Error al obtener los productos ordenados' });
+          res.status(500).json({
+              error: error.name || 'Error',
+              message: error.message
+          });
         }
       }
 
@@ -53,7 +51,7 @@ export class ProductoController {
             } = req.query;
 
             if (!vendedorId){
-                return res.status(400).json({ error: "Debe indicar el vendedor" });
+                return res.status(400).json({ message: "Debe indicar el vendedor" });
             }
 
             const filters = {vendedor: vendedorId};
@@ -91,9 +89,13 @@ export class ProductoController {
 
             res.status(200).json(result);
         }catch(error){
-            res.status(500).json({ mensaje: "Error al listar productos del vendedor" });
+            console.error('Error al listar productos del vendedor:', error);
+            res.status(500).json({
+                error: error.name || 'Error',
+                message: error.message
+            });
         }
-        
+
     }
 }
 

@@ -1,4 +1,4 @@
-import { Usuario } from '../dominio/usuario.js';
+import { Usuario } from '../models/entities/usuario.js';
 import { UsuarioYaExiste, EmailInvalido, DatosUsuarioInvalidos } from '../excepciones/usuario.js';
 
 export class UsuarioService {

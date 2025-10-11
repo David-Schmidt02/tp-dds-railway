@@ -9,7 +9,13 @@
       "Bash(curl -X POST http://localhost:3000/pedidos -H \"Content-Type: application/json\" -d \"{\"\"usuarioId\"\": \"\"68e899e0cf7c1a0f5353e611\"\", \"\"items\"\": [{\"\"productoId\"\": \"\"68e899e0cf7c1a0f5353e61b\"\", \"\"cantidad\"\": 3}], \"\"metodoPago\"\": \"\"PESO_ARG\"\", \"\"direccionEntrega\"\": {\"\"calle\"\": \"\"San Martín\"\", \"\"numero\"\": \"\"567\"\", \"\"ciudad\"\": \"\"Rosario\"\", \"\"codigoPostal\"\": \"\"2000\"\", \"\"provincia\"\": \"\"Santa Fe\"\"}}\")",
       "Bash(curl -X POST http://localhost:3000/pedidos -H \"Content-Type: application/json\" -d \"{\"\"usuarioId\"\": \"\"68e899e0cf7c1a0f5353e611\"\", \"\"items\"\": [{\"\"productoId\"\": \"\"68e899e0cf7c1a0f5353e61d\"\", \"\"cantidad\"\": 999}], \"\"metodoPago\"\": \"\"PESO_ARG\"\", \"\"direccionEntrega\"\": {\"\"calle\"\": \"\"Av. Test\"\", \"\"numero\"\": \"\"123\"\", \"\"ciudad\"\": \"\"Buenos Aires\"\", \"\"codigoPostal\"\": \"\"1000\"\", \"\"provincia\"\": \"\"CABA\"\"}}\")",
       "Bash(curl \"http://localhost:3000/pedidos/historial?usuarioId=68e899e0cf7c1a0f5353e611\")",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(tree:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(npm start)",
+      "Bash(cat:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

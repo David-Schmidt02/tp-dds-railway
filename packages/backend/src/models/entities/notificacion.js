@@ -1,4 +1,4 @@
-import { NotificacionInexistente, EstadoNoSoportado } from "../excepciones/notificacion.js"
+import { NotificacionInexistente, EstadoNoSoportado } from "../../excepciones/notificacion.js"
 import{ Pedido } from "./pedido.js"
 import { Producto } from "./producto.js";
 import { EstadoPedido } from "./estadoPedido.js";

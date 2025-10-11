@@ -1,8 +1,8 @@
 // Repositorios
-import { NotificacionRepository } from "../repositories/notificacionRepository.js";
-import { PedidoRepository } from "../repositories/pedidoRepository.js";
-import { ProductoRepository } from "../repositories/productoRepository.js";
-import { UsuarioRepository } from "../repositories/usuarioRepository.js";
+import { NotificacionRepository } from "../models/repositories/notificacionRepository.js";
+import { PedidoRepository } from "../models/repositories/pedidoRepository.js";
+import { ProductoRepository } from "../models/repositories/productoRepository.js";
+import { UsuarioRepository } from "../models/repositories/usuarioRepository.js";
 
 // Services
 import { PedidoService } from "../services/pedidoService.js";

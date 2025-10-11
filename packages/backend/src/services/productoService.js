@@ -1,5 +1,5 @@
-import { Producto } from '../dominio/producto.js';
-import { ProductoRepository } from '../repositories/productoRepository.js';
+import { Producto } from '../models/entities/producto.js';
+import { ProductoRepository } from '../models/repositories/productoRepository.js';
 import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/producto.js';
 import mongoose from 'mongoose';
 
@@ -168,25 +168,13 @@ export class ProductoService {
             
             await session.withTransaction(async () => {
                 // PASO 1: Verificar que ambos productos existen
-                const productoOrigen = await this.productoRepository.obtenerProductoPorId(idProductoOrigen, session);
-                const productoDestino = await this.productoRepository.obtenerProductoPorId(idProductoDestino, session);
-                
-                if (!productoOrigen) {
-                    throw new ProductoInexistente(`Producto origen ${idProductoOrigen} no encontrado`);
-                }
-                if (!productoDestino) {
-                    throw new ProductoInexistente(`Producto destino ${idProductoDestino} no encontrado`);
-                }
+                await this.productoRepository.obtenerProductoPorId(idProductoOrigen, session);
+                await this.productoRepository.obtenerProductoPorId(idProductoDestino, session);
 
-                // PASO 2: Verificar stock disponible en producto origen
+                // PASO 2: Obtener stock disponible en producto origen
                 const stockOrigen = await this.productoRepository.obtenerStockDisponible(idProductoOrigen, session);
-                if (stockOrigen < cantidad) {
-                    throw new ProductoStockInsuficiente(
-                        `Stock insuficiente en producto origen. Disponible: ${stockOrigen}, Solicitado: ${cantidad}`
-                    );
-                }
-                
-                // PASO 3: Realizar la transferencia atómica
+
+                // PASO 3: Realizar la transferencia atómica (reservarStock valida stock disponible)
                 await this.productoRepository.reservarStock(idProductoOrigen, cantidad, session);
                 await this.productoRepository.cancelarStock(idProductoDestino, cantidad, session);
                 
@@ -221,13 +209,10 @@ export class ProductoService {
             await session.withTransaction(async () => {
                 for (const actualizacion of actualizaciones) {
                     const { id, cambios } = actualizacion;
-                    
+
                     // Verificar que el producto existe antes de actualizar
-                    const producto = await this.productoRepository.obtenerProductoPorId(id, session);
-                    if (!producto) {
-                        throw new ProductoInexistente(`Producto ${id} no encontrado`);
-                    }
-                    
+                    await this.productoRepository.obtenerProductoPorId(id, session);
+
                     // Aplicar cambios (esto requeriría un método updateProducto en el repository)
                     // const productoActualizado = await this.productoRepository.actualizarProducto(id, cambios, session);
                     

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { NotificacionInexistente } from "../excepciones/notificacion.js";
-import { NotificacionModel } from '../schema/notificacionSchema.js';
+import { NotificacionInexistente } from "../../excepciones/notificacion.js";
+import { NotificacionModel } from '../../schema/notificacionSchema.js';
 
 export class NotificacionRepository {
     constructor() {
@@ -16,11 +16,15 @@ export class NotificacionRepository {
     }
 
     async marcarComoLeida(id) {
-        return await NotificacionModel.findByIdAndUpdate(
-            id, 
-            { leida: true, fechaLeida: new Date() }, 
+        const notificacion = await NotificacionModel.findByIdAndUpdate(
+            id,
+            { leida: true, fechaLeida: new Date() },
             { new: true }
         );
+        if (!notificacion) {
+            throw new NotificacionInexistente(id);
+        }
+        return notificacion;
     }
 
     async obtenerTodos() {
@@ -28,15 +32,11 @@ export class NotificacionRepository {
     }
 
     async agregarNotificacion(usuarioId, notificacion) {
-        const notificacionExistente = await NotificacionModel.findOne({ receptorId: usuarioId });
-        if (notificacionExistente) {
-            throw new NotificacionInexistente("Ya existe una notificación para este usuario");
-        }
         return await NotificacionModel.create({ receptorId: usuarioId, ...notificacion });
     }
 
     async obtenerNotificacionesDeUnUsuario(usuarioId, leida) {
-         const filtro = { usuarioId };
+         const filtro = { receptorId: usuarioId };
          if (leida !== undefined) {
             filtro.leida = leida; // true o false
          }

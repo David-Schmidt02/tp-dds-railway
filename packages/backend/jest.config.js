@@ -10,12 +10,14 @@ module.exports = {
   
   // Patrones de archivos de test
   testMatch: [
+    '**/test/**/*.test.js',
+    '**/test/**/*.spec.js',
     '**/__tests__/**/*.js',
     '**/?(*.)+(spec|test).js'
   ],
-  
+
   // Setup antes de todos los tests
-  setupFilesAfterEnv: ['<rootDir>/__tests__/setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
   
   // Cobertura de código
   collectCoverageFrom: [
@@ -55,17 +57,19 @@ module.exports = {
   projects: [
     {
       displayName: 'Concurrencia',
-      testMatch: ['**/__tests__/concurrencia.test.js'],
+      testMatch: ['**/test/concurrencia.test.js', '**/__tests__/concurrencia.test.js'],
       maxConcurrency: 1
     },
     {
       displayName: 'HTTP',
-      testMatch: ['**/__tests__/http.test.js']
+      testMatch: ['**/test/http.test.js', '**/__tests__/http.test.js']
     },
     {
       displayName: 'Unit',
-      testMatch: ['**/__tests__/*.test.js'],
+      testMatch: ['**/test/*.test.js', '**/__tests__/*.test.js'],
       testPathIgnorePatterns: [
+        '**/test/concurrencia.test.js',
+        '**/test/http.test.js',
         '**/__tests__/concurrencia.test.js',
         '**/__tests__/http.test.js'
       ]

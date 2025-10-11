@@ -1,14 +1,14 @@
 // El Service se va a encargar de orquestar las clases de negocio + el órden de las operaciones
 // El Service no debería tener lógica de negocio, solo orquestación
 
-import { Pedido } from '../dominio/pedido.js';
-import { ItemPedido } from '../dominio/itemPedido.js';
-import { Producto } from '../dominio/producto.js';
-import { DireccionEntrega } from '../dominio/direccionEntrega.js';
-import { PedidoRepository } from '../repositories/pedidoRepository.js';
+import { Pedido } from '../models/entities/pedido.js';
+import { ItemPedido } from '../models/entities/itemPedido.js';
+import { Producto } from '../models/entities/producto.js';
+import { DireccionEntrega } from '../models/entities/direccionEntrega.js';
+import { PedidoRepository } from '../models/repositories/pedidoRepository.js';
 import { PedidoInexistente } from '../excepciones/pedido.js';
 import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/producto.js';
-import { factoryNotificacionPedidos } from '../dominio/FactoryNotificacion.js';
+import { factoryNotificacionPedidos } from '../models/entities/FactoryNotificacion.js';
 import mongoose from 'mongoose';
 
 export class PedidoService {
@@ -32,25 +32,9 @@ export class PedidoService {
                 for (const itemData of items) {
                     const { productoId, cantidad } = itemData;
 
-                    console.log('=== DEBUG PEDIDO SERVICE ===');
-                    console.log('ItemData completo:', JSON.stringify(itemData, null, 2));
-                    console.log('ProductoId extraído:', productoId);
-                    console.log('Tipo de productoId:', typeof productoId);
-                    console.log('Cantidad:', cantidad);
-
-                    // Validar que el producto existe
+                    // Validar que el producto existe y obtener stock disponible
                     const producto = await this.productoRepository.obtenerProductoPorId(productoId, session);
-                    if (!producto) {
-                        throw new ProductoInexistente(`Producto ${productoId} no encontrado`);
-                    }
-
-                    // Validar stock disponible ANTES de reservar
-                    const stockDisponible = await this.productoRepository.obtenerStockDisponible(productoId, session);
-                    if (stockDisponible < cantidad) {
-                        throw new ProductoStockInsuficiente(
-                            `Stock insuficiente para ${producto.titulo}. Disponible: ${stockDisponible}, Solicitado: ${cantidad}`
-                        );
-                    }
+                    await this.productoRepository.obtenerStockDisponible(productoId, session);
                 }
 
                 // PASO 2: SI TODO EL STOCK ESTÁ DISPONIBLE, RESERVAR ATÓMICAMENTE Y CREAR ITEMS DE DOMINIO
@@ -97,10 +81,8 @@ export class PedidoService {
                 pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo, session);
             });
             
-            // PASO 4: CREAR NOTIFICACIÓN FUERA DE LA TRANSACCIÓN PRINCIPAL
             try {
-                // Crear notificación usando el factory
-                const notificacion = FactoryNotificacionPedidos.crearPedido(pedidoGuardado, session);
+                const notificacion = factoryNotificacionPedidos.crearPedido(pedidoGuardado);
                 if (notificacion && notificacion.receptor) {
                     await this.notificacionRepository.agregarNotificacion(
                         notificacion.receptor.id,
@@ -108,7 +90,7 @@ export class PedidoService {
                     );
                 }
             } catch (notificacionError) {
-                console.warn('Error al crear notificación:', notificacionError.message);
+                console.error('Error al crear notificación:', notificacionError);
             }
             
         } catch (error) {
@@ -129,10 +111,7 @@ export class PedidoService {
         try {
             await session.withTransaction(async () => {
                 const pedido = await this.pedidoRepository.obtenerPedidoPorId(id, session);
-                if (!pedido) {
-                    throw new PedidoInexistente(`Pedido ${id} no encontrado`);
-                }
-                
+
                 // Validar que se puede cancelar
                 if (pedido.estado.nombre === 'ENVIADO' || pedido.estado.nombre === 'ENTREGADO') {
                     throw new PedidoYaEntregado(id)
@@ -148,9 +127,9 @@ export class PedidoService {
             
             // Crear notificación de cancelación fuera de la transacción
             try {
-                const notificacion = FactoryNotificacionPedidos.cancelarPedido(
-                    pedidoActualizado, 
-                    motivo, 
+                const notificacion = factoryNotificacionPedidos.cancelarPedido(
+                    pedidoActualizado,
+                    motivo,
                     'comprador'
                 );
                 if (notificacion) {
@@ -183,21 +162,12 @@ export class PedidoService {
         try {
             await session.withTransaction(async () => {
                 const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido, session);
-                if (!pedido) {
-                    throw new PedidoInexistente(`Pedido ${idPedido} no encontrado`);
-                }
-                
+
                 const cantidadPrevia = pedido.obtenerCantidadItem(idItem);
                 const diferencia = nuevaCantidad - cantidadPrevia;
-                
+
                 if (diferencia > 0) {
-                    // Necesitamos más stock - validar disponibilidad primero
-                    const stockDisponible = await this.productoRepository.obtenerStockDisponible(idItem, session);
-                    if (stockDisponible < diferencia) {
-                        throw new ProductoStockInsuficiente(
-                            `Stock insuficiente. Disponible: ${stockDisponible}, Solicitado: ${diferencia}`
-                        );
-                    }
+                    // Necesitamos más stock - reservar (el repository valida stock disponible)
                     await this.productoRepository.reservarStock(idItem, diferencia, session);
                 } else if (diferencia < 0) {
                     // Liberamos stock

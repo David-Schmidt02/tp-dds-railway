@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-import { PedidoInexistente } from "../excepciones/pedido.js";
-import { PedidoModel } from "../schema/pedidoSchema.js";
-import { Pedido } from "../dominio/pedido.js";
-import { ItemPedido } from "../dominio/itemPedido.js";
-import { Usuario } from "../dominio/usuario.js";
-import { Producto } from "../dominio/producto.js";
-import { DireccionEntrega } from "../dominio/direccionEntrega.js";
-import { Moneda } from "../dominio/moneda.js";
+import { PedidoInexistente, EstadoPedidoInvalido, PedidoYaCancelado, PedidoYaEntregado } from "../../excepciones/pedido.js";
+import { PedidoModel } from "../../schema/pedidoSchema.js";
+import { Pedido } from "../entities/pedido.js";
+import { ItemPedido } from "../entities/itemPedido.js";
+import { Usuario } from "../entities/usuario.js";
+import { Producto } from "../entities/producto.js";
+import { DireccionEntrega } from "../entities/direccionEntrega.js";
+import { Moneda } from "../entities/moneda.js";
 
 export class PedidoRepository {
     constructor() {
@@ -161,10 +161,12 @@ export class PedidoRepository {
             resultado = await nuevoPedido.save();
         }
 
-        // Populate para obtener los datos completos antes de devolver
         const pedidoCompleto = await this.model.findById(resultado._id)
             .populate('usuarioId')
-            .populate('items.productoId')
+            .populate({
+                path: 'items.productoId',
+                populate: { path: 'vendedor' }
+            })
             .session(session);
 
         return this.dePedidoDB(pedidoCompleto.toObject());
@@ -187,31 +189,27 @@ export class PedidoRepository {
     }
 
     async obtenerPedidos(session = null) {
-        console.log('=== DEBUG obtenerPedidos ===');
         let query = this.model.find();
         if (session) {
             query = query.session(session);
         }
-        console.log('Query creada:', query.getQuery());
         const pedidos = await query
             .populate('usuarioId')
             .populate('items.productoId')
             .sort({ fechaPedido: -1 });
-        console.log(`Pedidos encontrados: ${pedidos.length}`);
-        const pedidosFormateados = pedidos.map(pedido => this.dePedidoDB(pedido.toObject()));
-        console.log('Pedidos formateados:', pedidosFormateados);
-        return pedidosFormateados;
+        return pedidos.map(pedido => this.dePedidoDB(pedido.toObject()));
     }
 
     async obtenerPedidosPorUsuario(usuarioId) {
         if (!mongoose.Types.ObjectId.isValid(usuarioId)) {
             return [];
         }
-        
+
         const pedidos = await this.model.find({ usuarioId })
+            .populate('usuarioId')
             .populate('items.productoId')
             .sort({ fechaPedido: -1 });
-        
+
         return pedidos.map(pedido => this.dePedidoDB(pedido.toObject()));
     }
 

@@ -3,7 +3,7 @@ import { CambioEstadoPedido } from "./cambioEstadoPedido.js"
 import { ItemPedido } from "./itemPedido.js"
 import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
-import { PedidoNoModificable } from "../excepciones/pedido.js"
+import { PedidoNoModificable } from "../../excepciones/pedido.js"
 
 export class Pedido {
     id;
