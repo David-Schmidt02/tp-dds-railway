@@ -21,6 +21,10 @@ export class ProductoRepository {
             }
             return producto;
         } catch (error) {
+            // Si es un error de casteo de ObjectId, significa que el ID es inválido
+            if (error.name === 'CastError') {
+                throw new ProductoInexistente(id);
+            }
             throw error;
         }
     }
@@ -65,6 +69,10 @@ export class ProductoRepository {
 
         return cantidad;
     } catch (error) {
+        // Si es un error de casteo de ObjectId, significa que el ID es inválido
+        if (error.name === 'CastError') {
+            throw new ProductoInexistente(idProducto);
+        }
         throw error;
     }
 }
@@ -97,18 +105,26 @@ export class ProductoRepository {
       }
 
     async obtenerStockDisponible(idProducto, session = null) {
-        let query = ProductoModel.findById(idProducto);
-        
-        if (session) {
-            query = query.session(session);
+        try {
+            let query = ProductoModel.findById(idProducto);
+
+            if (session) {
+                query = query.session(session);
+            }
+
+            const producto = await query;
+
+            if (!producto) {
+                throw new ProductoInexistente(idProducto);
+            }
+            return producto.stock;
+        } catch (error) {
+            // Si es un error de casteo de ObjectId, significa que el ID es inválido
+            if (error.name === 'CastError') {
+                throw new ProductoInexistente(idProducto);
+            }
+            throw error;
         }
-        
-        const producto = await query;
-        
-        if (!producto) {
-            throw new ProductoInexistente(idProducto);
-        }
-        return producto.stock;
     }
 
 async findByFilters(filters, page, limit, sort) {
@@ -119,6 +135,7 @@ async findByFilters(filters, page, limit, sort) {
 
     const items = await ProductoModel
       .find(filters)
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean();

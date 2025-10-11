@@ -16,6 +16,10 @@ export class NotificacionRepository {
     }
 
     async marcarComoLeida(id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new NotificacionInexistente(id);
+        }
+
         const notificacion = await NotificacionModel.findByIdAndUpdate(
             id,
             { leida: true, fechaLeida: new Date() },

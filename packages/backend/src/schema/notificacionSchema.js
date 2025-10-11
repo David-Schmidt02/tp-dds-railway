@@ -27,14 +27,14 @@ const notificacionSchema = new mongoose.Schema({
   collection: 'notificaciones'
 });
 
-notificacionSchema.loadClass(class Notificacion{});
-export const NotificacionModel = mongoose.model('Notificacion', notificacionSchema);
-
 notificacionSchema.pre('save', function(next) {
   if (this.isModified('leida') && this.leida && !this.fechaLeida) {
     this.fechaLeida = new Date();
   }
   next();
 });
+
+notificacionSchema.loadClass(class Notificacion{});
+export const NotificacionModel = mongoose.model('Notificacion', notificacionSchema);
 
 

@@ -57,7 +57,7 @@ export class ProductoController {
             }
 
             if (nombre) {
-                filters.nombre = new RegExp(nombre.trim(), "i");
+                filters.titulo = new RegExp(nombre.trim(), "i");
             }
 
             if (descripcion) {

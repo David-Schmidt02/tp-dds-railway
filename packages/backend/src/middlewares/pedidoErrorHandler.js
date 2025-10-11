@@ -7,9 +7,13 @@ import {
   PedidoYaEntregado
 } from '../excepciones/pedido.js';
 
-export function pedidoErrorHandler(err, _req, res, _next) {
+import { productoErrorHandler } from './productoErrorHandler.js';
+import { usuarioErrorHandler } from './usuarioErrorHandler.js';
+
+export function pedidoErrorHandler(err, req, res, next) {
   console.log(err.message);
 
+  // Errores de Pedido
   if (err.constructor.name === PedidoInexistente.name) {
     return res.status(404).json({ error: err.name, message: err.message });
   }
@@ -34,5 +38,17 @@ export function pedidoErrorHandler(err, _req, res, _next) {
     return res.status(409).json({ error: err.name, message: err.message });
   }
 
-  res.status(500).json({ error: 'Error', message: 'Ups. Algo sucedió en el servidor.' });
+  // Si no es un error de pedido, delegar a otros middlewares
+  // Intentar con el middleware de productos
+  productoErrorHandler(err, req, res, (err) => {
+    if (err) {
+      // Si el middleware de productos no lo manejó, intentar con usuarios
+      usuarioErrorHandler(err, req, res, (err) => {
+        if (err) {
+          // Si ninguno lo manejó, error genérico
+          res.status(500).json({ error: 'Error', message: 'Ups. Algo sucedió en el servidor.' });
+        }
+      });
+    }
+  });
 }
