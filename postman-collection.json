@@ -1,0 +1,676 @@
+{
+	"info": {
+		"_postman_id": "e-commerce-api-2025",
+		"name": "E-Commerce Backend - Entrega 1",
+		"description": "Colección de endpoints para la Entrega 1: Backend Rest + Persistencia\n\nIncluye:\n- Gestión de Pedidos (crear, cancelar, historial, modificar items)\n- Búsqueda y Visualización de Productos (listado, filtros, paginación, ordenamiento)\n- Gestión de Notificaciones (listar leídas/no leídas, marcar como leída)\n- Gestión de Usuarios (crear usuario)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Crear Usuario Comprador",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"telefono\": \"1112345678\",\n  \"tipoUsuario\": \"COMPRADOR\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"usuarios"
+							]
+						},
+						"description": "Crea un nuevo usuario de tipo COMPRADOR. Campos requeridos: nombre, email, tipoUsuario. Tipos válidos: COMPRADOR, VENDEDOR, ADMIN"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Usuario Vendedor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"María García\",\n  \"email\": \"maria.garcia@tienda.com\",\n  \"telefono\": \"1187654321\",\n  \"tipoUsuario\": \"VENDEDOR\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"usuarios"
+							]
+						},
+						"description": "Crea un nuevo usuario de tipo VENDEDOR que puede publicar productos"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Usuario Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Admin Sistema\",\n  \"email\": \"admin@sistema.com\",\n  \"telefono\": \"1100000000\",\n  \"tipoUsuario\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"usuarios"
+							]
+						},
+						"description": "Crea un nuevo usuario de tipo ADMIN con permisos administrativos"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pedidos",
+			"item": [
+				{
+					"name": "Crear Pedido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"usuarioId\": \"<ID_USUARIO_COMPRADOR>\",\n  \"items\": [\n    {\n      \"productoId\": \"<ID_PRODUCTO_1>\",\n      \"cantidad\": 2\n    },\n    {\n      \"productoId\": \"<ID_PRODUCTO_2>\",\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"PESO_ARG\",\n  \"direccionEntrega\": {\n    \"calle\": \"Av. Corrientes\",\n    \"numero\": \"1234\",\n    \"ciudad\": \"Buenos Aires\",\n    \"codigoPostal\": \"1043\",\n    \"provincia\": \"CABA\"\n  },\n  \"comentarios\": \"Entregar en horario de oficina\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/pedidos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos"
+							]
+						},
+						"description": "Crea un nuevo pedido validando el stock disponible de cada producto. Implementa manejo de concurrencia para evitar consumir más stock del disponible.\n\nCampos requeridos:\n- usuarioId: ID del usuario comprador\n- items: Array de productos con productoId y cantidad\n- metodoPago: PESO_ARG, DOLAR_USA, o REAL\n- direccionEntrega: Objeto con calle, numero, ciudad, codigoPostal\n\nCampos opcionales:\n- comentarios: Observaciones del pedido\n- direccionEntrega.provincia: Provincia (opcional)"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Todos los Pedidos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/pedidos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos"
+							]
+						},
+						"description": "Obtiene la lista completa de pedidos"
+					},
+					"response": []
+				},
+				{
+					"name": "Consultar Historial de Pedidos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/pedidos/historial?usuarioId=<ID_USUARIO>",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos",
+								"historial"
+							],
+							"query": [
+								{
+									"key": "usuarioId",
+									"value": "<ID_USUARIO>",
+									"description": "ID del usuario para consultar su historial"
+								}
+							]
+						},
+						"description": "Consulta el historial de pedidos de un usuario específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Pedido",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"motivo\": \"Cliente cambió de opinión\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/pedidos/<ID_PEDIDO>",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos",
+								"<ID_PEDIDO>"
+							]
+						},
+						"description": "Cancela un pedido. Solo es posible antes de que haya sido enviado (estados PENDIENTE, CONFIRMADO, PREPARANDO)"
+					},
+					"response": []
+				},
+				{
+					"name": "Modificar Cantidad de Item",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cantidad\": 5\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/pedidos/<ID_PEDIDO>/itemsPedidos/<ID_ITEM>",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"pedidos",
+								"<ID_PEDIDO>",
+								"itemsPedidos",
+								"<ID_ITEM>"
+							]
+						},
+						"description": "Modifica la cantidad de un ítem en un pedido. Solo posible antes de que haya sido enviado y ajustada al stock disponible"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "Obtener Todos los Productos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos"
+							]
+						},
+						"description": "Obtiene la lista completa de productos"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Productos Ordenados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/ordenados?orden=precioAsc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"ordenados"
+							],
+							"query": [
+								{
+									"key": "orden",
+									"value": "precioAsc",
+									"description": "Opciones: precioAsc, precioDesc, masVendido"
+								}
+							]
+						},
+						"description": "Obtiene productos ordenados por precio (ascendente/descendente) o por más vendidos"
+					},
+					"response": []
+				},
+				{
+					"name": "Productos Ordenados - Precio Descendente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/ordenados?orden=precioDesc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"ordenados"
+							],
+							"query": [
+								{
+									"key": "orden",
+									"value": "precioDesc"
+								}
+							]
+						},
+						"description": "Obtiene productos ordenados por precio descendente"
+					},
+					"response": []
+				},
+				{
+					"name": "Productos Ordenados - Más Vendidos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/ordenados?orden=masVendido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"ordenados"
+							],
+							"query": [
+								{
+									"key": "orden",
+									"value": "masVendido"
+								}
+							]
+						},
+						"description": "Obtiene productos ordenados por cantidad vendida"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Productos por Vendedor (Sin Filtros)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/vendedor?vendedorId=<ID_VENDEDOR>&page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"vendedor"
+							],
+							"query": [
+								{
+									"key": "vendedorId",
+									"value": "<ID_VENDEDOR>",
+									"description": "ID del vendedor (obligatorio)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número de página (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Cantidad de resultados por página (default: 10)"
+								}
+							]
+						},
+						"description": "Lista productos de un vendedor específico con paginación básica"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Productos por Vendedor (Con Filtros Completos)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/vendedor?vendedorId=<ID_VENDEDOR>&nombre=laptop&descripcion=gaming&categorias=Electrónica,Computadoras&min=500&max=2000&page=1&limit=10&orden=precioAsc",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"vendedor"
+							],
+							"query": [
+								{
+									"key": "vendedorId",
+									"value": "<ID_VENDEDOR>",
+									"description": "ID del vendedor (obligatorio)"
+								},
+								{
+									"key": "nombre",
+									"value": "laptop",
+									"description": "Buscar por término en el nombre"
+								},
+								{
+									"key": "descripcion",
+									"value": "gaming",
+									"description": "Buscar por término en la descripción"
+								},
+								{
+									"key": "categorias",
+									"value": "Electrónica,Computadoras",
+									"description": "Filtrar por categorías (separadas por coma)"
+								},
+								{
+									"key": "min",
+									"value": "500",
+									"description": "Precio mínimo"
+								},
+								{
+									"key": "max",
+									"value": "2000",
+									"description": "Precio máximo"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número de página"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Cantidad de resultados por página"
+								},
+								{
+									"key": "orden",
+									"value": "precioAsc",
+									"description": "Orden: precioAsc, precioDesc, masVendido"
+								}
+							]
+						},
+						"description": "Lista productos de un vendedor con todos los filtros aplicados: búsqueda por nombre/categoría/descripción, rango de precios, paginación y ordenamiento"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Productos por Vendedor (Filtro Precio)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/vendedor?vendedorId=<ID_VENDEDOR>&min=100&max=500&page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"vendedor"
+							],
+							"query": [
+								{
+									"key": "vendedorId",
+									"value": "<ID_VENDEDOR>"
+								},
+								{
+									"key": "min",
+									"value": "100",
+									"description": "Precio mínimo"
+								},
+								{
+									"key": "max",
+									"value": "500",
+									"description": "Precio máximo"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista productos de un vendedor filtrando por rango de precios"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Productos por Vendedor (Filtro Nombre)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/productos/vendedor?vendedorId=<ID_VENDEDOR>&nombre=laptop&page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"productos",
+								"vendedor"
+							],
+							"query": [
+								{
+									"key": "vendedorId",
+									"value": "<ID_VENDEDOR>"
+								},
+								{
+									"key": "nombre",
+									"value": "laptop",
+									"description": "Término de búsqueda en el nombre"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Lista productos de un vendedor filtrando por término de búsqueda en el nombre"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notificaciones",
+			"item": [
+				{
+					"name": "Obtener Notificaciones No Leídas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/notificaciones?usuarioId=<ID_USUARIO>&leida=false",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notificaciones"
+							],
+							"query": [
+								{
+									"key": "usuarioId",
+									"value": "<ID_USUARIO>",
+									"description": "ID del usuario"
+								},
+								{
+									"key": "leida",
+									"value": "false",
+									"description": "false para obtener no leídas"
+								}
+							]
+						},
+						"description": "Obtiene la lista de notificaciones sin leer de un usuario. Las notificaciones incluyen: confirmación de pedido, aviso de pedido enviado, cancelación de pedido"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Notificaciones Leídas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/notificaciones?usuarioId=<ID_USUARIO>&leida=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notificaciones"
+							],
+							"query": [
+								{
+									"key": "usuarioId",
+									"value": "<ID_USUARIO>",
+									"description": "ID del usuario"
+								},
+								{
+									"key": "leida",
+									"value": "true",
+									"description": "true para obtener leídas"
+								}
+							]
+						},
+						"description": "Obtiene la lista de notificaciones leídas de un usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Todas las Notificaciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/notificaciones?usuarioId=<ID_USUARIO>",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notificaciones"
+							],
+							"query": [
+								{
+									"key": "usuarioId",
+									"value": "<ID_USUARIO>",
+									"description": "ID del usuario"
+								}
+							]
+						},
+						"description": "Obtiene todas las notificaciones de un usuario (leídas y no leídas)"
+					},
+					"response": []
+				},
+				{
+					"name": "Marcar Notificación como Leída",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notificacionId\": \"<ID_NOTIFICACION>\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/notificaciones",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"notificaciones"
+							]
+						},
+						"description": "Marca una notificación específica como leída"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

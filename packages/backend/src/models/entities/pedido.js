@@ -56,7 +56,7 @@ export class Pedido {
 
     puedeModificarItems() {
         // Solo se puede modificar si no ha sido enviado
-        return this.estado.nombre !== 'ENVIADO' && this.estado.nombre !== 'ENTREGADO' && this.estado.nombre !== 'CANCELADO';
+        return this.estado !== 'ENVIADO' && this.estado !== 'ENTREGADO' && this.estado !== 'CANCELADO';
     }
 
     puedeCancelarse() {

@@ -8,9 +8,7 @@ import {
   PermisosInsuficientes
 } from '../excepciones/usuario.js';
 
-export function usuarioErrorHandler(err, _req, res, _next) {
-  console.log(err.message);
-
+export function usuarioErrorHandler(err, req, res, next) {
   if (err.constructor.name === UsuarioYaExiste.name) {
     return res.status(409).json({ error: err.name, message: err.message });
   }
@@ -39,5 +37,6 @@ export function usuarioErrorHandler(err, _req, res, _next) {
     return res.status(403).json({ error: err.name, message: err.message });
   }
 
-  res.status(500).json({ error: 'Error', message: 'Ups. Algo sucedió en el servidor.' });
+  // Si no es un error de usuario, pasar al siguiente middleware
+  next(err);
 }

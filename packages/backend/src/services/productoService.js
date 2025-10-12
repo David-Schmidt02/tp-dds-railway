@@ -135,7 +135,7 @@ export class ProductoService {
                 sort = { precio: -1 };
                 break;
             case "masVendido":
-                sort = { cantidadVendida: -1 };
+                sort = { vendidos: -1 };
                 break;
             default:
                 sort = { createdAt: -1 };

@@ -107,31 +107,21 @@ export class PedidoService {
     async cancelarPedido(id, motivo, usuario) {
         const session = await mongoose.startSession();
         let pedidoActualizado;
-        
+
         try {
             await session.withTransaction(async () => {
-                const pedido = await this.pedidoRepository.obtenerPedidoPorId(id, session);
+                // El repository valida la lógica de negocio
+                pedidoActualizado = await this.pedidoRepository.cancelarPedido(id, session);
 
-                // Validar que se puede cancelar
-                if (pedido.estado.nombre === 'ENVIADO' || pedido.estado.nombre === 'ENTREGADO') {
-                    throw new PedidoYaEntregado(id)
-                }
-                
-                pedidoActualizado = await this.pedidoRepository.actualizarEstadoPedido(pedido.id, 'CANCELADO', session);
-                
                 // Devolver stock de todos los items
-                for (const item of pedido.itemsPedido) {
+                for (const item of pedidoActualizado.itemsPedido) {
                     await this.productoRepository.cancelarStock(item.producto.id, item.cantidad, session);
                 }
             });
             
             // Crear notificación de cancelación fuera de la transacción
             try {
-                const notificacion = factoryNotificacionPedidos.cancelarPedido(
-                    pedidoActualizado,
-                    motivo,
-                    'comprador'
-                );
+                const notificacion = factoryNotificacionPedidos.cancelarPedido(pedidoActualizado);
                 if (notificacion) {
                     await this.notificacionRepository.agregarNotificacion(
                         notificacion.receptor.id,
@@ -157,14 +147,15 @@ export class PedidoService {
      */
     async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
         const session = await mongoose.startSession();
-        let pedidoActualizado;
-        
+        let resultado;
+
         try {
             await session.withTransaction(async () => {
-                const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido, session);
+                // El repository valida la lógica de negocio y retorna el pedido actualizado + diferencia
+                resultado = await this.pedidoRepository.cambiarCantidadItem(idPedido, idItem, nuevaCantidad, session);
 
-                const cantidadPrevia = pedido.obtenerCantidadItem(idItem);
-                const diferencia = nuevaCantidad - cantidadPrevia;
+                // Ajustar stock según la diferencia
+                const diferencia = resultado.diferenciaCantidad;
 
                 if (diferencia > 0) {
                     // Necesitamos más stock - reservar (el repository valida stock disponible)
@@ -173,9 +164,6 @@ export class PedidoService {
                     // Liberamos stock
                     await this.productoRepository.cancelarStock(idItem, Math.abs(diferencia), session);
                 }
-                
-                pedido.modificarCantidadItem(idItem, nuevaCantidad);
-                pedidoActualizado = await this.pedidoRepository.guardarPedidoModificado(pedido, session);
             });
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
@@ -183,8 +171,8 @@ export class PedidoService {
         } finally {
             await session.endSession();
         }
-        
-        return pedidoActualizado;
+
+        return resultado.pedido;
     }
 
     async obtenerPedidos() {

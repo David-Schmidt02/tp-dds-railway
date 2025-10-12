@@ -7,9 +7,7 @@ import {
   PrecioInvalido
 } from '../excepciones/producto.js';
 
-export function productoErrorHandler(err, _req, res, _next) {
-  console.log(err.message);
-
+export function productoErrorHandler(err, req, res, next) {
   if (err.constructor.name === ProductoInexistente.name) {
     return res.status(404).json({ error: err.name, message: err.message });
   }
@@ -34,5 +32,6 @@ export function productoErrorHandler(err, _req, res, _next) {
     return res.status(400).json({ error: err.name, message: err.message });
   }
 
-  res.status(500).json({ error: 'Error', message: 'Ups. Algo sucedió en el servidor.' });
+  // Si no es un error de producto, pasar al siguiente middleware
+  next(err);
 }

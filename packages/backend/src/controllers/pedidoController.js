@@ -18,7 +18,7 @@ export class PedidoController {
         if(resultBody.error){
             return res.status(400).json({
                 message: 'Datos de entrada inválidos',
-                details: resultBody.error.errors
+                details: resultBody.error.issues
             });
         }
 

@@ -1,4 +1,5 @@
 import { usuarioToDTO } from '../dto/usuarioDTO.js';
+import { usuarioSchema } from '../models/entities/validaciones.js';
 
 export class UsuarioController {
   constructor(usuarioService) {
@@ -6,10 +7,19 @@ export class UsuarioController {
   }
 
   async crearUsuario(req, res, next) {
-    try {
-      const datosUsuario = req.body;
+    const body = req.body;
 
-      const nuevoUsuario = await this.usuarioService.crearUsuario(datosUsuario);
+    const resultBody = usuarioSchema.safeParse(body);
+
+    if (resultBody.error) {
+      return res.status(400).json({
+        message: 'Datos de entrada inválidos',
+        details: resultBody.error.issues
+      });
+    }
+
+    try {
+      const nuevoUsuario = await this.usuarioService.crearUsuario(resultBody.data);
 
       res.status(201).json(usuarioToDTO(nuevoUsuario));
     } catch (error) {
