@@ -56,12 +56,14 @@ export class Pedido {
 
     puedeModificarItems() {
         // Solo se puede modificar si no ha sido enviado
-        return this.estado !== 'ENVIADO' && this.estado !== 'ENTREGADO' && this.estado !== 'CANCELADO';
+        let nombre = this.estado.nombre
+        return nombre !== 'ENVIADO' && nombre !== 'ENTREGADO' && nombre !== 'CANCELADO';
     }
 
     puedeCancelarse() {
         // Solo se puede cancelar si no ha sido enviado ni entregado, y tampoco si ya está cancelado
-        return this.estado !== 'ENVIADO' && this.estado !== 'ENTREGADO' && this.estado !== 'CANCELADO';
+        let nombre = this.estado.nombre
+        return nombre !== 'ENVIADO' && nombre !== 'ENTREGADO' && nombre !== 'CANCELADO';
     }
 
     modificarCantidadItem(productoId, nuevaCantidad) {

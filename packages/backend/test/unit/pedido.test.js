@@ -25,6 +25,17 @@ const mockItem2 = {
   }
 };
 
+const mockItem3 = {
+  getId: jest.fn().mockReturnValue('prod3'),
+  subtotal: jest.fn().mockReturnValue(300),
+  cantidad: 2,
+  cambiarCantidad: jest.fn(),
+  producto: {
+    id: 'prod3',
+    estaDisponible: jest.fn().mockReturnValue(true)
+  }
+};
+
 const mockUsuario = {
   getId: jest.fn().mockReturnValue('user1')
 };
@@ -48,6 +59,12 @@ describe('Clase Pedido', () => {
 
   test('Calcular el total', () => {
     expect(pedido.calcularTotal()).toBe(100);
+  });
+
+  test('Agregar un item y calcular el total con 2 items distintos', () => {
+    const nuevoItem = mockItem3;
+    pedido.agregarItem(nuevoItem);
+    expect(pedido.calcularTotal()).toBe(400);
   });
 
   test('Validar que todos los productos tengan stock', () => {
@@ -74,12 +91,12 @@ describe('Clase Pedido', () => {
     pedido.modificarCantidadItem('prod1', 5);
     expect(mockItem1.cambiarCantidad).toHaveBeenCalledWith(5);
   });
-/* //TODO
+
   test('debe lanzar error si intenta modificar con estado no modificable', () => {
     pedido.estado = { nombre: 'ENVIADO' };
     expect(() => pedido.modificarCantidadItem('prod1', 3)).toThrow(PedidoNoModificable);
   });
-*/
+
   test('debe lanzar error si el producto no existe al modificar cantidad', () => {
     expect(() => pedido.modificarCantidadItem('inexistente', 3)).toThrow('Producto no encontrado en el pedido');
   });
@@ -96,9 +113,9 @@ describe('Clase Pedido', () => {
   });
 
   test('puedeCancelarse devuelve correctamente según estado', () => {
-    pedido.estado = 'PENDIENTE';
+    pedido.estado.nombre = 'PENDIENTE';
     expect(pedido.puedeCancelarse()).toBe(true);
-    pedido.estado = 'ENVIADO';
+    pedido.estado.nombre = 'ENVIADO';
     expect(pedido.puedeCancelarse()).toBe(false);
   });
 
@@ -106,10 +123,9 @@ describe('Clase Pedido', () => {
     pedido.estado = { nombre: 'PENDIENTE' };
     expect(pedido.puedeModificarItems()).toBe(true);
   });
-/* //TODO
+
   test('puedeModificarItems devuelve false si el estado no lo permite', () => {
     pedido.estado = { nombre: 'ENVIADO' };
     expect(pedido.puedeModificarItems()).toBe(false);
   });
-  */
 });
