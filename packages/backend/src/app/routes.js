@@ -18,4 +18,5 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
     app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController), notificacionErrorHandler);
 
     app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController), usuarioErrorHandler);
+    app.get('/usuarios', usuarioController.obtenerUsuarios.bind(usuarioController), usuarioErrorHandler);
 }

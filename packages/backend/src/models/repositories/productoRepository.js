@@ -2,6 +2,24 @@ import { ProductoModel } from '../../schema/productoSchema.js';
 import { ProductoInexistente, ProductoStockInsuficiente, ProductoNoDisponible, ProductoSinStock } from "../../excepciones/producto.js";
 
 export class ProductoRepository {
+    async cancelarStockProductos(itemsPedidos, usuario = null) {
+        const mongoose = (await import('mongoose')).default;
+        const session = await mongoose.startSession();
+        try {
+            await session.withTransaction(async () => {
+                for (const itemPedido of itemsPedidos) {
+                    // Se asume que itemPedido tiene producto.id y cantidad
+                    await this.cancelarStock(itemPedido.producto.id, itemPedido.cantidad, session);
+                }
+                // Aquí podrías guardar auditoría con el usuario si lo necesitas
+            });
+        } catch (error) {
+            throw error;
+        } finally {
+            await session.endSession();
+        }
+    }
+    
     constructor() {
         // No necesitas inicializar nada con Mongoose
     }
@@ -21,7 +39,29 @@ export class ProductoRepository {
             }
             return producto;
         } catch (error) {
+            // Si es un error de casteo de ObjectId, significa que el ID es inválido
+            if (error.name === 'CastError') {
+                throw new ProductoInexistente(id);
+            }
             throw error;
+        }
+    }
+
+    async reservarStockProductos(itemsPedidos, usuario = null) {
+        const mongoose = (await import('mongoose')).default;
+        const session = await mongoose.startSession();
+        try {
+            await session.withTransaction(async () => {
+                for (const itemPedido of itemsPedidos) {
+                    // Se asume que itemPedido tiene producto.id y cantidad
+                    await this.reservarStock(itemPedido.producto.id, itemPedido.cantidad, session);
+                }
+                // Aquí podrías guardar auditoría con el usuario si lo necesitas
+            });
+        } catch (error) {
+            throw error;
+        } finally {
+            await session.endSession();
         }
     }
 
@@ -65,22 +105,13 @@ export class ProductoRepository {
 
         return cantidad;
     } catch (error) {
+        // Si es un error de casteo de ObjectId, significa que el ID es inválido
+        if (error.name === 'CastError') {
+            throw new ProductoInexistente(idProducto);
+        }
         throw error;
     }
 }
-    async cancelarStock(idProducto, cantidad, session = null) {
-        const result = await ProductoModel.findByIdAndUpdate(
-            idProducto,
-            { $inc: { stock: cantidad } },
-            { new: true, session }
-        );
-
-        if (!result) {
-            throw new ProductoInexistente(idProducto);
-        }
-
-        return cantidad;
-    }
 
     async obtenerPrecioUnitario(idProducto, session = null) {
         const producto = await this.obtenerProductoPorId(idProducto, session);
@@ -97,18 +128,26 @@ export class ProductoRepository {
       }
 
     async obtenerStockDisponible(idProducto, session = null) {
-        let query = ProductoModel.findById(idProducto);
-        
-        if (session) {
-            query = query.session(session);
+        try {
+            let query = ProductoModel.findById(idProducto);
+
+            if (session) {
+                query = query.session(session);
+            }
+
+            const producto = await query;
+
+            if (!producto) {
+                throw new ProductoInexistente(idProducto);
+            }
+            return producto.stock;
+        } catch (error) {
+            // Si es un error de casteo de ObjectId, significa que el ID es inválido
+            if (error.name === 'CastError') {
+                throw new ProductoInexistente(idProducto);
+            }
+            throw error;
         }
-        
-        const producto = await query;
-        
-        if (!producto) {
-            throw new ProductoInexistente(idProducto);
-        }
-        return producto.stock;
     }
 
 async findByFilters(filters, page, limit, sort) {
@@ -119,6 +158,7 @@ async findByFilters(filters, page, limit, sort) {
 
     const items = await ProductoModel
       .find(filters)
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean();

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { PedidoInexistente, EstadoPedidoInvalido, PedidoYaCancelado, PedidoYaEntregado } from "../../excepciones/pedido.js";
+import { PedidoInexistente, EstadoPedidoInvalido, PedidoYaCancelado, PedidoYaEntregado, PedidoNoCancelable, PedidoNoModificable } from "../../excepciones/pedido.js";
+import { UsuarioInexistente } from "../../excepciones/usuario.js";
 import { PedidoModel } from "../../schema/pedidoSchema.js";
 import { Pedido } from "../entities/pedido.js";
 import { ItemPedido } from "../entities/itemPedido.js";
@@ -30,9 +31,10 @@ export class PedidoRepository {
         const direccionDB = {
             calle: direccion.calle,
             numero: direccion.altura || direccion.numero, // DireccionEntrega usa 'altura', el JSON usa 'numero'
-            ciudad: direccion.ciudad,
+           piso: direccion.piso,
+            departamento: direccion.departamento,
             codigoPostal: direccion.codigoPostal,
-            provincia: direccion.provincia,
+            ciudad: direccion.ciudad,
             referencia: direccion.referencia
         };
 
@@ -116,7 +118,7 @@ export class PedidoRepository {
         const direccionEntrega = pedidoDB.direccionEntrega
             ? new DireccionEntrega(
                 pedidoDB.direccionEntrega.calle,
-                pedidoDB.direccionEntrega.numero,
+                pedidoDB.direccionEntrega.numero || pedidoDB.direccionEntrega.altura,
                 pedidoDB.direccionEntrega.piso,
                 pedidoDB.direccionEntrega.departamento,
                 pedidoDB.direccionEntrega.codigoPostal
@@ -150,26 +152,37 @@ export class PedidoRepository {
         return pedido;
     }
 
+    
+
     async guardarPedido(pedidoData, session = null) {
-        const pedidoDB = this.aPedidoDB(pedidoData);  // Convierte a formato de DB
-        const nuevoPedido = new this.model(pedidoDB); // Usa el modelo de Mongoose
+        try {
 
-        let resultado;
-        if (session) {
-            resultado = await nuevoPedido.save({ session });
-        } else {
-            resultado = await nuevoPedido.save();
+            const pedidoDB = this.aPedidoDB(pedidoData);  // Convierte a formato de DB
+            const nuevoPedido = new this.model(pedidoDB); // Usa el modelo de Mongoose
+
+            let resultado;
+            if (session) {
+                resultado = await nuevoPedido.save({ session });
+            } else {
+                resultado = await nuevoPedido.save();
+            }
+
+            const pedidoCompleto = await this.model.findById(resultado._id)
+                .populate('usuarioId')
+                .populate({
+                    path: 'items.productoId',
+                    populate: { path: 'vendedor' }
+                })
+                .session(session);
+
+            return this.dePedidoDB(pedidoCompleto.toObject());
+        } catch (error) {
+            // Si es un error de validación de Mongoose que incluye CastError para usuarioId
+            if (error.name === 'ValidationError' && error.errors?.usuarioId?.name === 'CastError') {
+                throw new UsuarioInexistente(pedidoData.comprador?.id || pedidoData.usuarioId);
+            }
+            throw error;
         }
-
-        const pedidoCompleto = await this.model.findById(resultado._id)
-            .populate('usuarioId')
-            .populate({
-                path: 'items.productoId',
-                populate: { path: 'vendedor' }
-            })
-            .session(session);
-
-        return this.dePedidoDB(pedidoCompleto.toObject());
     }
 
     async obtenerPedidoPorId(id) {
@@ -255,30 +268,49 @@ export class PedidoRepository {
         return this.dePedidoDB(pedidoCompleto.toObject());
     }
 
-    async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
+    /**
+     * Cambia la cantidad de un item del pedido con validación de negocio
+     * Retorna el pedido actualizado y la diferencia de cantidad (para ajustar stock)
+     */
+    async cambiarCantidadItem(idPedido, idItem, nuevaCantidad, session = null) {
         if (!mongoose.Types.ObjectId.isValid(idPedido)) {
             throw new PedidoInexistente(idPedido);
         }
 
-        const pedido = await this.model.findById(idPedido);
-        if (!pedido) {
+        // Obtener pedido con populate para convertir a dominio
+        let query = this.model.findById(idPedido)
+            .populate('usuarioId')
+            .populate('items.productoId');
+
+        if (session) {
+            query = query.session(session);
+        }
+
+        const pedidoDB = await query;
+        if (!pedidoDB) {
             throw new PedidoInexistente(idPedido);
         }
 
-        const item = pedido.items.id(idItem);
-        if (!item) {
-            throw new Error('Item no encontrado en el pedido');
+        // Convertir a objeto de dominio para validar
+        const pedido = this.dePedidoDB(pedidoDB.toObject());
+
+        // Obtener cantidad previa antes de modificar
+        const cantidadPrevia = pedido.obtenerCantidadItem(idItem);
+        if (cantidadPrevia === null) {
+            throw new Error('Producto no encontrado en el pedido');
         }
 
-        item.cantidad = nuevaCantidad;
-        item.subtotal.valor = item.precioUnitario.valor * nuevaCantidad;
+        // Validar lógica de negocio (lanza PedidoNoModificable si no se puede)
+        pedido.modificarCantidadItem(idItem, nuevaCantidad);
 
-        // Recalcular total del pedido
-        const nuevoTotal = pedido.items.reduce((suma, item) => suma + item.subtotal.valor, 0);
-        pedido.total.valor = nuevoTotal;
+        // Guardar cambios
+        const pedidoActualizado = await this.guardarPedidoModificado(pedido, session);
 
-        const resultado = await pedido.save();
-        return this.dePedidoDB(resultado.toObject());
+        // Retornar pedido actualizado y diferencia para que el service ajuste stock
+        return {
+            pedido: pedidoActualizado,
+            diferenciaCantidad: nuevaCantidad - cantidadPrevia
+        };
     }
 
     /**
@@ -288,14 +320,14 @@ export class PedidoRepository {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new PedidoInexistente(id);
         }
-        
+
         const pedido = await this.model.findById(id);
         if (!pedido) {
             throw new PedidoInexistente(id);
         }
-        
+
         const estadoAnterior = pedido.estado;
-        
+
         // Agregar cambio al historial
         pedido.historialEstados.push({
             estadoAnterior,
@@ -303,9 +335,9 @@ export class PedidoRepository {
             fecha: new Date(),
             motivo
         });
-        
+
         pedido.estado = nuevoEstado;
-        
+
         const resultado = await pedido.save();
         return this.dePedidoDB(resultado.toObject());
     }
