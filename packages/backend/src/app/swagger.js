@@ -24,7 +24,7 @@ export function setupSwagger(app) {
             properties: {
               productoId: { type: 'string', example: '66fabc1234567890abc12345' },
               cantidad: { type: 'integer', minimum: 1, example: 2 }
-            }
+            }  
           },
           DireccionEntregaInput: {
             type: 'object',
