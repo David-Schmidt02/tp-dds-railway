@@ -1,4 +1,4 @@
-import { pedidoRequestSchema } from '../models/entities/validaciones.js';
+import { pedidoSchema } from '../models/entities/validaciones.js';
 import { pedidoToDTO } from '../dto/pedidoDTO.js';
 
 export const pedidos = []
@@ -12,8 +12,7 @@ export class PedidoController {
 
     async crearPedido(req, res, next) {
         const body = req.body;
-
-        const resultBody = pedidoRequestSchema.safeParse(body);
+        const resultBody = pedidoSchema.safeParse(body);
 
         if(resultBody.error){
             return res.status(400).json({

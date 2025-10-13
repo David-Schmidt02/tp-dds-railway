@@ -31,9 +31,10 @@ export class PedidoRepository {
         const direccionDB = {
             calle: direccion.calle,
             numero: direccion.altura || direccion.numero, // DireccionEntrega usa 'altura', el JSON usa 'numero'
-            ciudad: direccion.ciudad,
+           piso: direccion.piso,
+            departamento: direccion.departamento,
             codigoPostal: direccion.codigoPostal,
-            provincia: direccion.provincia,
+            ciudad: direccion.ciudad,
             referencia: direccion.referencia
         };
 
@@ -117,7 +118,7 @@ export class PedidoRepository {
         const direccionEntrega = pedidoDB.direccionEntrega
             ? new DireccionEntrega(
                 pedidoDB.direccionEntrega.calle,
-                pedidoDB.direccionEntrega.numero,
+                pedidoDB.direccionEntrega.numero || pedidoDB.direccionEntrega.altura,
                 pedidoDB.direccionEntrega.piso,
                 pedidoDB.direccionEntrega.departamento,
                 pedidoDB.direccionEntrega.codigoPostal
@@ -151,8 +152,11 @@ export class PedidoRepository {
         return pedido;
     }
 
+    
+
     async guardarPedido(pedidoData, session = null) {
         try {
+
             const pedidoDB = this.aPedidoDB(pedidoData);  // Convierte a formato de DB
             const nuevoPedido = new this.model(pedidoDB); // Usa el modelo de Mongoose
 
@@ -336,54 +340,6 @@ export class PedidoRepository {
 
         const resultado = await pedido.save();
         return this.dePedidoDB(resultado.toObject());
-    }
-
-    /**
-     * Cancela un pedido con validación de negocio
-     */
-    async cancelarPedido(id, session = null) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new PedidoInexistente(id);
-        }
-
-        let query = this.model.findById(id);
-        if (session) {
-            query = query.session(session);
-        }
-
-        const pedidoDB = await query;
-        if (!pedidoDB) {
-            throw new PedidoInexistente(id);
-        }
-
-        // Convertir a objeto de dominio para validar
-        const pedido = this.dePedidoDB(pedidoDB.toObject());
-
-        // Validar lógica de negocio
-        if (!pedido.puedeCancelarse()) {
-            throw new PedidoNoCancelable(pedido.estado);
-        }
-
-        // Si pasa la validación, actualizar estado
-        pedidoDB.estado = 'CANCELADO';
-        pedidoDB.historialEstados.push({
-            estadoAnterior: pedido.estado,
-            estadoNuevo: 'CANCELADO',
-            fecha: new Date()
-        });
-
-        const resultado = await pedidoDB.save({ session });
-
-        // Populate y retornar objeto de dominio
-        const pedidoCompleto = await this.model.findById(resultado._id)
-            .populate('usuarioId')
-            .populate({
-                path: 'items.productoId',
-                populate: { path: 'vendedor' }
-            })
-            .session(session);
-
-        return this.dePedidoDB(pedidoCompleto.toObject());
     }
 
     async obtenerPrecioUnitario(id, productoId) {

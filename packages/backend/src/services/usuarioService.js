@@ -9,4 +9,7 @@ export class UsuarioService {
 
     return nuevoUsuario;
   }
+  async obtenerTodosUsuarios() {
+    return await this.usuarioRepository.obtenerTodosUsuarios();
+  }
 }

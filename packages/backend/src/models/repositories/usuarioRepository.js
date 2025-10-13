@@ -33,7 +33,7 @@ export class UsuarioRepository {
         }
     }
 
-    async obtenerTodos() {
+    async obtenerTodosUsuarios() {
         return await UsuarioModel.find();
     }
 

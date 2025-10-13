@@ -1,4 +1,4 @@
-import { usuarioToDTO } from '../dto/usuarioDTO.js';
+import { usuarioToDTO, usuariosToDTO } from '../dto/usuarioDTO.js';
 import { usuarioSchema } from '../models/entities/validaciones.js';
 
 export class UsuarioController {
@@ -22,6 +22,14 @@ export class UsuarioController {
       const nuevoUsuario = await this.usuarioService.crearUsuario(resultBody.data);
 
       res.status(201).json(usuarioToDTO(nuevoUsuario));
+    } catch (error) {
+      next(error);
+    }
+  }
+  async obtenerUsuarios(req, res, next) {
+    try {
+      const usuarios = await this.usuarioService.obtenerTodosUsuarios();
+      res.json(usuariosToDTO(usuarios));
     } catch (error) {
       next(error);
     }

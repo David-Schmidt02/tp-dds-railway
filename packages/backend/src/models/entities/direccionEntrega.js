@@ -5,19 +5,16 @@ export class DireccionEntrega {
     departamento
     codigoPostal
     ciudad
-    //calculables con ciudad    
-    provincia
-    pais
-    //calculables de otra forma
-    latitud
-    longitud
+    referencia
 
-    constructor(calle, altura, piso, departamento, codigoPostal) {
+    constructor(calle, altura, piso, departamento, codigoPostal, ciudad, referencia = null) {
         this.calle = calle
         this.altura = altura
         this.piso = piso
         this.departamento = departamento
         this.codigoPostal = codigoPostal
+        this.ciudad = ciudad
+        this.referencia = referencia
     }
 
 }
