@@ -1,159 +1,115 @@
-/*
-import { Pedido } from '../../src/models/entities/pedido.js';
+import { Pedido } from '../../src/models/entities/pedido';
+import { PedidoNoModificable } from '../../src/excepciones/pedido';
+import { jest } from '@jest/globals';
 
-// Mockeamos las dependencias
-jest.mock('../models/estadoPedido.js', () => ({
-  EstadoPedido: {
-    PENDIENTE: { nombre: 'PENDIENTE', puedeTransicionarA: jest.fn() },
-  },
-}));
+// Creamos mocks de las dependencias
+const mockItem1 = {
+  getId: jest.fn().mockReturnValue('prod1'),
+  subtotal: jest.fn().mockReturnValue(100),
+  cantidad: 2,
+  cambiarCantidad: jest.fn(),
+  producto: {
+    id: 'prod1',
+    estaDisponible: jest.fn().mockReturnValue(true)
+  }
+};
 
-jest.mock('../models/cambioEstadoPedido.js', () => ({
-  CambioEstadoPedido: jest.fn().mockImplementation((estado, pedido, usuario, motivo) => ({
-    estado,
-    pedido,
-    usuario,
-    motivo,
-  })),
-}));
+const mockItem2 = {
+  getId: jest.fn().mockReturnValue('prod2'),
+  subtotal: jest.fn().mockReturnValue(200),
+  cantidad: 1,
+  cambiarCantidad: jest.fn(),
+  producto: {
+    id: 'prod2',
+    estaDisponible: jest.fn().mockReturnValue(false)
+  }
+};
+
+const mockUsuario = {
+  getId: jest.fn().mockReturnValue('user1')
+};
+
+const mockDireccion = {
+  calle: 'Av. Siempre Viva',
+  altura: 742,
+  ciudad: 'Springfield'
+};
+
+const mockEstadoPendiente = { nombre: 'PENDIENTE', puedeTransicionarA: jest.fn().mockReturnValue(true) };
+const mockNuevoEstado = { nombre: 'EN_PROCESO' };
 
 describe('Clase Pedido', () => {
-  let mockItem1;
-  let mockItem2;
-  let mockComprador;
-  let mockDireccion;
   let pedido;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockItem1 = {
-      subtotal: jest.fn(() => 100),
-      producto: { estaDisponible: jest.fn(() => true) },
-      getId: jest.fn(() => 'p001'),
-      cambiarCantidad: jest.fn(),
-      cantidad: 2
-    };
-
-    mockItem2 = {
-      subtotal: jest.fn(() => 200),
-      producto: { estaDisponible: jest.fn(() => false) },
-      getId: jest.fn(() => 'p002'),
-      cambiarCantidad: jest.fn(),
-      cantidad: 1
-    };
-
-    mockComprador = { getId: jest.fn(() => 'u001') };
-    mockDireccion = {};
-
-    const { EstadoPedido } = jest.requireMock('../models/estadoPedido.js');
-    pedido = new Pedido(mockComprador, [mockItem1, mockItem2], 'ARS', mockDireccion);
-    pedido.estado = EstadoPedido.PENDIENTE;
+    pedido = new Pedido(mockUsuario, [mockItem1], 'ARS', mockDireccion);
+    pedido.estado = mockEstadoPendiente; // Sobrescribimos el estado por mock
   });
 
-  // --------------------
-  // TESTS DE CONSTRUCCIÓN
-  // --------------------
-  test('debería crearse con los valores correctos', () => {
-    expect(pedido.comprador).toBe(mockComprador);
-    expect(pedido.itemsPedido.length).toBe(2);
-    expect(pedido.moneda).toBe('ARS');
-    expect(pedido.direccionEntrega).toBe(mockDireccion);
-    expect(pedido.estado.nombre).toBe('PENDIENTE');
-    expect(pedido.historialEstados).toEqual([]);
-    expect(pedido.fechaCreacion).toBeInstanceOf(Date);
+  test('Calcular el total', () => {
+    expect(pedido.calcularTotal()).toBe(100);
   });
 
-  // --------------------
-  // calcularTotal
-  // --------------------
-  test('debería calcular el total correctamente', () => {
-    const total = pedido.calcularTotal();
-    expect(total).toBe(300);
-    expect(mockItem1.subtotal).toHaveBeenCalled();
-    expect(mockItem2.subtotal).toHaveBeenCalled();
-  });
-
-  // --------------------
-  // validarStock
-  // --------------------
-  test('debería validar el stock correctamente', () => {
-    expect(pedido.validarStock()).toBe(false); // mockItem2 devuelve false
-    mockItem2.producto.estaDisponible.mockReturnValueOnce(true);
+  test('Validar que todos los productos tengan stock', () => {
     expect(pedido.validarStock()).toBe(true);
+    pedido.itemsPedido = [mockItem2]; // uno sin stock
+    expect(pedido.validarStock()).toBe(false);
   });
 
-  // --------------------
-  // agregar y sacar item
-  // --------------------
-  test('debería agregar y sacar items', () => {
-    const nuevoItem = { subtotal: jest.fn(() => 50), producto: {}, cantidad: 1 };
+  test('Agregar y sacar items correctamente', () => {
+    const nuevoItem = { ...mockItem2 };
     pedido.agregarItem(nuevoItem);
-    expect(pedido.itemsPedido.includes(nuevoItem)).toBe(true);
+    expect(pedido.itemsPedido).toContain(nuevoItem);
 
-    pedido.sacarItem();
-    expect(pedido.itemsPedido.includes(nuevoItem)).toBe(false);
+    pedido.sacarItem(nuevoItem);
+    expect(pedido.itemsPedido).not.toContain(nuevoItem);
   });
 
-  // --------------------
-  // obtenerCantidadItem
-  // --------------------
-  test('debería obtener la cantidad de un item existente', () => {
-    expect(pedido.obtenerCantidadItem('p001')).toBe(2);
+  test('Obtener la cantidad del item por ID', () => {
+    expect(pedido.obtenerCantidadItem('prod1')).toBe(2);
+    expect(pedido.obtenerCantidadItem('inexistente')).toBeNull();
   });
 
-  test('debería devolver null si el producto no está en el pedido', () => {
-    expect(pedido.obtenerCantidadItem('xyz')).toBeNull();
+  test('debe permitir modificar items si el estado lo permite', () => {
+    pedido.modificarCantidadItem('prod1', 5);
+    expect(mockItem1.cambiarCantidad).toHaveBeenCalledWith(5);
   });
-
-  // --------------------
-  // puedeModificarItems / puedeCancelarse
-  // --------------------
-  test('debería permitir modificar items cuando el estado no es final', () => {
-    pedido.estado = { nombre: 'PENDIENTE' };
-    expect(pedido.puedeModificarItems()).toBe(true);
-  });
-
-  test('no debería permitir modificar si el pedido está enviado', () => {
+/* //TODO
+  test('debe lanzar error si intenta modificar con estado no modificable', () => {
     pedido.estado = { nombre: 'ENVIADO' };
-    expect(pedido.puedeModificarItems()).toBe(false);
+    expect(() => pedido.modificarCantidadItem('prod1', 3)).toThrow(PedidoNoModificable);
+  });
+*/
+  test('debe lanzar error si el producto no existe al modificar cantidad', () => {
+    expect(() => pedido.modificarCantidadItem('inexistente', 3)).toThrow('Producto no encontrado en el pedido');
   });
 
-  test('debería poder cancelarse si no está enviado ni entregado ni cancelado', () => {
+  test('debe actualizar el estado correctamente cuando puede transicionar', () => {
+    pedido.actualizarEstado(mockNuevoEstado, mockUsuario, 'Motivo de prueba');
+    expect(pedido.estado).toBe(mockNuevoEstado);
+    expect(pedido.historialEstados.length).toBeGreaterThan(0);
+  });
+
+  test('debe devolver true si pertenece al usuario correcto', () => {
+    expect(pedido.perteneceAUsuario('user1')).toBe(true);
+    expect(pedido.perteneceAUsuario('otroUser')).toBe(false);
+  });
+
+  test('puedeCancelarse devuelve correctamente según estado', () => {
     pedido.estado = 'PENDIENTE';
     expect(pedido.puedeCancelarse()).toBe(true);
-  });
-
-  test('no debería poder cancelarse si ya fue enviado', () => {
     pedido.estado = 'ENVIADO';
     expect(pedido.puedeCancelarse()).toBe(false);
   });
 
-  // --------------------
-  // modificarCantidadItem
-  // --------------------
-  test('debería modificar la cantidad de un item existente', () => {
+  test('puedeModificarItems devuelve true si el estado lo permite', () => {
     pedido.estado = { nombre: 'PENDIENTE' };
-    pedido.modificarCantidadItem('p001', 5);
-    expect(mockItem1.cambiarCantidad).toHaveBeenCalledWith(5);
+    expect(pedido.puedeModificarItems()).toBe(true);
   });
-
-  test('debería lanzar error si el producto no existe en el pedido', () => {
-    expect(() => pedido.modificarCantidadItem('zzz', 5)).toThrow('Producto no encontrado en el pedido');
+/* //TODO
+  test('puedeModificarItems devuelve false si el estado no lo permite', () => {
+    pedido.estado = { nombre: 'ENVIADO' };
+    expect(pedido.puedeModificarItems()).toBe(false);
   });
-
-  test('debería lanzar PedidoNoModificable si el estado no permite cambios', async () => {
-    pedido.puedeModificarItems = jest.fn(() => false);
-    const { PedidoNoModificable } = await import('../../excepciones/pedido.js');
-    expect(() => pedido.modificarCantidadItem('p001', 2)).toThrow();
-  });
-
-  // --------------------
-  // perteneceAUsuario
-  // --------------------
-  test('debería verificar si el pedido pertenece al usuario', () => {
-    expect(pedido.perteneceAUsuario('u001')).toBe(true);
-    expect(pedido.perteneceAUsuario('otro')).toBe(false);
-  });
+  */
 });
-*/
