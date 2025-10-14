@@ -30,6 +30,7 @@ export class NotificacionController {
 
             // TODO: Validar que el usuario que marca la notificación sea el receptor (seguridad)
             // Actualmente cualquier usuario con el ID de la notificación puede marcarla como leída
+            
             await this.notificacionRepository.marcarComoLeida(notificacionId);
             res.status(200).json({ message: 'Notificación marcada como leída' });
         } catch (error) {

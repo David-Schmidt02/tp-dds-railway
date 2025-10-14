@@ -19,10 +19,6 @@ export class ProductoRepository {
             await session.endSession();
         }
     }
-    
-    constructor() {
-        // No necesitas inicializar nada con Mongoose
-    }
 
     async obtenerProductoPorId(id, session = null) {
         try {
@@ -65,68 +61,104 @@ export class ProductoRepository {
         }
     }
 
-   async reservarStock(idProducto, cantidad, session = null) {
-    try {
-        const result = await ProductoModel.findOneAndUpdate(
-            {
-                _id: idProducto,
-                stock: { $gte: cantidad },
-                activo: true
-            },
-            { $inc: { stock: -cantidad } },
-            {
-                new: true,
-                runValidators: true,
-                session
-            }
-        );
+    async reservarStock(idProducto, cantidad, session = null) {
+        try {
+            const result = await ProductoModel.findOneAndUpdate(
+                {
+                    _id: idProducto,
+                    stock: { $gte: cantidad },
+                    activo: true
+                },
+                { $inc: { stock: -cantidad } },
+                {
+                    new: true,
+                    runValidators: true,
+                    session
+                }
+            );
 
-        if (!result) {
-            // Buscar el producto para obtener información detallada
-            let query = ProductoModel.findById(idProducto);
-            if (session) {
-                query = query.session(session);
-            }
-            const producto = await query;
+            if (!result) {
+                // Buscar el producto para obtener información detallada
+                let query = ProductoModel.findById(idProducto);
+                if (session) {
+                    query = query.session(session);
+                }
+                const producto = await query;
 
-            if (!producto) {
+                if (!producto) {
+                    throw new ProductoInexistente(idProducto);
+                }
+
+                // Verificar si el producto está activo
+                if (!producto.activo) {
+                throw new ProductoNoDisponible(idProducto);
+                }
+
+                // Si llegamos aquí es porque no hay suficiente stock
+                throw new ProductoStockInsuficiente(idProducto, producto.stock, cantidad);
+
+            }
+
+            return cantidad;
+        } catch (error) {
+            // Si es un error de casteo de ObjectId, significa que el ID es inválido
+            if (error.name === 'CastError') {
                 throw new ProductoInexistente(idProducto);
             }
-
-            // Verificar si el producto está activo
-            if (!producto.activo) {
-               throw new ProductoNoDisponible(idProducto);
+            throw error;
             }
-
-            // Si llegamos aquí es porque no hay suficiente stock
-            throw new ProductoStockInsuficiente(idProducto, producto.stock, cantidad);
-
-        }
-
-        return cantidad;
-    } catch (error) {
-        // Si es un error de casteo de ObjectId, significa que el ID es inválido
-        if (error.name === 'CastError') {
-            throw new ProductoInexistente(idProducto);
-        }
-        throw error;
     }
-}
 
     async obtenerPrecioUnitario(idProducto, session = null) {
         const producto = await this.obtenerProductoPorId(idProducto, session);
         return producto.precio;
     }
 
-    async obtenerTodos() {
-        return await ProductoModel.find({});
+    async obtenerTodos(page, limit) {
+        const skip = (page - 1) * limit;
+
+        const totalItems = await ProductoModel.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
+
+        const items = await ProductoModel
+        .find({})
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+        return {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+        items
+        }
     }
 
-      async obtenerProductosOrdenados(sortOption) {
-        // Mongoose se encarga del ordenamiento directamente
-        return await ProductoModel.find().sort(sortOption).exec();
-      }
+    async obtenerProductosOrdenados(page, limit, sortOp) {
+        const skip = (page - 1) * limit;
 
+        const totalItems = await ProductoModel.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Mongoose se encarga del ordenamiento directamente
+        const items = await ProductoModel
+            .find({})
+            .sort(sortOp)
+            .skip(skip)
+            .limit(limit)
+            .lean();
+        return {
+            page,
+            limit,
+            totalItems,
+            totalPages,
+            items
+            }
+    }
+
+    
     async obtenerStockDisponible(idProducto, session = null) {
         try {
             let query = ProductoModel.findById(idProducto);
@@ -150,25 +182,25 @@ export class ProductoRepository {
         }
     }
 
-async findByFilters(filters, page, limit, sort) {
-    const skip = (page - 1) * limit;
+    async findByFilters(filters, page, limit, sort) {
+        const skip = (page - 1) * limit;
 
-    const totalItems = await ProductoModel.countDocuments(filters);
-    const totalPages = Math.ceil(totalItems / limit);
+        const totalItems = await ProductoModel.countDocuments(filters);
+        const totalPages = Math.ceil(totalItems / limit);
 
-    const items = await ProductoModel
-      .find(filters)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean();
+        const items = await ProductoModel
+        .find(filters)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean();
 
-    return {
-      page,
-      limit,
-      totalItems,
-      totalPages,
-      items
+        return {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+        items
+        }
     }
-  }
 }

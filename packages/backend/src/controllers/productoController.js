@@ -11,6 +11,10 @@ export class ProductoController {
 
     async obtenerProductos(req, res, next) {
         try {
+            const {
+                page = 1,
+                limit = 10,
+            } = req.query;
             const productos = await this.productoService.obtenerProductos();
             res.status(200).json(productosToDTO(productos));
         } catch (error) {
@@ -20,8 +24,12 @@ export class ProductoController {
 
     async obtenerProductosOrdenados(req, res, next) {
         try {
-          const { orden = 'precioAsc' } = req.query;
-          const resultado = await this.productoService.obtenerProductosOrdenados(orden);
+          const {
+                page = 1,
+                limit = 10,
+                orden
+            } = req.query;
+          const resultado = await this.productoService.obtenerProductosOrdenados(page, limit, orden);
           res.status(200).json(productosToDTO(resultado));
         } catch (error) {
           next(error);
@@ -46,7 +54,7 @@ export class ProductoController {
                 return res.status(400).json({ message: "Debe indicar el vendedor" });
             }
 
-            const filters = {vendedor: vendedorId};
+            const filters = {vendedor: vendedorId}; 
 
             if (min && max) {
                 filters.precio = { $gte: parseFloat(min), $lte: parseFloat(max) };

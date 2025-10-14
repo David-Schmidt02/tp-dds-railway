@@ -34,7 +34,7 @@ afterAll(async () => {
   }
 });
 
-// ⬇️ imports de la app y modelos
+//imports de la app y modelos
 import express from 'express';
 import bodyParser from 'body-parser';
 import request from 'supertest';
