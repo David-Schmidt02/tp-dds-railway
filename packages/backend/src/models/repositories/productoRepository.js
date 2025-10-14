@@ -20,6 +20,20 @@ export class ProductoRepository {
         }
     }
 
+    async cancelarStock(idProducto, cantidad, session = null) {
+    const result = await ProductoModel.findByIdAndUpdate(
+        idProducto,
+        { $inc: { stock: cantidad } },
+        { new: true, session }
+    );
+
+    if (!result) {
+        throw new ProductoInexistente(idProducto);
+    }
+
+    return cantidad;
+}
+
     async obtenerProductoPorId(id, session = null) {
         try {
             let query = ProductoModel.findById(id);
