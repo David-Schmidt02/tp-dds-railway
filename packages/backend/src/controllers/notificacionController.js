@@ -1,8 +1,8 @@
 import { notificacionesToDTO } from '../dto/notificacionDTO.js';
 
 export class NotificacionController {
-    constructor(notificacionRepository) {
-        this.notificacionRepository = notificacionRepository;
+    constructor(notificacionService) {
+        this.notificacionService = notificacionService;
     }
 
     async obtenerNotificacionesDeUnUsuario(req, res, next) {
@@ -14,7 +14,7 @@ export class NotificacionController {
             }
 
             const filtroLeida = leida === undefined ? undefined : leida === 'true';
-            const notificaciones = await this.notificacionRepository.obtenerNotificacionesDeUnUsuario(usuarioId, filtroLeida);
+            const notificaciones = await this.notificacionService.obtenerNotificacionesDeUnUsuario(usuarioId, filtroLeida);
             return res.status(200).json(notificacionesToDTO(notificaciones));
         } catch(error) {
             next(error);
@@ -30,8 +30,8 @@ export class NotificacionController {
 
             // TODO: Validar que el usuario que marca la notificación sea el receptor (seguridad)
             // Actualmente cualquier usuario con el ID de la notificación puede marcarla como leída
-            
-            await this.notificacionRepository.marcarComoLeida(notificacionId);
+
+            await this.notificacionService.marcarComoLeida(notificacionId);
             res.status(200).json({ message: 'Notificación marcada como leída' });
         } catch (error) {
             next(error);

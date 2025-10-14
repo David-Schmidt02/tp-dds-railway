@@ -1,4 +1,4 @@
-import { productosToDTO } from '../dto/productoDTO.js';
+import { productoToDTO } from '../dto/productoDTO.js';
 
 export const producto = []
 
@@ -15,8 +15,11 @@ export class ProductoController {
                 page = 1,
                 limit = 10,
             } = req.query;
-            const productos = await this.productoService.obtenerProductos();
-            res.status(200).json(productosToDTO(productos));
+            const resultado = await this.productoService.obtenerProductos(parseInt(page), parseInt(limit));
+            res.status(200).json({
+                ...resultado,
+                items: resultado.items.map(productoToDTO)
+            });
         } catch (error) {
             next(error);
         }
@@ -29,8 +32,11 @@ export class ProductoController {
                 limit = 10,
                 orden
             } = req.query;
-          const resultado = await this.productoService.obtenerProductosOrdenados(page, limit, orden);
-          res.status(200).json(productosToDTO(resultado));
+          const resultado = await this.productoService.obtenerProductosOrdenados(parseInt(page), parseInt(limit), orden);
+          res.status(200).json({
+                ...resultado,
+                items: resultado.items.map(productoToDTO)
+            });
         } catch (error) {
           next(error);
         }
@@ -80,14 +86,17 @@ export class ProductoController {
                 filters.categorias = { $all: categoriasArray };
             }
 
-            const result = await this.productoService.listarProductosVendedorConFiltros(
+            const resultado = await this.productoService.listarProductosVendedorConFiltros(
                 filters,
                 parseInt(page),
                 parseInt(limit),
                 orden
             );
 
-            res.status(200).json(result);
+            res.status(200).json({
+                ...resultado,
+                items: resultado.items.map(productoToDTO)
+            });
         }catch(error){
             next(error);
         }

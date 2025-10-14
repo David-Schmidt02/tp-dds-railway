@@ -8,6 +8,7 @@ import { UsuarioRepository } from "../models/repositories/usuarioRepository.js";
 import { PedidoService } from "../services/pedidoService.js";
 import { ProductoService } from "../services/productoService.js";
 import { UsuarioService } from "../services/usuarioService.js";
+import { NotificacionService } from "../services/notificacionService.js";
 
 // Controllers
 import { PedidoController } from "../controllers/pedidoController.js";
@@ -27,14 +28,15 @@ export const buildAppContext = () => {
     
     // Services
     const pedidoService = new PedidoService(pedidoRepository, productoRepository, notificacionRepository, usuarioRepository);
-    const productoService = new ProductoService(productoRepository);
+    const productoService = new ProductoService(productoRepository, usuarioRepository);
     const usuarioService = new UsuarioService(usuarioRepository);
+    const notificacionService = new NotificacionService(notificacionRepository, usuarioRepository);
     
     // Controllers
     const pedidoController = new PedidoController(pedidoService);
     const productoController = new ProductoController(productoService);
     const usuarioController = new UsuarioController(usuarioService);
-    const notificacionController = new NotificacionController(notificacionRepository);
+    const notificacionController = new NotificacionController(notificacionService);
 
     return {
         pedidoRepository,
@@ -44,6 +46,7 @@ export const buildAppContext = () => {
         pedidoService,
         productoService,
         usuarioService,
+        notificacionService,
         pedidoController,
         productoController,
         usuarioController,

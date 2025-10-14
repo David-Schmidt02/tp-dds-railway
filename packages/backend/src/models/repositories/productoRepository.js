@@ -136,7 +136,7 @@ export class ProductoRepository {
 
         const items = await ProductoModel
         .find({})
-        .sort(sort)
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean();
