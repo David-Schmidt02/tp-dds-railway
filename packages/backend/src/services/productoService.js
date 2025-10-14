@@ -4,8 +4,9 @@ import { ProductoInexistente, ProductoStockInsuficiente } from '../excepciones/p
 import mongoose from 'mongoose';
 
 export class ProductoService {
-    constructor(productoRepository) {
+    constructor(productoRepository, usuarioRepository) {
         this.productoRepository = productoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     /**
@@ -35,6 +36,15 @@ export class ProductoService {
      * Obtiene productos ordenados (con soporte para sessions)
      */
     async obtenerProductosOrdenados(page, limit, orden) {
+        // Validaciones
+        if (isNaN(page) || isNaN(limit)) {
+            throw new Error("Los parámetros de paginación deben ser números");
+        }
+
+        if (page < 1 || limit < 1) {
+            throw new Error("Los parámetros de paginación deben ser positivos");
+        }
+
         let sort = {};
 
         switch (orden) {
@@ -52,7 +62,7 @@ export class ProductoService {
         }
 
         try {
-            const productos = await this.productoRepository.obtenerProductosOrdenados(sort);
+            const productos = await this.productoRepository.obtenerProductosOrdenados(page, limit, sort);
             return productos;
         } catch (error) {
             console.error('Error al obtener productos ordenados:', error.message);
@@ -71,6 +81,11 @@ export class ProductoService {
 
         if (page < 1 || limit < 1) {
             throw new Error("Los parámetros de paginación deben ser positivos");
+        }
+
+        // Validar que el vendedor existe
+        if (filters.vendedor) {
+            await this.usuarioRepository.obtenerUsuarioPorId(filters.vendedor);
         }
 
         // Configurar ordenamiento

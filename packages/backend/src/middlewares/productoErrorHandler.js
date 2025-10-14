@@ -7,6 +7,8 @@ import {
   PrecioInvalido
 } from '../excepciones/producto.js';
 
+import { usuarioErrorHandler } from './usuarioErrorHandler.js';
+
 export function productoErrorHandler(err, req, res, next) {
   if (err.constructor.name === ProductoInexistente.name) {
     return res.status(404).json({ error: err.name, message: err.message });
@@ -32,6 +34,11 @@ export function productoErrorHandler(err, req, res, next) {
     return res.status(400).json({ error: err.name, message: err.message });
   }
 
-  // Si no es un error de producto, pasar al siguiente middleware
-  next(err);
+  // Si no es un error de producto, delegar a usuarioErrorHandler
+  usuarioErrorHandler(err, req, res, (err) => {
+    if (err) {
+      // Si tampoco es de usuario, pasar al siguiente middleware
+      next(err);
+    }
+  });
 }

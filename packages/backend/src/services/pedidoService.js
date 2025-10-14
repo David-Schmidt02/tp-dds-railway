@@ -181,6 +181,9 @@ export class PedidoService {
     }
 
     async obtenerPedidosPorUsuario(usuarioId) {
+        // Validar que el usuario existe
+        await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+
         return await this.pedidoRepository.obtenerPedidosPorUsuario(usuarioId);
     }
 }
