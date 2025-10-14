@@ -1,0 +1,1358 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tienda Sol - API",
+    "version": "1.0.0",
+    "description": "API completa de Tienda Sol - Sistema de e-commerce con gestión de pedidos, productos, notificaciones y usuarios.\n\nStack: Express 5.x + Mongoose + MongoDB con replica set.\nTesting: Jest + Supertest + mongodb-memory-server."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor local de desarrollo"
+    }
+  ],
+  "tags": [
+    { "name": "Pedidos", "description": "Gestión completa de pedidos - creación, consulta, cancelación y modificación de items" },
+    { "name": "Productos", "description": "Catálogo de productos con búsqueda, filtros, ordenamiento y paginación" },
+    { "name": "Notificaciones", "description": "Sistema de notificaciones para usuarios (generadas automáticamente por cambios de estado)" },
+    { "name": "Usuarios", "description": "Gestión de usuarios - compradores y vendedores" }
+  ],
+  "paths": {
+    "/healthCheck": {
+      "get": {
+        "summary": "Health check del servidor",
+        "description": "Verifica que el servidor esté funcionando correctamente",
+        "responses": {
+          "200": {
+            "description": "Servidor funcionando",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mensaje": { "type": "string", "example": "Todo marcha bien!" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos": {
+      "get": {
+        "tags": ["Pedidos"],
+        "summary": "Obtener todos los pedidos",
+        "description": "Devuelve la lista completa de pedidos del sistema, ordenados por fecha de creación (más recientes primero).",
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PedidoDTO" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Pedidos"],
+        "summary": "Crear un nuevo pedido",
+        "description": "Crea un pedido para un usuario comprador. Realiza las siguientes operaciones:\n- Valida el body con Zod (estructura y tipos)\n- Verifica que el usuario existe y es comprador\n- Verifica que todos los productos existan y estén activos\n- Valida que hay stock suficiente para cada producto\n- Reduce el stock de los productos\n- Genera notificación automática al vendedor\n- Retorna el pedido creado en estado PENDIENTE\n\nTodas estas operaciones se ejecutan en una transacción MongoDB para garantizar consistencia.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PedidoInput" },
+              "examples": {
+                "pedidoValido": {
+                  "summary": "Pedido válido con múltiples items",
+                  "value": {
+                    "usuarioId": "66fabcd234567890abc12345",
+                    "items": [
+                      { "productoId": "66fabc1234567890abc12345", "cantidad": 2 },
+                      { "productoId": "66fabc1234567890abc99999", "cantidad": 1 }
+                    ],
+                    "moneda": "PESO_ARG",
+                    "direccionEntrega": {
+                      "calle": "Av. Siempreviva",
+                      "altura": 742,
+                      "piso": 1,
+                      "departamento": 2,
+                      "codigoPostal": 1405,
+                      "ciudad": "CABA",
+                      "referencia": "Timbre verde"
+                    }
+                  }
+                },
+                "pedidoInvalido": {
+                  "summary": "Pedido con cantidad inválida (Zod validation error)",
+                  "value": {
+                    "usuarioId": "66fabcd234567890abc12345",
+                    "items": [
+                      { "productoId": "66fabc1234567890abc12345", "cantidad": 0 }
+                    ],
+                    "moneda": "PESO_ARG",
+                    "direccionEntrega": {
+                      "calle": "Av. Siempreviva",
+                      "altura": 742,
+                      "piso": 1,
+                      "departamento": 2,
+                      "codigoPostal": 1405,
+                      "ciudad": "CABA",
+                      "referencia": "Timbre verde"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pedido creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PedidoDTO" },
+                "example": {
+                  "id": "66face01234567890abc0001",
+                  "comprador": {
+                    "id": "66fabcd234567890abc12345",
+                    "nombre": "Juan Pérez",
+                    "email": "juan@example.com"
+                  },
+                  "items": [
+                    {
+                      "producto": {
+                        "id": "66fabc1234567890abc12345",
+                        "titulo": "Mouse Gamer RGB",
+                        "descripcion": "Mouse gaming 7200 DPI",
+                        "precio": 10000,
+                        "categoria": "perifericos"
+                      },
+                      "cantidad": 2,
+                      "precioUnitario": 10000,
+                      "subtotal": 20000
+                    }
+                  ],
+                  "total": 20000,
+                  "moneda": "PESO_ARG",
+                  "direccionEntrega": {
+                    "calle": "Av. Siempreviva",
+                    "altura": 742,
+                    "piso": 1,
+                    "departamento": 2,
+                    "codigoPostal": 1405,
+                    "ciudad": "CABA",
+                    "referencia": "Timbre verde"
+                  },
+                  "estado": "PENDIENTE",
+                  "fechaCreacion": "2025-10-13T15:30:00.000Z",
+                  "fechaActualizacion": "2025-10-13T15:30:00.000Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación Zod - body inválido (antes de llegar a la lógica de negocio)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" },
+                "example": {
+                  "message": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "path": ["items", "0", "cantidad"],
+                      "message": "Debe haber al menos 1"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Errores de negocio: ProductoInexistente | ProductoNoDisponible | UsuarioInexistente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "ProductoInexistente": {
+                    "value": {
+                      "error": "ProductoInexistente",
+                      "message": "El producto con id 66fabc1234567890abc12345 no existe"
+                    }
+                  },
+                  "ProductoNoDisponible": {
+                    "value": {
+                      "error": "ProductoNoDisponible",
+                      "message": "El producto con id 66fabc1234567890abc12345 no está activo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de negocio: ProductoStockInsuficiente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "ProductoStockInsuficiente",
+                  "message": "Stock disponible 5, solicitado 10"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/historial": {
+      "get": {
+        "tags": ["Pedidos"],
+        "summary": "Consultar historial de pedidos de un usuario",
+        "description": "Devuelve todos los pedidos realizados por un usuario específico, ordenados por fecha de creación (más recientes primero).",
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del usuario (MongoDB ObjectId)",
+            "example": "66fabcd234567890abc12345"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de pedidos del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PedidoDTO" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta el parámetro usuarioId",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "BadRequest",
+                  "message": "El parámetro usuarioId es requerido"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{id}": {
+      "patch": {
+        "tags": ["Pedidos"],
+        "summary": "Cancelar un pedido",
+        "description": "Cancela un pedido existente si cumple con las reglas de negocio:\n- El pedido no puede estar en estado ENVIADO, ENTREGADO o CANCELADO\n- Se actualiza el estado a CANCELADO\n- Se registra el motivo de cancelación en el historial de estados",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del pedido a cancelar (MongoDB ObjectId)",
+            "example": "66face01234567890abc0001"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["motivo"],
+                "properties": {
+                  "motivo": {
+                    "type": "string",
+                    "description": "Motivo de la cancelación del pedido",
+                    "minLength": 1
+                  }
+                }
+              },
+              "example": {
+                "motivo": "Cliente solicitó la cancelación del pedido"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pedido cancelado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PedidoDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error en la solicitud (PedidoNoModificable - estado no permite cancelación)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "PedidoNoModificable",
+                  "message": "El pedido en estado ENVIADO no puede ser cancelado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pedido no encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "PedidoInexistente",
+                  "message": "El pedido con id 66face01234567890abc0001 no existe"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{idPedido}/itemsPedidos/{idItem}": {
+      "patch": {
+        "tags": ["Pedidos"],
+        "summary": "Cambiar cantidad de un item en un pedido",
+        "description": "Modifica la cantidad de un producto específico dentro de un pedido.\n\nRestricciones:\n- Solo se puede modificar si el pedido está en estado PENDIENTE o CONFIRMADO\n- No se puede modificar si el pedido está ENVIADO, ENTREGADO o CANCELADO\n- La nueva cantidad debe ser mayor a 0\n- Se recalcula el subtotal del item y el total del pedido",
+        "parameters": [
+          {
+            "name": "idPedido",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del pedido (MongoDB ObjectId)",
+            "example": "66face01234567890abc0001"
+          },
+          {
+            "name": "idItem",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del producto dentro del pedido (MongoDB ObjectId)",
+            "example": "66fabc1234567890abc12345"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["cantidad"],
+                "properties": {
+                  "cantidad": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Nueva cantidad del producto"
+                  }
+                }
+              },
+              "example": {
+                "cantidad": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cantidad actualizada exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PedidoDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Cantidad inválida o pedido no modificable",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "examples": {
+                  "CantidadInvalida": {
+                    "value": {
+                      "error": "BadRequest",
+                      "message": "La cantidad debe ser un número positivo"
+                    }
+                  },
+                  "PedidoNoModificable": {
+                    "value": {
+                      "error": "PedidoNoModificable",
+                      "message": "El pedido en estado ENVIADO no puede ser modificado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pedido o item no encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "NotFound",
+                  "message": "Producto no encontrado en el pedido"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productos": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Obtener productos con filtros y paginación",
+        "description": "Devuelve la lista de productos del catálogo con soporte para:\n- Paginación (page, limit)\n- Filtro por vendedor\n- Búsqueda por texto en título/descripción\n- Filtro por rango de precios",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Número de página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100 },
+            "description": "Cantidad de items por página"
+          },
+          {
+            "name": "vendedorId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtrar productos por ID de vendedor"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Buscar coincidencias en título o descripción"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "schema": { "type": "number", "minimum": 0 },
+            "description": "Precio mínimo"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "schema": { "type": "number", "minimum": 0 },
+            "description": "Precio máximo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de productos",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductosPaginadosResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productos/ordenados": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Obtener productos ordenados con paginación",
+        "description": "Devuelve productos ordenados según el criterio especificado:\n- precioAsc: Precio ascendente (menor a mayor)\n- precioDesc: Precio descendente (mayor a menor)\n- masVendido: Por cantidad de ventas (más vendidos primero)",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Número de página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100 },
+            "description": "Cantidad de items por página"
+          },
+          {
+            "name": "orden",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["precioAsc", "precioDesc", "masVendido"],
+              "default": "precioAsc"
+            },
+            "description": "Criterio de ordenamiento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Productos ordenados (paginados)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductosPaginadosResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productos/vendedor": {
+      "get": {
+        "tags": ["Productos"],
+        "summary": "Listar productos de un vendedor específico con filtros avanzados",
+        "description": "Endpoint especializado para obtener productos de un vendedor con múltiples filtros:\n- Filtro por rango de precio (min/max)\n- Búsqueda por nombre (regex case-insensitive)\n- Búsqueda por descripción (regex case-insensitive)\n- Filtro por categorías (múltiples, separadas por coma)\n- Ordenamiento (precio asc/desc, más vendidos, fecha de creación)\n- Paginación completa",
+        "parameters": [
+          {
+            "name": "vendedorId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del vendedor (obligatorio)",
+            "example": "66fabcd234567890abc12345"
+          },
+          {
+            "name": "min",
+            "in": "query",
+            "schema": { "type": "number", "minimum": 0 },
+            "description": "Precio mínimo"
+          },
+          {
+            "name": "max",
+            "in": "query",
+            "schema": { "type": "number", "minimum": 0 },
+            "description": "Precio máximo"
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtro por título del producto (búsqueda parcial, case-insensitive)"
+          },
+          {
+            "name": "descripcion",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtro por descripción del producto (búsqueda parcial, case-insensitive)"
+          },
+          {
+            "name": "categorias",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Categorías separadas por coma (ej: 'perifericos,electronicos')"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Número de página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100 },
+            "description": "Cantidad de items por página"
+          },
+          {
+            "name": "orden",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["precioAsc", "precioDesc", "masVendido", "createdAtDesc"]
+            },
+            "description": "Criterio de ordenamiento"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Productos del vendedor con paginación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductosPaginadosResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros inválidos (falta vendedorId)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "BadRequest",
+                  "message": "El parámetro vendedorId es obligatorio"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notificaciones": {
+      "get": {
+        "tags": ["Notificaciones"],
+        "summary": "Obtener notificaciones de un usuario",
+        "description": "Devuelve las notificaciones de un usuario, con opción de filtrar por estado (leídas/no leídas).\n\nLas notificaciones se generan automáticamente cuando:\n- Se crea un nuevo pedido (notificación al vendedor)\n- Cambia el estado de un pedido\n- Ocurren otros eventos relevantes del sistema",
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID del usuario receptor de las notificaciones",
+            "example": "66fabcd234567890abc12345"
+          },
+          {
+            "name": "leida",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean" },
+            "description": "Filtrar por notificaciones leídas (true) o no leídas (false). Si se omite, devuelve todas."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificaciones del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/NotificacionDTO" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta el parámetro usuarioId",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "BadRequest",
+                  "message": "Se requiere el ID del usuario"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Notificaciones"],
+        "summary": "Marcar una notificación como leída",
+        "description": "Actualiza el estado de una notificación a 'leída' y registra la fecha/hora de lectura.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["notificacionId"],
+                "properties": {
+                  "notificacionId": {
+                    "type": "string",
+                    "description": "ID de la notificación a marcar como leída"
+                  }
+                }
+              },
+              "example": {
+                "notificacionId": "66fabcd234567890abc12345"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notificación marcada como leída exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "message": "Notificación marcada como leída"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta el ID de la notificación",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "BadRequest",
+                  "message": "Se requiere el ID de la notificación"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Notificación no encontrada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "NotificacionInexistente",
+                  "message": "La notificación con id 66fabcd234567890abc12345 no existe"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "tags": ["Usuarios"],
+        "summary": "Crear un nuevo usuario",
+        "description": "Registra un nuevo usuario en el sistema (comprador, vendedor o admin).\n\nValidaciones:\n- Nombre: 3-25 caracteres\n- Email: formato válido y único\n- Teléfono: 8-15 dígitos numéricos\n- Tipo de usuario: COMPRADOR, VENDEDOR o ADMIN",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UsuarioCreateInput" },
+              "examples": {
+                "comprador": {
+                  "summary": "Usuario comprador",
+                  "value": {
+                    "nombre": "Juan Pérez",
+                    "email": "juan@example.com",
+                    "telefono": "1123456789",
+                    "tipoUsuario": "COMPRADOR"
+                  }
+                },
+                "vendedor": {
+                  "summary": "Usuario vendedor",
+                  "value": {
+                    "nombre": "Tienda Sol",
+                    "email": "ventas@tiendasol.com",
+                    "telefono": "1198765432",
+                    "tipoUsuario": "VENDEDOR"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsuarioDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos (error de validación Zod)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" },
+                "example": {
+                  "message": "Datos de entrada inválidos",
+                  "details": [
+                    {
+                      "path": ["email"],
+                      "message": "Formato de email invalido"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Usuario ya existe (email duplicado)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": {
+                  "error": "UsuarioExistente",
+                  "message": "Ya existe un usuario con el email juan@example.com"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Usuarios"],
+        "summary": "Obtener todos los usuarios",
+        "description": "Devuelve la lista completa de usuarios registrados en el sistema.",
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/UsuarioDTO" }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error inesperado del servidor",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NotificacionDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID único de la notificación",
+            "example": "66fabcd234567890abc12345"
+          },
+          "receptor": {
+            "type": "object",
+            "description": "Usuario que recibe la notificación",
+            "properties": {
+              "id": { "type": "string", "example": "66fabcd234567890abc12345" },
+              "nombre": { "type": "string", "example": "Juan Pérez" },
+              "email": { "type": "string", "format": "email", "example": "juan@example.com" }
+            }
+          },
+          "mensaje": {
+            "type": "string",
+            "description": "Contenido del mensaje de notificación",
+            "example": "Tienes un nuevo pedido #PED-1697123456789-1"
+          },
+          "leida": {
+            "type": "boolean",
+            "description": "Indica si la notificación fue leída",
+            "example": false
+          },
+          "fechaAlta": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación de la notificación",
+            "example": "2025-10-13T15:30:00.000Z"
+          },
+          "fechaLeida": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Fecha en que se marcó como leída (null si no ha sido leída)",
+            "example": null
+          }
+        }
+      },
+      "ItemPedidoInput": {
+        "type": "object",
+        "required": ["productoId", "cantidad"],
+        "properties": {
+          "productoId": {
+            "type": "string",
+            "description": "ID del producto (MongoDB ObjectId)",
+            "example": "66fabc1234567890abc12345"
+          },
+          "cantidad": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Cantidad de unidades del producto",
+            "example": 2
+          }
+        }
+      },
+      "DireccionEntregaInput": {
+        "type": "object",
+        "required": ["calle", "altura", "piso", "departamento", "codigoPostal", "ciudad", "referencia"],
+        "properties": {
+          "calle": {
+            "type": "string",
+            "description": "Nombre de la calle",
+            "example": "Av. Siempreviva"
+          },
+          "altura": {
+            "type": "integer",
+            "description": "Número de altura",
+            "example": 742
+          },
+          "piso": {
+            "type": "integer",
+            "description": "Número de piso",
+            "example": 1
+          },
+          "departamento": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Número o letra de departamento",
+            "example": 2
+          },
+          "codigoPostal": {
+            "type": "integer",
+            "description": "Código postal",
+            "example": 1405
+          },
+          "ciudad": {
+            "type": "string",
+            "description": "Ciudad",
+            "example": "CABA"
+          },
+          "referencia": {
+            "type": "string",
+            "description": "Referencias adicionales para la entrega",
+            "example": "Timbre verde, edificio de ladrillos"
+          }
+        }
+      },
+      "PedidoInput": {
+        "type": "object",
+        "required": ["usuarioId", "items", "moneda", "direccionEntrega"],
+        "properties": {
+          "usuarioId": {
+            "type": "string",
+            "description": "ID del usuario comprador (MongoDB ObjectId)",
+            "example": "66fabcd234567890abc12345"
+          },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Lista de productos y cantidades del pedido",
+            "items": { "$ref": "#/components/schemas/ItemPedidoInput" }
+          },
+          "moneda": {
+            "type": "string",
+            "enum": ["PESO_ARG", "DOLAR_USA", "REAL"],
+            "description": "Moneda del pedido",
+            "example": "PESO_ARG"
+          },
+          "direccionEntrega": {
+            "$ref": "#/components/schemas/DireccionEntregaInput"
+          }
+        }
+      },
+      "ItemPedidoDTO": {
+        "type": "object",
+        "properties": {
+          "producto": {
+            "type": "object",
+            "description": "Información del producto",
+            "properties": {
+              "id": { "type": "string", "example": "66fabc1234567890abc12345" },
+              "titulo": { "type": "string", "example": "Mouse Gamer RGB" },
+              "descripcion": { "type": "string", "example": "Mouse gaming 7200 DPI con iluminación RGB" },
+              "precio": { "type": "number", "example": 10000 },
+              "categoria": { "type": "string", "example": "perifericos" }
+            }
+          },
+          "cantidad": {
+            "type": "integer",
+            "description": "Cantidad de unidades",
+            "example": 2
+          },
+          "precioUnitario": {
+            "type": "number",
+            "description": "Precio unitario al momento de crear el pedido",
+            "example": 10000
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Subtotal del item (cantidad × precioUnitario)",
+            "example": 20000
+          }
+        }
+      },
+      "PedidoDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID único del pedido",
+            "example": "66face01234567890abc0001"
+          },
+          "comprador": {
+            "type": "object",
+            "description": "Usuario comprador del pedido",
+            "properties": {
+              "id": { "type": "string", "example": "66fabcd234567890abc12345" },
+              "nombre": { "type": "string", "example": "Juan Pérez" },
+              "email": { "type": "string", "format": "email", "example": "juan@example.com" }
+            }
+          },
+          "items": {
+            "type": "array",
+            "description": "Lista de items del pedido",
+            "items": { "$ref": "#/components/schemas/ItemPedidoDTO" }
+          },
+          "total": {
+            "type": "number",
+            "description": "Total del pedido (suma de subtotales)",
+            "example": 35000
+          },
+          "moneda": {
+            "type": "string",
+            "description": "Moneda del pedido",
+            "example": "PESO_ARG"
+          },
+          "direccionEntrega": {
+            "$ref": "#/components/schemas/DireccionEntregaInput"
+          },
+          "estado": {
+            "type": "string",
+            "enum": ["PENDIENTE", "CONFIRMADO", "EN_PREPARACION", "ENVIADO", "ENTREGADO", "CANCELADO"],
+            "description": "Estado actual del pedido",
+            "example": "PENDIENTE"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del pedido",
+            "example": "2025-10-13T15:30:00.000Z"
+          },
+          "fechaActualizacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización del pedido",
+            "example": "2025-10-13T15:30:00.000Z"
+          }
+        }
+      },
+      "ProductoDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID único del producto",
+            "example": "66fabc1234567890abc12345"
+          },
+          "vendedor": {
+            "type": "object",
+            "description": "Usuario vendedor del producto",
+            "properties": {
+              "id": { "type": "string", "example": "66fabcd234567890abc99999" },
+              "nombre": { "type": "string", "example": "Tienda Sol" },
+              "email": { "type": "string", "format": "email", "example": "ventas@tiendasol.com" }
+            }
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Título del producto",
+            "example": "Mouse Gamer RGB"
+          },
+          "descripcion": {
+            "type": "string",
+            "description": "Descripción detallada del producto",
+            "example": "Mouse gaming de alta precisión con sensor de 7200 DPI e iluminación RGB personalizable"
+          },
+          "categorias": {
+            "type": "array",
+            "description": "Categorías del producto",
+            "items": { "type": "string" },
+            "example": ["perifericos", "gaming"]
+          },
+          "precio": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 10000
+          },
+          "moneda": {
+            "type": "string",
+            "description": "Moneda del precio",
+            "example": "PESO_ARG"
+          },
+          "stock": {
+            "type": "integer",
+            "description": "Cantidad disponible en stock",
+            "example": 50
+          },
+          "fotos": {
+            "type": "array",
+            "description": "URLs de fotos del producto",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": { "type": "string", "format": "uri", "example": "https://example.com/foto1.jpg" }
+              }
+            }
+          },
+          "activo": {
+            "type": "boolean",
+            "description": "Indica si el producto está activo y disponible para la venta",
+            "example": true
+          },
+          "vendidos": {
+            "type": "integer",
+            "description": "Cantidad total de unidades vendidas",
+            "example": 150
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de creación del producto",
+            "example": "2025-10-01T10:00:00.000Z"
+          },
+          "fechaActualizacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización",
+            "example": "2025-10-13T12:00:00.000Z"
+          }
+        }
+      },
+      "ProductosPaginadosResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Página actual",
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Items por página",
+            "example": 10
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total de items disponibles",
+            "example": 45
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total de páginas",
+            "example": 5
+          },
+          "items": {
+            "type": "array",
+            "description": "Lista de productos de la página actual",
+            "items": { "$ref": "#/components/schemas/ProductoDTO" }
+          }
+        }
+      },
+      "UsuarioCreateInput": {
+        "type": "object",
+        "required": ["nombre", "email", "telefono", "tipoUsuario"],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 25,
+            "description": "Nombre del usuario (3-25 caracteres)",
+            "example": "Juan Pérez"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email único del usuario",
+            "example": "juan@example.com"
+          },
+          "telefono": {
+            "type": "string",
+            "pattern": "^\\d{8,15}$",
+            "description": "Teléfono del usuario (8-15 dígitos numéricos)",
+            "example": "1123456789"
+          },
+          "tipoUsuario": {
+            "type": "string",
+            "enum": ["COMPRADOR", "VENDEDOR", "ADMIN"],
+            "description": "Tipo de usuario",
+            "example": "COMPRADOR"
+          }
+        }
+      },
+      "UsuarioDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID único del usuario",
+            "example": "66fabcd234567890abc12345"
+          },
+          "nombre": {
+            "type": "string",
+            "example": "Juan Pérez"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "juan@example.com"
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true,
+            "example": "1123456789"
+          },
+          "tipoUsuario": {
+            "type": "string",
+            "enum": ["COMPRADOR", "VENDEDOR", "ADMIN"],
+            "example": "COMPRADOR"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de registro del usuario",
+            "example": "2025-09-15T10:00:00.000Z"
+          },
+          "fechaActualizacion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de última actualización",
+            "example": "2025-10-13T12:00:00.000Z"
+          }
+        }
+      },
+      "ValidationIssue": {
+        "type": "object",
+        "description": "Detalle individual de un error de validación Zod",
+        "properties": {
+          "path": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ruta del campo con error",
+            "example": ["items", "0", "cantidad"]
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje de error",
+            "example": "Debe haber al menos 1"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "description": "Respuesta de error de validación (generalmente 400 - Bad Request)",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje general del error",
+            "example": "Datos de entrada inválidos"
+          },
+          "details": {
+            "type": "array",
+            "description": "Lista de errores de validación específicos",
+            "items": { "$ref": "#/components/schemas/ValidationIssue" }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Respuesta estándar de error del sistema",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Nombre/código del error",
+            "example": "ProductoInexistente"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje descriptivo del error",
+            "example": "El producto con id 66fabc1234567890abc12345 no existe"
+          }
+        }
+      }
+    }
+  }
+}
