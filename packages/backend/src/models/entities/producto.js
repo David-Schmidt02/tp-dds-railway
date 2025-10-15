@@ -27,16 +27,23 @@ export class Producto {
         this.fotos = fotos 
         this.activo = activo
     }
+
+    disminuirStock(cantidad) {
+        if (!this.activo) {
+            return false;
+        }
+        if (this.estaDisponible(cantidad)) {
+            this.stock -= cantidad
+            return true;
+        }
+        return false;
+    }
     
     estaDisponible(cantidad) {
         return this.stock >= cantidad;
     }
 
-    reducirStock(cantidad) {
-        this.stock -= cantidad
-    }
-
     aumentarStock(cantidad) {
-        this.stock += cantidad
+        this.stock += cantidad;
     }
 }

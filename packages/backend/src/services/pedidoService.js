@@ -21,26 +21,18 @@ export class PedidoService {
 
     async crearPedido(pedidoJSON) {
 
-        const { usuarioId, items, moneda, direccionEntrega, comentarios } = pedidoJSON;
+        const { usuarioId, items, moneda, direccionEntrega } = pedidoJSON;
         let pedidoGuardado;
         
         // transformar items JSON a objetos de dominio
-        const itemsPedidos = [];
-
-        for (const itemData of items) {
+        const itemsPedidos = await Promise.all(items.map(async (itemData) => {
             let { productoId, cantidad } = itemData;
             const producto = await this.productoRepository.obtenerProductoPorId(productoId);
-            if (!producto) {
-                throw new ProductoInexistente(`El producto con ID ${productoId} no existe.`);
-            }
-            cantidad = parseInt(cantidad); // No validamos porque supuestamente si ya llegó la propuesta de crear pedido es porque hay stock suficiente, igualmente saltaría sino en reservaStock
-            const precioUnitario = await this.productoRepository.obtenerPrecioUnitario(productoId);
-            
-            const itemPedido = new ItemPedido(producto, cantidad, precioUnitario);
-            itemsPedidos.push(itemPedido);
-        }
+            cantidad = parseInt(cantidad);
+            const precioUnitario = producto.precioUnitario;
+        }));
 
-        const comprador = await  this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+        const comprador = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
 
         const direccion = new DireccionEntrega(
             direccionEntrega.calle,
@@ -61,26 +53,20 @@ export class PedidoService {
             null // ID se asigna al guardar
         );
 
-        try {
-            await this.productoRepository.reservarStockProductos(itemsPedidos);
+        try {    // no se bien como atajar esto
+            const reservado = pedido.reservarItems(); //capaz estaria bueno q se haga en el constructor
         } catch (error) {
             if (error instanceof ProductoNoDisponible) {
-                throw error;
+            throw error;
             }
             if (error instanceof ProductoStockInsuficiente) {
-                throw error;
+            throw error;
             }
             throw new Error('Error al reservar stock: ' + error.message);
         }
 
         // Guardar el pedido (aPedidoDB transformará a formato DB)
-        try {
-            pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
-        } catch (error) {
-            // Si ocurre un error al guardar, liberar el stock reservado
-            await this.productoRepository.cancelarStockProductos(itemsPedidos);
-            throw error;
-        }
+        pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
 
         try {
             const notificacion = factoryNotificacionPedidos.crearPedido(pedidoGuardado);
@@ -98,26 +84,13 @@ export class PedidoService {
 
    
     async cancelarPedido(id, motivo, usuario) {
-        const session = await mongoose.startSession();
         let pedidoActualizado;
         let pedido;
 
-        try {
-            await session.withTransaction(async () => {
-                pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
-                pedido.actualizarEstado('CANCELADO', usuario, motivo);
+        pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
+        pedido.actualizarEstado('CANCELADO', usuario, motivo);
 
-                // Devolver stock de todos los items (debe aceptar session)
-                await this.productoRepository.cancelarStockProductos(pedido.itemsPedido, session);
-
-                pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido, session);
-            });
-        } catch (error) {
-            console.error('Error al cancelar pedido:', error.message);
-            throw error;
-        } finally {
-            await session.endSession();
-        }
+        pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido);
 
         // Crear notificación de cancelación fuera de la transacción
         try {
@@ -135,37 +108,21 @@ export class PedidoService {
         return pedidoActualizado;
     }
 
-    /**
-     * Cambia la cantidad de un item del pedido con validación de stock
-     */
     async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
         const session = await mongoose.startSession();
-        let resultado;
-
+        let pedidoActualizado;
         try {
-            await session.withTransaction(async () => {
-                // El repository valida la lógica de negocio y retorna el pedido actualizado + diferencia
-                resultado = await this.pedidoRepository.cambiarCantidadItem(idPedido, idItem, nuevaCantidad, session);
+            const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
 
-                // Ajustar stock según la diferencia
-                const diferencia = resultado.diferenciaCantidad;
+            const diferenciaCantidad = pedido.cambiarCantidadItem(idItem, nuevaCantidad);
 
-                if (diferencia > 0) {
-                    // Necesitamos más stock - reservar (el repository valida stock disponible)
-                    await this.productoRepository.reservarStock(idItem, diferencia, session);
-                } else if (diferencia < 0) {
-                    // Liberamos stock
-                    await this.productoRepository.cancelarStock(idItem, Math.abs(diferencia), session);
-                }
-            });
+            pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido);
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
             throw error;
-        } finally {
-            await session.endSession();
         }
 
-        return resultado.pedido;
+        return pedidoActualizado;
     }
 
     async obtenerPedidos() {

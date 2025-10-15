@@ -37,9 +37,13 @@ export class Pedido {
             this.historialEstados.push(new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)) // Revisar
             this.estado = nuevoEstado;
         }
+
+        if (nuevoEstado.nombre == 'CANCELADO') {
+            this.itemsPedido.forEach(item => {
+                item.devolverStockProductos();
+            });
+        }
     }
-    
-    validarStock() { return this.itemsPedido.every(item => item.producto.estaDisponible(item.cantidad)) }
 
     agregarItem(item){
         this.itemsPedido.push(item);
@@ -56,12 +60,7 @@ export class Pedido {
 
     puedeModificarItems() {
         // Solo se puede modificar si no ha sido enviado
-        let nombre = this.estado.nombre
-        return nombre !== 'ENVIADO' && nombre !== 'ENTREGADO' && nombre !== 'CANCELADO';
-    }
-
-    puedeCancelarse() {
-        // Solo se puede cancelar si no ha sido enviado ni entregado, y tampoco si ya está cancelado
+        //Esto tiene que estar en el ENUM
         let nombre = this.estado.nombre
         return nombre !== 'ENVIADO' && nombre !== 'ENTREGADO' && nombre !== 'CANCELADO';
     }
@@ -78,6 +77,12 @@ export class Pedido {
 
         item.cambiarCantidad(nuevaCantidad);
 
+    }
+
+    reservarItems() {
+        this.itemsPedido.forEach(item => {
+            item.reservarStockProductos();
+        });
     }
 
     

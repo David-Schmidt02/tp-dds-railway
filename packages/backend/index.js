@@ -24,17 +24,6 @@ try {
   console.error('Error específico:', err.message);
   console.error('Stack trace:', err.stack);
   
-  appContext = {
-    pedidoController: {
-      crearPedido: (req, res) => res.status(503).json({ error: 'Funcionalidad no disponible en modo desarrollo.' }),
-      obtenerPedidos: (req, res) => res.status(503).json({ error: 'Funcionalidad no disponible en modo desarrollo.' }),
-      cancelarPedido: (req, res) => res.status(503).json({ error: 'Funcionalidad no disponible en modo desarrollo.' })
-    },
-    productoController: {
-      obtenerProductos: (req, res) => res.status(503).json({ error: 'Funcionalidad no disponible en modo desarrollo.' })
-    }
-  };
-
   setupSwagger(app);
 }
 

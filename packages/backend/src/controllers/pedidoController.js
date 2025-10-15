@@ -24,10 +24,6 @@ export class PedidoController {
         try {
             const nuevoPedido = await this.pedidoService.crearPedido(resultBody.data);
 
-            if (!nuevoPedido) {
-                throw new Error('El servicio no devolvió un pedido válido');
-            }
-
             const pedidoDTO = pedidoToDTO(nuevoPedido);
             res.status(201).json(pedidoDTO);
 

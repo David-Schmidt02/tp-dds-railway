@@ -23,6 +23,13 @@ export class ItemPedido {
         return this.producto.id;
     }
 
+    reservarStockProductos() {
+        this.producto.disminuirStock(this.cantidad);
+    }
+
+    devolverStockProductos() {
+        this.producto.aumentarStock(this.cantidad);
+    }
 
     cambiarCantidad(nuevaCantidad) {
         if (nuevaCantidad <= 0) {
@@ -30,5 +37,13 @@ export class ItemPedido {
         }
         
         this.cantidad = nuevaCantidad;
+
+        // Ajustar stock según la diferencia
+        const diferenciaCantidad = nuevaCantidad - this.cantidad;
+        if (diferenciaCantidad > 0) {
+            this.producto.disminuirStock(diferenciaCantidad);
+        } else if (diferenciaCantidad < 0) {
+            this.producto.aumentarStock(Math.abs(diferenciaCantidad));
+        }
     }
 }

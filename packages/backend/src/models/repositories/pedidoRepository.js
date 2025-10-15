@@ -144,10 +144,80 @@ export class PedidoRepository {
 
         // Asignar propiedades adicionales que no están en el constructor
         pedido.numero = pedidoDB.numero;
-        pedido.estado = pedidoDB.estado; // El estado será un string del enum
+        // Transformar el string de estado en el enum correspondiente
+        switch (pedidoDB.estado) {
+            case 'PENDIENTE':
+                pedido.estado = EstadoPedido.PENDIENTE;
+                break;
+            case 'CONFIRMADO':
+                pedido.estado = EstadoPedido.CONFIRMADO;
+                break;
+            case 'EN_PREPARACION':
+                pedido.estado = EstadoPedido.EN_PREPARACION;
+                break;
+            case 'ENVIADO':
+                pedido.estado = EstadoPedido.ENVIADO;
+                break;
+            case 'ENTREGADO':
+                pedido.estado = EstadoPedido.ENTREGADO;
+                break;
+            case 'CANCELADO':
+                pedido.estado = EstadoPedido.CANCELADO;
+                break;
+            default:
+                pedido.estado = EstadoPedido.PENDIENTE;
+        }
         pedido.fechaCreacion = pedidoDB.createdAt || pedidoDB.fechaPedido;
         pedido.fechaPedido = pedidoDB.fechaPedido;
-        pedido.historialEstados = pedidoDB.historialEstados || [];
+        // Transformar historialEstados a instancias de CambioEstadoPedido
+        pedido.historialEstados = (pedidoDB.historialEstados || []).map(hist => {
+            // Estado anterior y nuevo pueden venir como string, convertir a enum
+            let estadoAnterior = null;
+            let nuevoEstado = null;
+            switch (hist.estadoAnterior) {
+                case 'PENDIENTE': estadoAnterior = EstadoPedido.PENDIENTE; break;
+                case 'CONFIRMADO': estadoAnterior = EstadoPedido.CONFIRMADO; break;
+                case 'EN_PREPARACION': estadoAnterior = EstadoPedido.EN_PREPARACION; break;
+                case 'ENVIADO': estadoAnterior = EstadoPedido.ENVIADO; break;
+                case 'ENTREGADO': estadoAnterior = EstadoPedido.ENTREGADO; break;
+                case 'CANCELADO': estadoAnterior = EstadoPedido.CANCELADO; break;
+                default: estadoAnterior = EstadoPedido.PENDIENTE;
+            }
+            switch (hist.nuevoEstado) {
+                case 'PENDIENTE': nuevoEstado = EstadoPedido.PENDIENTE; break;
+                case 'CONFIRMADO': nuevoEstado = EstadoPedido.CONFIRMADO; break;
+                case 'EN_PREPARACION': nuevoEstado = EstadoPedido.EN_PREPARACION; break;
+                case 'ENVIADO': nuevoEstado = EstadoPedido.ENVIADO; break;
+                case 'ENTREGADO': nuevoEstado = EstadoPedido.ENTREGADO; break;
+                case 'CANCELADO': nuevoEstado = EstadoPedido.CANCELADO; break;
+                default: nuevoEstado = EstadoPedido.PENDIENTE;
+            }
+            // Reconstruir usuario si está presente
+            let usuario = null;
+            if (hist.usuario && typeof hist.usuario === 'object') {
+                usuario = new Usuario(
+                    hist.usuario.nombre,
+                    hist.usuario.email,
+                    hist.usuario.telefono,
+                    hist.usuario.tipoUsuario
+                );
+                if (hist.usuario._id) {
+                    usuario.id = hist.usuario._id.toString();
+                }
+            }
+            // Instanciar CambioEstadoPedido y setear fecha si existe
+            const cambio = new CambioEstadoPedido(
+                estadoAnterior,
+                nuevoEstado,
+                pedido,
+                usuario,
+                hist.motivo
+            );
+            if (hist.fecha) {
+                cambio.fecha = new Date(hist.fecha);
+            }
+            return cambio;
+        });
 
         return pedido;
     }
@@ -266,100 +336,6 @@ export class PedidoRepository {
             .session(session);
 
         return this.dePedidoDB(pedidoCompleto.toObject());
-    }
-
-    /**
-     * Cambia la cantidad de un item del pedido con validación de negocio
-     * Retorna el pedido actualizado y la diferencia de cantidad (para ajustar stock)
-     */
-    async cambiarCantidadItem(idPedido, idItem, nuevaCantidad, session = null) {
-        if (!mongoose.Types.ObjectId.isValid(idPedido)) {
-            throw new PedidoInexistente(idPedido);
-        }
-
-        // Obtener pedido con populate para convertir a dominio
-        let query = this.model.findById(idPedido)
-            .populate('usuarioId')
-            .populate('items.productoId');
-
-        if (session) {
-            query = query.session(session);
-        }
-
-        const pedidoDB = await query;
-        if (!pedidoDB) {
-            throw new PedidoInexistente(idPedido);
-        }
-
-        // Convertir a objeto de dominio para validar
-        const pedido = this.dePedidoDB(pedidoDB.toObject());
-
-        // Obtener cantidad previa antes de modificar
-        const cantidadPrevia = pedido.obtenerCantidadItem(idItem);
-        if (cantidadPrevia === null) {
-            throw new Error('Producto no encontrado en el pedido');
-        }
-
-        // Validar lógica de negocio (lanza PedidoNoModificable si no se puede)
-        pedido.modificarCantidadItem(idItem, nuevaCantidad);
-
-        // Guardar cambios
-        const pedidoActualizado = await this.guardarPedidoModificado(pedido, session);
-
-        // Retornar pedido actualizado y diferencia para que el service ajuste stock
-        return {
-            pedido: pedidoActualizado,
-            diferenciaCantidad: nuevaCantidad - cantidadPrevia
-        };
-    }
-
-    /**
-     * Actualiza el estado de un pedido y registra el cambio en el historial
-     */
-    async actualizarEstadoPedido(id, nuevoEstado, usuario, motivo) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new PedidoInexistente(id);
-        }
-
-        const pedido = await this.model.findById(id);
-        if (!pedido) {
-            throw new PedidoInexistente(id);
-        }
-
-        const estadoAnterior = pedido.estado;
-
-        // Agregar cambio al historial
-        pedido.historialEstados.push({
-            estadoAnterior,
-            estadoNuevo: nuevoEstado,
-            fecha: new Date(),
-            motivo
-        });
-
-        pedido.estado = nuevoEstado;
-
-        const resultado = await pedido.save();
-        return this.dePedidoDB(resultado.toObject());
-    }
-
-    async obtenerPrecioUnitario(id, productoId) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new PedidoInexistente(id);
-        }
-        
-        const pedido = await this.model.findById(id);
-        if (!pedido) {
-            throw new PedidoInexistente(id);
-        }
-        
-        const item = pedido.items.find(item => 
-            item.productoId.toString() === productoId.toString()
-        );
-        
-        return item ? {
-            valor: item.precioUnitario.valor,
-            moneda: item.precioUnitario.moneda
-        } : null;
     }
 
     async eliminarPedido(id) {
