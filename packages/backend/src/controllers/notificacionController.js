@@ -8,11 +8,6 @@ export class NotificacionController {
     async obtenerNotificacionesDeUnUsuario(req, res, next) {
         try {
             const { usuarioId, leida } = req.query;
-
-            if (!usuarioId) {
-                return res.status(400).json({ message: 'Se requiere el ID del usuario' });
-            }
-
             const filtroLeida = leida === undefined ? undefined : leida === 'true';
             const notificaciones = await this.notificacionService.obtenerNotificacionesDeUnUsuario(usuarioId, filtroLeida);
             return res.status(200).json(notificacionesToDTO(notificaciones));

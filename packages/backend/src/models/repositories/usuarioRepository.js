@@ -1,3 +1,4 @@
+    
 import { ObjectId } from "mongodb";
 import { UsuarioInexistente, UsuarioYaExiste } from "../../excepciones/usuario.js";
 import { UsuarioModel } from '../../schema/usuarioSchema.js';
@@ -15,34 +16,8 @@ export class UsuarioRepository {
         return usuario;
     }
 
-    async crearUsuario(usuario) {
-        try {
-            // Verificar si el usuario ya existe
-            const usuarioExistente = await UsuarioModel.findOne({ email: usuario.email });
-            if (usuarioExistente) {
-                throw new UsuarioYaExiste(usuario.email);
-            }
-
-            return await UsuarioModel.create(usuario);
-        } catch (error) {
-            // Si es error de duplicado de MongoDB (por si acaso)
-            if (error.code === 11000) {
-                throw new UsuarioYaExiste(usuario.email);
-            }
-            throw error;
-        }
-    }
-
     async obtenerTodosUsuarios() {
         return await UsuarioModel.find();
-    }
-
-    async actualizarUsuario(id, updates) {
-        const usuario = await UsuarioModel.findByIdAndUpdate(id, updates, { new: true });
-        if (!usuario) {
-            throw new UsuarioInexistente(id);
-        }
-        return usuario;
     }
 
     async eliminarUsuario(id) {
@@ -51,5 +26,39 @@ export class UsuarioRepository {
             throw new UsuarioInexistente(id);
         }
         return usuario;
+    }
+
+    async guardarUsuario(usuario) {
+        const id = usuario._id || usuario.id;
+        const isUpdate = Boolean(id);
+        const query = isUpdate ? { _id: id } : { _id: new UsuarioModel()._id };
+        // Extraer datos desde la instancia de dominio
+        const data = {
+            nombre: usuario.nombre,
+            email: usuario.email,
+            password: usuario.password,
+            direccion: usuario.direccion,
+            telefono: usuario.telefono
+        };
+        // Si es creación, verificar duplicado por email
+        if (!isUpdate) {
+            const usuarioExistente = await UsuarioModel.findOne({ email: usuario.email });
+            if (usuarioExistente) {
+                throw new UsuarioYaExiste(usuario.email);
+            }
+        }
+        const updated = await UsuarioModel.findOneAndUpdate(
+            query,
+            data,
+            {
+                new: true,
+                runValidators: true,
+                upsert: true
+            }
+        );
+        if (!updated) {
+            throw new Error('Usuario no guardado');
+        }
+        return updated;
     }
 }

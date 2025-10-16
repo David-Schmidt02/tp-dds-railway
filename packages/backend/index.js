@@ -6,7 +6,7 @@ import { setupSwagger } from "./src/app/swagger.js";
 
 const app = express();
 const PORT = 3000;
-const DB_URI = "mongodb://localhost:27017/desarrollo?replicaSet=rs0";
+const DB_URI = "mongodb://localhost:27017/TiendaSol";
 
 let appContext = {};
 try {
@@ -20,7 +20,7 @@ try {
   setupSwagger(app);
 
 } catch (err) {
-  console.warn('No se pudo conectar a la base de datos. El servidor se inicia en modo desarrollo.');
+  console.warn('No se pudo conectar a la base de datos. ');
   console.error('Error específico:', err.message);
   console.error('Stack trace:', err.stack);
   

@@ -12,7 +12,8 @@ export class PedidoController {
 
     async crearPedido(req, res, next) {
         const body = req.body;
-        const resultBody = pedidoSchema.safeParse(body);
+        
+        
 
         if(resultBody.error){
             return res.status(400).json({

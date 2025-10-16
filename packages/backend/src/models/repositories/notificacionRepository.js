@@ -7,43 +7,49 @@ export class NotificacionRepository {
         // No necesitas db con Mongoose
     }
 
-    async crear(notificacion) {
-        return await NotificacionModel.create(notificacion);
+    async obtenerNotificacion(notificacionId) {
+    return await NotificacionModel.findById(notificacionId).populate('receptor');
     }
 
-    async obtenerPorUsuario(usuarioId) {
-        return await NotificacionModel.find({ receptorId: usuarioId });
-    }
+    async guardarNotificacion(notificacion) {
+        // Si tiene id o _id, es update; si no, es create
+        const id = notificacion._id || notificacion.id;
+        const query = id ? { _id: id } : { _id: new NotificacionModel()._id };
 
-    async marcarComoLeida(id) {
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new NotificacionInexistente(id);
-        }
+        // Extraer datos desde la instancia de dominio
+        const data = {
+            mensaje: notificacion.mensaje,
+            receptorId: notificacion.receptor._id,
+            fechaAlta: notificacion.fechaAlta,
+            leida: notificacion.leida,
+            fechaLeida: notificacion.fechaLeida
+        };
 
-        const notificacion = await NotificacionModel.findByIdAndUpdate(
-            id,
-            { leida: true, fechaLeida: new Date() },
-            { new: true }
-        );
-        if (!notificacion) {
-            throw new NotificacionInexistente(id);
+        const updated = await NotificacionModel.findOneAndUpdate(
+            query,
+            data,
+            {
+                new: true,
+                runValidators: true,
+                upsert: true
+            }
+        ).populate('receptor');
+        if (!updated) {
+            throw new NotificacionInexistente();
         }
-        return notificacion;
+        return updated;
     }
 
     async obtenerTodos() {
-        return await NotificacionModel.find();
+    return await NotificacionModel.find().populate('receptor');
     }
 
-    async agregarNotificacion(usuarioId, notificacion) {
-        return await NotificacionModel.create({ receptorId: usuarioId, ...notificacion });
-    }
 
     async obtenerNotificacionesDeUnUsuario(usuarioId, leida) {
-         const filtro = { receptorId: usuarioId };
-         if (leida !== undefined) {
-            filtro.leida = leida; // true o false
-         }
-         return await NotificacionModel.find(filtro);
+            const filtro = { receptorId: usuarioId };
+            if (leida !== undefined) {
+                filtro.leida = leida; // true o false
+            }
+            return await NotificacionModel.find(filtro).populate('receptor');
     }
 }

@@ -71,10 +71,8 @@ export class PedidoService {
         try {
             const notificacion = factoryNotificacionPedidos.crearPedido(pedidoGuardado);
             if (notificacion && notificacion.receptor) {
-                await this.notificacionRepository.agregarNotificacion(
-                    notificacion.receptor.id,
-                    notificacion
-                );
+                notificacion.usuarioId = notificacion.receptor.id;
+                await this.notificacionRepository.guardarNotificacion(notificacion);
             }
         } catch (notificacionError) {
             console.error('Error al crear notificación:', notificacionError);
@@ -96,10 +94,8 @@ export class PedidoService {
         try {
             const notificacion = factoryNotificacionPedidos.cancelarPedido(pedidoActualizado);
             if (notificacion) {
-                await this.notificacionRepository.agregarNotificacion(
-                    notificacion.receptor.id,
-                    notificacion
-                );
+                notificacion.usuarioId = notificacion.receptor.id;
+                await this.notificacionRepository.guardarNotificacion(notificacion);
             }
         } catch (notificacionError) {
             console.warn('Error al crear notificación de cancelación:', notificacionError.message);

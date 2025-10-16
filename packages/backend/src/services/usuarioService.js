@@ -4,10 +4,9 @@ export class UsuarioService {
   }
 
   async crearUsuario(datosUsuario) {
-    // Crear el usuario usando el repository
-    const nuevoUsuario = await this.usuarioRepository.crearUsuario(datosUsuario);
-
-    return nuevoUsuario;
+  const usuario = new Usuario(datosUsuario);
+  const nuevoUsuario = await this.usuarioRepository.guardarUsuario(usuario);
+  return nuevoUsuario;
   }
   async obtenerTodosUsuarios() {
     return await this.usuarioRepository.obtenerTodosUsuarios();

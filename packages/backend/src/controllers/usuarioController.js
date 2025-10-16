@@ -20,7 +20,6 @@ export class UsuarioController {
 
     try {
       const nuevoUsuario = await this.usuarioService.crearUsuario(resultBody.data);
-
       res.status(201).json(usuarioToDTO(nuevoUsuario));
     } catch (error) {
       next(error);

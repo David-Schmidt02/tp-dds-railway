@@ -12,6 +12,11 @@ export class NotificacionService {
     }
 
     async marcarComoLeida(notificacionId) {
-        return await this.notificacionRepository.marcarComoLeida(notificacionId);
+        let notificacion = await this.notificacionRepository.obtenerNotificacion(notificacionId);
+
+       notificacion.marcarComoLeida();
+
+       return await this.notificacionRepository.guardarNotificacion(notificacion);
+
     }
 }
