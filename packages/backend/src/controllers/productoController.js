@@ -9,39 +9,6 @@ export class ProductoController {
         this.productoService = productoService;
     }
 
-    async obtenerProductos(req, res, next) {
-        try {
-            const {
-                page = 1,
-                limit = 10,
-            } = req.query;
-            const resultado = await this.productoService.obtenerProductos(parseInt(page), parseInt(limit));
-            res.status(200).json({
-                ...resultado,
-                items: resultado.items.map(productoToDTO)
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async obtenerProductosOrdenados(req, res, next) {
-        try {
-          const {
-                page = 1,
-                limit = 10,
-                orden
-            } = req.query;
-          const resultado = await this.productoService.obtenerProductosOrdenados(parseInt(page), parseInt(limit), orden);
-          res.status(200).json({
-                ...resultado,
-                items: resultado.items.map(productoToDTO)
-            });
-        } catch (error) {
-          next(error);
-        }
-      }
-
     async listarProductosVendedorConFiltros(req, res, next) {
         try {
             const {
@@ -61,29 +28,14 @@ export class ProductoController {
             }
 
             const filters = {vendedor: vendedorId}; 
+            if (min) filters.min = min;
+            if (max) filters.max = max;
+            if (nombre) filters.titulo = nombre;
+            if (descripcion) filters.descripcion = descripcion;
+            if (categorias) filters.categorias = categorias;
 
-            if (min && max) {
-                filters.precio = { $gte: parseFloat(min), $lte: parseFloat(max) };
-            } else if (min) {
-                filters.precio = { $gte: parseFloat(min) };
-            } else if (max) {
-                filters.precio = { $lte: parseFloat(max) };
-            }
-
-            if (nombre) {
-                filters.titulo = new RegExp(nombre.trim(), "i");
-            }
-
-            if (descripcion) {
-                filters.descripcion = new RegExp(descripcion.trim(), "i");
-            }
-
-            if (categorias) {
-                const categoriasArray = typeof categorias === "string"
-                ? categorias.split(",")
-                : categorias;
-                //suponiendo que se requieren todas las categorias
-                filters.categorias = { $all: categoriasArray };
+            if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1) {
+            throw new Error("Los parámetros de paginación deben ser números positivos");
             }
 
             const resultado = await this.productoService.listarProductosVendedorConFiltros(
