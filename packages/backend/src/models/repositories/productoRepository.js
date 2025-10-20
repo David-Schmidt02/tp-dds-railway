@@ -2,27 +2,11 @@ import { ProductoModel } from '../../schema/productoSchema.js';
 import { ProductoInexistente, ProductoStockInsuficiente, ProductoNoDisponible, ProductoSinStock } from "../../excepciones/producto.js";
 
 export class ProductoRepository {
-   
-    async obtenerProductoPorId(id, session = null) {
-        try {
-            let query = ProductoModel.findById(id);
 
-            if (session) {
-                query = query.session(session);
-            }
-
-            const producto = await query;
-
-            if (!producto) {
-                throw new ProductoInexistente(id);
-            }
-            return producto;
-        } catch (error) {
-            // Si es un error de casteo de ObjectId, significa que el ID es inválido
-            if (error.name === 'CastError') {
-                throw new ProductoInexistente(id);
-            }
-            throw error;
+    async obtenerProductoPorId(id) {
+        producto = await ProductoModel.findById(id);
+        if(!producto) {
+            throw new ProductoInexistente(id);
         }
     }
 
