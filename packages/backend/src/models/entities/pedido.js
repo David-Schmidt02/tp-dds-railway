@@ -16,7 +16,6 @@ export class Pedido {
     historialEstados;
 
     constructor(comprador, items, moneda, direccionEntrega, id = null) {
-        this.id = id;
         this.comprador = comprador;
         this.itemsPedido = items;
         this.moneda = moneda; 
@@ -24,6 +23,8 @@ export class Pedido {
         this.estado = EstadoPedido.PENDIENTE;
         this.fechaCreacion = new Date();
         this.historialEstados = []; 
+
+        pedidoNuevo.reservarItems(); 
     }
 
     calcularTotal() { return this.itemsPedido.reduce((acc, item) => acc + item.subtotal(), 0) }
@@ -76,7 +77,6 @@ export class Pedido {
         }
 
         item.cambiarCantidad(nuevaCantidad);
-
     }
 
     reservarItems() {
@@ -90,6 +90,9 @@ export class Pedido {
         return this.comprador.getId() === usuarioId;
     }
 
+    getItems() {
+        return this.itemsPedido;
+    }   
 }
 
 

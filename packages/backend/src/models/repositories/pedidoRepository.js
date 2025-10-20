@@ -64,23 +64,13 @@ export class PedidoRepository {
 
     // Transformación de formato DB a dominio
     dePedidoDB(pedidoDB) {
-        if (!pedidoDB) return null;
 
         // Reconstruir objeto Usuario (comprador) de dominio
-        const usuarioData = typeof pedidoDB.usuarioId === 'object' ? pedidoDB.usuarioId : null;
-        const comprador = usuarioData
-            ? new Usuario(usuarioData.nombre, usuarioData.email, usuarioData.telefono, usuarioData.tipoUsuario)
-            : null;
-
-        // Asignar ID al comprador si existe
-        if (comprador && usuarioData._id) {
-            comprador.id = usuarioData._id.toString();
-        }
+        const comprador = new Usuario(usuarioData.nombre, usuarioData.email, usuarioData.telefono, usuarioData.tipoUsuario)
 
         // Reconstruir items de dominio (ItemPedido con Producto)
         const itemsPedido = pedidoDB.items?.map(item => {
-            const productoData = typeof item.productoId === 'object' ? item.productoId : null;
-
+            
             let producto = null;
             if (productoData) {
                 // Reconstruir vendedor del producto si está disponible
@@ -102,7 +92,7 @@ export class PedidoRepository {
                     productoData.moneda || Moneda.PESO_ARG,
                     productoData.stock || 0,
                     productoData.fotos || [],
-                    productoData.activo !== false
+                    productoData.activo 
                 );
                 producto.id = productoData._id.toString();
             }
@@ -142,8 +132,6 @@ export class PedidoRepository {
             pedidoDB._id?.toString()
         );
 
-        // Asignar propiedades adicionales que no están en el constructor
-        pedido.numero = pedidoDB.numero;
         // Transformar el string de estado en el enum correspondiente
         switch (pedidoDB.estado) {
             case 'PENDIENTE':

@@ -1,8 +1,3 @@
-import Joi from "joi";
-
-export const NotificacionSchema = Joi.object({
-  id: Joi.string().required(),
-});
 
 export default NotificacionSchema;
 import mongoose from 'mongoose';

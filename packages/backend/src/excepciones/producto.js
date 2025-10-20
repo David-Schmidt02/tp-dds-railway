@@ -39,3 +39,10 @@ export class PrecioInvalido extends Error {
     this.name = 'PrecioInvalido';
   }
 }
+
+export class ProductoInactivo extends Error {
+  constructor() {
+    super(`El producto esta inactivo`);
+    this.name = 'ProductoInactivo';
+  }
+}

@@ -28,8 +28,7 @@ export class PedidoService {
         const itemsPedidos = await Promise.all(items.map(async (itemData) => {
             let { productoId, cantidad } = itemData;
             const producto = await this.productoRepository.obtenerProductoPorId(productoId);
-            cantidad = parseInt(cantidad);
-            const precioUnitario = producto.precioUnitario;
+            new ItemPedido(producto, parseInt(cantidad),producto.precio)
         }));
 
         const comprador = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
@@ -44,37 +43,30 @@ export class PedidoService {
             direccionEntrega.referencia
         );
 
-        console.log('Dirección de entrega:', direccion);
-        const pedidoNuevo = new Pedido(
-            comprador,
-            itemsPedidos,
-            moneda, // La moneda(Ya validada)
-            direccion,
-            null // ID se asigna al guardar
-        );
+        try { 
+            const pedidoNuevo = new Pedido(
+                comprador,
+                itemsPedidos,
+                moneda,
+                direccion
+            );
 
-        try {    // no se bien como atajar esto
-            const reservado = pedido.reservarItems(); //capaz estaria bueno q se haga en el constructor
+            for (const item of pedidoNuevo.getItems()) {
+                await this.productoRepository.guardarProducto(item.getProducto());
+            } 
+                 
         } catch (error) {
-            if (error instanceof ProductoNoDisponible) {
-            throw error;
-            }
-            if (error instanceof ProductoStockInsuficiente) {
-            throw error;
-            }
+            if (error instanceof ProductoNoDisponible) throw error;
+            if (error instanceof ProductoStockInsuficiente) throw error;
             throw new Error('Error al reservar stock: ' + error.message);
         }
-
-        this.guardarEstadoDeItems(itemsPedido); //TODO que dentro deberia de tener guardar estado del producto, donde se haga el productModel.save()
-
 
         // Guardar el pedido (aPedidoDB transformará a formato DB)
         pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
 
         try {
             const notificacion = factoryNotificacionPedidos.crearPedido(pedidoGuardado);
-            if (notificacion && notificacion.receptor) {
-                notificacion.usuarioId = notificacion.receptor.id;
+            if (notificacion) {
                 await this.notificacionRepository.guardarNotificacion(notificacion);
             }
         } catch (notificacionError) {
@@ -91,13 +83,21 @@ export class PedidoService {
         pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
         pedido.actualizarEstado('CANCELADO', usuario, motivo);
 
-        pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido);
+        pedidoActualizado = await this.pedidoRepository.guardarPedido(pedido);
+
+        try { 
+            for (const item of pedidoNuevo.getItems()) {
+                await this.productoRepository.guardarProducto(item.getProducto());
+            }     
+        } catch (error) {
+            if (error instanceof ProductoNoDisponible) throw error;
+            throw new Error('Error al renovar stock por cancelacion de pedido: ' + error.message);
+        } 
 
         // Crear notificación de cancelación fuera de la transacción
         try {
             const notificacion = factoryNotificacionPedidos.cancelarPedido(pedidoActualizado);
             if (notificacion) {
-                notificacion.usuarioId = notificacion.receptor.id;
                 await this.notificacionRepository.guardarNotificacion(notificacion);
             }
         } catch (notificacionError) {
@@ -108,31 +108,24 @@ export class PedidoService {
     }
 
     async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
-        const session = await mongoose.startSession();
-        let pedidoActualizado;
         try {
             const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
+            pedido.modificarCantidadItem(idItem, nuevaCantidad);
+            await this.pedidoRepository.actualizarPedido(pedido);
+            await this.productoRepository.guardarProducto(item.getProducto());
 
-            const diferenciaCantidad = pedido.cambiarCantidadItem(idItem, nuevaCantidad);
-
-            pedidoActualizado = await this.pedidoRepository.actualizarPedido(pedido);
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
             throw error;
         }
-
         return pedidoActualizado;
     }
 
     async obtenerPedidos() {
-        const session = await mongoose.startSession();
         try {
-            return await this.pedidoRepository.obtenerPedidos(session);
+            return await this.pedidoRepository.obtenerPedidos();
         } catch (error) {
-            console.error('Error al obtener pedidos:', error.message);
             throw error;
-        } finally {
-            await session.endSession();
         }
     }
 

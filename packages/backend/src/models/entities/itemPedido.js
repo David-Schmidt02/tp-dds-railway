@@ -35,8 +35,6 @@ export class ItemPedido {
         if (nuevaCantidad <= 0) {
             throw new Error('La cantidad debe ser mayor a 0');
         }
-        
-        this.cantidad = nuevaCantidad;
 
         // Ajustar stock según la diferencia
         const diferenciaCantidad = nuevaCantidad - this.cantidad;
@@ -45,5 +43,11 @@ export class ItemPedido {
         } else if (diferenciaCantidad < 0) {
             this.producto.aumentarStock(Math.abs(diferenciaCantidad));
         }
+
+        this.cantidad = nuevaCantidad;
+    }
+
+    getProducto() {
+        return this.producto;
     }
 }

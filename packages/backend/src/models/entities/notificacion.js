@@ -7,14 +7,14 @@ import { NotificacionRepository } from "../repositories/notificacionRepository.j
 
 
 export class Notificacion{
-    receptor;
+    receptorId;
     mensaje;
     fechaAlta;
     leida;
     fechaLeida;
 
-    constructor(receptor, mensaje) {
-        this.receptor = receptor;
+    constructor(receptorId, mensaje) {
+        this.receptorId = receptorId;
         this.mensaje = mensaje;
         this.fechaAlta = new Date();
         this.leida = false;

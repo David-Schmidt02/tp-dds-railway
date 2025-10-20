@@ -1,6 +1,7 @@
 import { Usuario } from "./usuario.js"
 import{ Categoria } from "./categoria.js"
 import { Moneda } from "./moneda.js"
+import { ProductoInactivo, ProductoStockInsuficiente } from "../../excepciones/producto.js"
 
 
 export class Producto {
@@ -29,14 +30,10 @@ export class Producto {
     }
 
     disminuirStock(cantidad) {
-        if (!this.activo) {
-            return false;
-        }
-        if (this.estaDisponible(cantidad)) {
-            this.stock -= cantidad
-            return true;
-        }
-        return false;
+        if (!this.activo) throw new ProductoInactivo();
+        if (this.estaDisponible(cantidad)) throw new ProductoStockInsuficiente();
+        this.stock -= cantidad
+
     }
     
     estaDisponible(cantidad) {
@@ -44,6 +41,6 @@ export class Producto {
     }
 
     aumentarStock(cantidad) {
-        this.stock += cantidad;
+        this.stock += cantidad
     }
 }

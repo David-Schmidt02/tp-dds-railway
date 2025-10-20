@@ -4,7 +4,8 @@ import {
   ProductoSinStock,
   ProductoNoDisponible,
   CategoriaInvalida,
-  PrecioInvalido
+  PrecioInvalido,
+  ProductoInactivo
 } from '../excepciones/producto.js';
 
 import { usuarioErrorHandler } from './usuarioErrorHandler.js';
@@ -31,6 +32,10 @@ export function productoErrorHandler(err, req, res, next) {
   }
 
   if (err.constructor.name === PrecioInvalido.name) {
+    return res.status(400).json({ error: err.name, message: err.message });
+  }
+
+  if (err.constructor.name === ProductoInactivo.name) {
     return res.status(400).json({ error: err.name, message: err.message });
   }
 

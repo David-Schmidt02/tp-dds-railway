@@ -48,7 +48,7 @@ export let factoryNotificacionPedidos = {
         return new Notificacion({ id: receptorId }, mensaje);
     },
 
-    cancelarPedido(pedido,) {
+    cancelarPedido(pedido) {
         const comprador = pedido.comprador.nombre;
         const productos = pedido.itemsPedido.map(item => item.producto.titulo).join(', ');
         const total = pedido.calcularTotal();

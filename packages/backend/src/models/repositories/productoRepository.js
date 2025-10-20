@@ -10,6 +10,10 @@ export class ProductoRepository {
         }
     }
 
+    async guardarProducto(producto) {
+       return productoGuardado = await ProductoModel.Save(producto)
+    }
+
     async findByFilters(filters, page, limit, sort) {
         const skip = (page - 1) * limit;
 

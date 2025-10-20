@@ -58,7 +58,6 @@ const productoSchema = new mongoose.Schema({
       default: 0
     }
 },{
-
   timestamps: true,
   collection: 'productos',
   versionKey: true,
