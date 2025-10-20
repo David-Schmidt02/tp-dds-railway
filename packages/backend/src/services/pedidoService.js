@@ -65,6 +65,9 @@ export class PedidoService {
             throw new Error('Error al reservar stock: ' + error.message);
         }
 
+        this.guardarEstadoDeItems(itemsPedido); //TODO que dentro deberia de tener guardar estado del producto, donde se haga el productModel.save()
+
+
         // Guardar el pedido (aPedidoDB transformará a formato DB)
         pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
 

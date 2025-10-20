@@ -60,7 +60,9 @@ const productoSchema = new mongoose.Schema({
 },{
 
   timestamps: true,
-  collection: 'productos'
+  collection: 'productos',
+  versionKey: true,
+  optimisticConcurrency: true
 });
 
 productoSchema.loadClass(class Producto{});
