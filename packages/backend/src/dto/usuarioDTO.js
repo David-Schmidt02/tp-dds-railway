@@ -1,3 +1,5 @@
+import { Usuario, TipoUsuario } from '../models/entities/usuario.js'
+
 export function usuarioToDTO(usuario) {
     return {
         id: usuario._id || usuario.id,
@@ -22,4 +24,25 @@ export function usuarioSimpleDTO(usuario) {
 
 export function usuariosToDTO(usuarios) {
     return usuarios.map(usuarioToDTO);
+}
+
+export function usuarioDocToDominio(usuarioDoc) {
+    return new Usuario(
+      usuarioDoc.id,
+      usuarioDoc.nombre,
+      usuarioDoc.email,
+      usuarioDoc.telefono,
+      tipoUsuarioFromString(usuarioDoc.tipoUsuario)
+    )
+}
+
+export function tipoUsuarioFromString(tipo) {
+  switch (tipo) {
+    case "COMPRADOR": 
+      return TipoUsuario.COMPRADOR;
+    case "VENDEDOR": 
+      return TipoUsuario.VENDEDOR;
+    case "ADMIN": 
+      return TipoUsuario.ADMIN;
+  }
 }

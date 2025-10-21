@@ -1,3 +1,11 @@
+import { ItemPedido } from "../models/entities/itemPedido.js";
+import {Pedido} from "../models/entities/pedido.js"
+import {DireccionEntrega} from "../models/entities/direccionEntrega.js"
+import {usuarioDocToDominio} from "./usuarioDTO.js"
+import {productoDocToDominio} from "./productoDTO.js"
+import { EstadoPedido } from "../models/entities/estadoPedido.js";
+
+
 export function pedidoToDTO(pedido) {
     const items = pedido.itemsPedido || pedido.items || [];
 
@@ -33,4 +41,72 @@ export function pedidoToDTO(pedido) {
         fechaCreacion: pedido.createdAt || pedido.fechaCreacion || new Date(),
         fechaActualizacion: pedido.updatedAt || pedido.fechaActualizacion || new Date()
     };
+}
+
+export function pedidoToDoc(pedido) {
+    const pedidoDoc = {
+        usuarioId: pedido.comprador.id,
+        items: pedido.itemsPedido.map(item => ({
+            productoId: item.producto.id,
+            cantidad: item.cantidad,
+            precioUnitario: item.precioUnitario
+        })),
+        direccionEntrega: {
+            calle: pedido.direccionEntrega.calle,
+            numero: pedido.direccionEntrega.altura,
+            ciudad: pedido.direccionEntrega.ciudad,
+            codigoPostal: pedido.direccionEntrega.codigoPostal
+        },
+        estado: pedido.estado.nobre,
+        historialEstados: pedido.historialEstados.map(he => ({
+            estadoAnterior: he.estadoAnterior?.nombre,
+            estadoNuevo: he.estadoNuevo?.nombre,
+            fecha: he.fecha || new Date(),
+            motivo: he.motivo || undefined
+        })),
+        total: pedido.itemsPedido.reduce((sum, item) => sum + item.precioUnitario * item.cantidad, 0),
+        fechaPedido: pedido.fechaCreacion || new Date()
+    };
+
+    return pedidoDoc;
+}
+
+export function pedidoDocToDominio(pedidoDoc) {
+    const direccionEntrega = new DireccionEntrega(
+        pedidoDoc.direccionEntrega.calle,
+        pedidoDoc.direccionEntrega.numero,
+        pedidoDoc.direccionEntrega.piso,
+        pedidoDoc.direccionEntrega.departamento,
+        pedidoDoc.direccionEntrega.codigoPostal,
+        pedidoDoc.direccionEntrega.ciudad,
+        pedidoDoc.direccionEntrega.calle
+    )
+
+    const comprador = usuarioDocToDominio(pedidoDoc.usuarioId);
+
+    const itemsPedido = pedidoDoc.items.map(item => {
+        const producto = productoDocToDominio(item.productoId);
+        return new ItemPedido(producto, item.cantidad, item.precioUnitario);
+    });
+
+    const estado = EstadoPedido[pedidoDoc.estado];
+
+    const historial = (pedidoDoc.historialEstados || []).map(he => ({
+        estadoAnterior: he.estadoAnterior ? EstadoPedido[he.estadoAnterior] : null,
+        estadoNuevo: he.estadoNuevo ? EstadoPedido[he.estadoNuevo] : null,
+        fecha: he.fecha ? new Date(he.fecha) : null,
+        motivo: he.motivo || null
+    }));
+
+    const pedido = new Pedido(
+        comprador,
+        itemsPedido,
+        'PESO_ARG', // no se porque cuando consultas a la db no te trae el precio, esto hay que cambiarlo
+        direccionEntrega,
+        estado,
+        pedidoDoc.fechaPedido,
+        historial
+    )
+
+    return pedido;
 }

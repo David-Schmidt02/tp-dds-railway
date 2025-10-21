@@ -23,8 +23,6 @@ export class Pedido {
         this.estado = EstadoPedido.PENDIENTE;
         this.fechaCreacion = new Date();
         this.historialEstados = []; 
-
-        pedidoNuevo.reservarItems(); 
     }
 
     calcularTotal() { return this.itemsPedido.reduce((acc, item) => acc + item.subtotal(), 0) }

@@ -1,17 +1,29 @@
+import { productoDocToDominio, productoToDoc } from '../../dto/productoDTO.js';
 import { ProductoModel } from '../../schema/productoSchema.js';
 import { ProductoInexistente, ProductoStockInsuficiente, ProductoNoDisponible, ProductoSinStock } from "../../excepciones/producto.js";
 
 export class ProductoRepository {
 
     async obtenerProductoPorId(id) {
-        producto = await ProductoModel.findById(id);
-        if(!producto) {
+        const productoDoc = await ProductoModel.findById(id).populate('vendedor');
+        if(!productoDoc) {
             throw new ProductoInexistente(id);
         }
+        const producto = productoDocToDominio(productoDoc);
+        return producto;
     }
 
     async guardarProducto(producto) {
-       return productoGuardado = await ProductoModel.Save(producto)
+        const data = productoToDoc(producto);
+        if(producto.id) {
+            const productoDoc = await ProductoModel.findById(producto.id)
+            productoDoc.set(data);
+            return await productoDoc.save()
+        } else { // caso de que sea un producto nuevo, no deberia usarse nunca por ahora
+            const nuevoProducto = new ProductoModel(data);
+            return await nuevoProducto.save();
+        }
+
     }
 
     async findByFilters(filters, page, limit, sort) {

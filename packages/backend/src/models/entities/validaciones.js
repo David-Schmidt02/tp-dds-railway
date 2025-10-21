@@ -10,12 +10,11 @@ export const monedaSchema = z.enum(["PESO_ARG", "DOLAR_USA", "REAL"]);
 
 export const direccionEntregaSchema = z.object({
     calle : z.string(),
-    altura : z.number().nonnegative(),
-    piso : z.number(),
-    departamento : z.number().nonnegative(),
+    numero : z.number().nonnegative(),
+    piso : z.number().optional(),
+    departamento : z.number().nonnegative().optional(),
     codigoPostal : z.number(),
-    ciudad : z.string(),
-    referencia : z.string()
+    ciudad : z.string()
 })
 
 export const usuarioSchema = z.object({
@@ -35,7 +34,6 @@ export const productoSchema = z.object({
     precio: z.number().nonnegative(),
     moneda: monedaSchema,
     stock: z.number().nonnegative(),
-    //fotos:
     activo: z.boolean().optional()
 })
 

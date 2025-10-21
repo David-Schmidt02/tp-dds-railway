@@ -1,6 +1,3 @@
-// El Service se va a encargar de orquestar las clases de negocio + el órden de las operaciones
-// El Service no debería tener lógica de negocio, solo orquestación
-
 import { Pedido } from '../models/entities/pedido.js';
 import { ItemPedido } from '../models/entities/itemPedido.js';
 import { Producto } from '../models/entities/producto.js';
@@ -10,6 +7,7 @@ import { PedidoInexistente } from '../excepciones/pedido.js';
 import { ProductoInexistente, ProductoStockInsuficiente, ProductoNoDisponible } from '../excepciones/producto.js';
 import { factoryNotificacionPedidos } from '../models/entities/FactoryNotificacion.js';
 import mongoose from 'mongoose';
+import { usuarioDocToDominio } from '../dto/usuarioDTO.js';
 
 export class PedidoService {
     constructor(pedidoRepository, productoRepository, notificacionRepository, usuarioRepository) {
@@ -20,22 +18,21 @@ export class PedidoService {
     }
 
     async crearPedido(pedidoJSON) {
-
+        let pedidoNuevo = {}
         const { usuarioId, items, moneda, direccionEntrega } = pedidoJSON;
-        let pedidoGuardado;
-        
-        // transformar items JSON a objetos de dominio
+    
         const itemsPedidos = await Promise.all(items.map(async (itemData) => {
             let { productoId, cantidad } = itemData;
             const producto = await this.productoRepository.obtenerProductoPorId(productoId);
-            new ItemPedido(producto, parseInt(cantidad),producto.precio)
+            return new ItemPedido(producto, parseInt(cantidad),producto.precio);
         }));
 
-        const comprador = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+        const compradorDoc = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+        const comprador = usuarioDocToDominio(compradorDoc);
 
         const direccion = new DireccionEntrega(
             direccionEntrega.calle,
-            direccionEntrega.altura || direccionEntrega.numero, // Aceptar ambos nombres
+            direccionEntrega.numero,
             direccionEntrega.piso,
             direccionEntrega.departamento,
             direccionEntrega.codigoPostal,
@@ -44,12 +41,14 @@ export class PedidoService {
         );
 
         try { 
-            const pedidoNuevo = new Pedido(
+            pedidoNuevo = new Pedido(
                 comprador,
                 itemsPedidos,
                 moneda,
                 direccion
             );
+
+            pedidoNuevo.reservarItems(); 
 
             for (const item of pedidoNuevo.getItems()) {
                 await this.productoRepository.guardarProducto(item.getProducto());
@@ -62,12 +61,12 @@ export class PedidoService {
         }
 
         // Guardar el pedido (aPedidoDB transformará a formato DB)
-        pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
+        let pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
 
         try {
             const notificacion = factoryNotificacionPedidos.crearPedido(pedidoGuardado);
             if (notificacion) {
-                await this.notificacionRepository.guardarNotificacion(notificacion);
+                await this.notificacionRepository.saveNotificacionNueva(notificacion);
             }
         } catch (notificacionError) {
             console.error('Error al crear notificación:', notificacionError);

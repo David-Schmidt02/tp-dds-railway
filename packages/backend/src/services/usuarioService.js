@@ -1,4 +1,5 @@
-import { Usuario, tipoUsuarioFromString } from '../models/entities/usuario.js';
+import { Usuario } from '../models/entities/usuario.js';
+import { tipoUsuarioFromString } from '../dto/usuarioDTO.js';
 
 export class UsuarioService {
   constructor(usuarioRepository) {

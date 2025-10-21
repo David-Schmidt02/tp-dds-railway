@@ -8,6 +8,7 @@ import { Usuario } from "../entities/usuario.js";
 import { Producto } from "../entities/producto.js";
 import { DireccionEntrega } from "../entities/direccionEntrega.js";
 import { Moneda } from "../entities/moneda.js";
+import { pedidoToDoc, pedidoDocToDominio } from "../../dto/pedidoDTO.js";
 
 export class PedidoRepository {
     constructor() {
@@ -34,8 +35,7 @@ export class PedidoRepository {
            piso: direccion.piso,
             departamento: direccion.departamento,
             codigoPostal: direccion.codigoPostal,
-            ciudad: direccion.ciudad,
-            referencia: direccion.referencia
+            ciudad: direccion.ciudad
         };
 
         // Calcular total: si es objeto de dominio, llamar al método; si no, usar el valor
@@ -212,28 +212,20 @@ export class PedidoRepository {
 
     
 
-    async guardarPedido(pedidoData, session = null) {
+    async guardarPedido(pedidoData) {
         try {
-
-            const pedidoDB = this.aPedidoDB(pedidoData);  // Convierte a formato de DB
-            const nuevoPedido = new this.model(pedidoDB); // Usa el modelo de Mongoose
-
-            let resultado;
-            if (session) {
-                resultado = await nuevoPedido.save({ session });
-            } else {
-                resultado = await nuevoPedido.save();
-            }
-
+            const pedidoDoc = pedidoToDoc(pedidoData);
+            const nuevoPedido = new PedidoModel(pedidoDoc);
+            const resultado = await nuevoPedido.save();
             const pedidoCompleto = await this.model.findById(resultado._id)
                 .populate('usuarioId')
                 .populate({
                     path: 'items.productoId',
                     populate: { path: 'vendedor' }
-                })
-                .session(session);
+                });
 
-            return this.dePedidoDB(pedidoCompleto.toObject());
+            return pedidoDocToDominio(pedidoCompleto);
+
         } catch (error) {
             // Si es un error de validación de Mongoose que incluye CastError para usuarioId
             if (error.name === 'ValidationError' && error.errors?.usuarioId?.name === 'CastError') {

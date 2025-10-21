@@ -5,12 +5,12 @@ export class Usuario {
     tipoUsuario
     fechaAlta
    
-    constructor(nombre, email, telefono, tipoUsuario ) {
+    constructor(id,nombre, email, telefono, tipoUsuario ) {
+      this.id = id;
       this.nombre = nombre;
       this.email = email;
       this.telefono = telefono;
       this.tipoUsuario = tipoUsuario; 
-      this.fechaAlta = new Date();
   }
   
 }
@@ -23,14 +23,3 @@ export class TipoUsuario {
 TipoUsuario.COMPRADOR = new TipoUsuario("COMPRADOR")
 TipoUsuario.VENDEDOR = new TipoUsuario("VENDEDOR")
 TipoUsuario.ADMIN = new TipoUsuario("ADMIN")
-
-export function tipoUsuarioFromString(tipo) {
-  switch (tipo) {
-    case "COMPRADOR": 
-      return TipoUsuario.COMPRADOR;
-    case "VENDEDOR": 
-      return TipoUsuario.VENDEDOR;
-    case "ADMIN": 
-      return TipoUsuario.ADMIN;
-  }
-}

@@ -128,8 +128,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 2,
           codigoPostal: 1405,
-          ciudad: 'CABA',
-          referencia: 'Timbre verde'
+          ciudad: 'CABA'
         }
       });
 
@@ -160,8 +159,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 1,
           codigoPostal: 1000,
-          ciudad: 'CABA',
-          referencia: 'x'
+          ciudad: 'CABA'
         }
       });
       expect(res.status).toBe(400);
@@ -180,8 +178,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 1,
           codigoPostal: 1000,
-          ciudad: 'CABA',
-          referencia: 'x'
+          ciudad: 'CABA'
         }
       });
       expect(res.status).toBe(400);
@@ -201,8 +198,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 1,
           codigoPostal: 1000,
-          ciudad: 'CABA',
-          referencia: 'x'
+          ciudad: 'CABA'
         }
       });
       expect(res.status).toBe(404);
@@ -220,8 +216,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 1,
           codigoPostal: 1000,
-          ciudad: 'CABA',
-          referencia: 'x'
+          ciudad: 'CABA'
         }
       });
       expect(res.status).toBe(404);
@@ -239,8 +234,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
           piso: 1,
           departamento: 1,
           codigoPostal: 1000,
-          ciudad: 'CABA',
-          referencia: 'x'
+          ciudad: 'CABA'
         }
       });
       expect(res.status).toBe(409);

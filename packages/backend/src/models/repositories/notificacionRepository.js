@@ -11,27 +11,40 @@ export class NotificacionRepository {
     return await NotificacionModel.findById(notificacionId).populate('receptor');
     }
 
-    async guardarNotificacion(notificacion) {
-        // Si tiene id o _id, es update; si no, es create
-        const id = notificacion._id || notificacion.id;
-        const query = id ? { _id: id } : { _id: new NotificacionModel()._id };
+    async saveNotificacionNueva(notificacion) {
+        const data = {
+            receptorId: notificacion.receptorId,
+            mensaje: notificacion.mensaje,
+            leida: notificacion.leida,
+            fechaAlta: notificacion.fechaAlta || new Date(),
+            fechaLeida: notificacion.fechaLeida || null
+        }
 
-        // Extraer datos desde la instancia de dominio
+        const notificacionDB = new NotificacionModel(data);
+        const saved = await notificacionDB.save();
+        console.log(saved);
+        return saved;
+    }
+
+    async guardarNotificacion(notificacion) {
+        console.log(notificacion);
         const data = {
             mensaje: notificacion.mensaje,
-            receptorId: notificacion.receptor._id,
+            receptorId: notificacion.receptor.id,
             fechaAlta: notificacion.fechaAlta,
             leida: notificacion.leida,
             fechaLeida: notificacion.fechaLeida
         };
+        const filtro = notificacion.id ? {_id: notificacion.id} : {}
 
         const updated = await NotificacionModel.findOneAndUpdate(
-            query,
+            filtro,
             data,
             {
                 new: true,
                 runValidators: true,
-                upsert: true
+                upsert: true,
+                setDefaultsOnInsert: true
             }
         ).populate('receptor');
         if (!updated) {

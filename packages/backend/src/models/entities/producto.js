@@ -5,7 +5,7 @@ import { ProductoInactivo, ProductoStockInsuficiente } from "../../excepciones/p
 
 
 export class Producto {
-    id
+
     vendedor
     titulo
     descripcion
@@ -16,8 +16,8 @@ export class Producto {
     fotos
     activo
 
-    constructor(vendedor, titulo, descripcion, categorias, precio, moneda, stock, fotos, activo) {
-        //this.id
+    constructor(id, vendedor, titulo, descripcion, categorias, precio, moneda, stock, fotos, activo, vendidos) {
+        this.id = id
         this.vendedor = vendedor
         this.titulo = titulo
         this.descripcion = descripcion
@@ -27,11 +27,12 @@ export class Producto {
         this.stock = stock 
         this.fotos = fotos 
         this.activo = activo
+        this.vendidos = vendidos
     }
 
     disminuirStock(cantidad) {
         if (!this.activo) throw new ProductoInactivo();
-        if (this.estaDisponible(cantidad)) throw new ProductoStockInsuficiente();
+        if (!this.estaDisponible(cantidad)) throw new ProductoStockInsuficiente();
         this.stock -= cantidad
 
     }

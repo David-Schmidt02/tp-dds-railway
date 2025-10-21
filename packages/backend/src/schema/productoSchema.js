@@ -41,17 +41,14 @@ const productoSchema = new mongoose.Schema({
       required: true,
       min: 0
     },
-    fotos: [{
-      url: {
-        type: String,
+    fotos: {
+        type: [String],
         required: true
-      }
-    }], 
+    }, 
     activo:{
       type: Boolean,
       required: true
     },
-    //TODO Revisar este vendidos
     vendidos: {
       type: Number,
       required: true,

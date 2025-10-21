@@ -53,7 +53,6 @@ const pedidoSchema = new mongoose.Schema({
     numero: { type: String, required: true },
     ciudad: { type: String, required: true },
     codigoPostal: { type: String, required: true },
-    referencia: { type: String }
   },
   estado: {
     type: String,

@@ -11,19 +11,17 @@ export class PedidoController {
     }
 
     async crearPedido(req, res, next) {
-        const body = req.body;
+        const body = pedidoSchema.safeParse(req.body);
         
-        
-
-        if(resultBody.error){
+        if(body.error){
             return res.status(400).json({
                 message: 'Datos de entrada inválidos',
-                details: resultBody.error.issues
+                details: body.error.issues
             });
         }
 
         try {
-            const nuevoPedido = await this.pedidoService.crearPedido(resultBody.data);
+            const nuevoPedido = await this.pedidoService.crearPedido(body.data);
 
             const pedidoDTO = pedidoToDTO(nuevoPedido);
             res.status(201).json(pedidoDTO);

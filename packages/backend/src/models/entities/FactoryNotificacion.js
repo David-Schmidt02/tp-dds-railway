@@ -20,9 +20,7 @@ export let factoryNotificacionPedidos = {
 
         const mensaje = formatearMensajeNotificacion(datosMensaje);
 
-        // El receptor debe ser el id del vendedor, no el objeto completo
-        const receptorId = vendedor?.id || vendedor?._id;
-        return new Notificacion({ id: receptorId }, mensaje);
+        return new Notificacion(null, vendedor.id, mensaje);
     },
 
     pedidoEnviado(pedido) {
