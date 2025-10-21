@@ -23,3 +23,14 @@ export class TipoUsuario {
 TipoUsuario.COMPRADOR = new TipoUsuario("COMPRADOR")
 TipoUsuario.VENDEDOR = new TipoUsuario("VENDEDOR")
 TipoUsuario.ADMIN = new TipoUsuario("ADMIN")
+
+export function tipoUsuarioFromString(tipo) {
+  switch (tipo) {
+    case "COMPRADOR": 
+      return TipoUsuario.COMPRADOR;
+    case "VENDEDOR": 
+      return TipoUsuario.VENDEDOR;
+    case "ADMIN": 
+      return TipoUsuario.ADMIN;
+  }
+}

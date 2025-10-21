@@ -39,8 +39,7 @@ export class ProductoRepository {
 
         const totalItems = await ProductoModel.countDocuments(mongoFilters);
         const totalPages = Math.ceil(totalItems / limit);
-
-        let sort = {};
+        
         switch (orden) {
             case "precioAsc":
                 sort = { precio: 1 };

@@ -60,7 +60,7 @@ const productoSchema = new mongoose.Schema({
 },{
   timestamps: true,
   collection: 'productos',
-  versionKey: true,
+  versionKey: 'version',
   optimisticConcurrency: true
 });
 

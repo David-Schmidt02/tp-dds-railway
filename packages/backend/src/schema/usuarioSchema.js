@@ -20,6 +20,7 @@ const usuarioSchema = new mongoose.Schema({
   },
   tipoUsuario: {
     type: String,
+    enum: ["COMPRADOR", "VENDEDOR", "ADMIN"],
     required: true
   },
   fechaAlta: {

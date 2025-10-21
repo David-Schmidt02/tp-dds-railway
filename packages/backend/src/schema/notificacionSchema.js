@@ -1,5 +1,3 @@
-
-export default NotificacionSchema;
 import mongoose from 'mongoose';
 
 const notificacionSchema = new mongoose.Schema({
