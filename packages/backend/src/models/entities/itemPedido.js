@@ -25,10 +25,12 @@ export class ItemPedido {
 
     reservarStockProductos() {
         this.producto.disminuirStock(this.cantidad);
+        this.producto.aumentarVendidos(this.cantidad);
     }
 
     devolverStockProductos() {
         this.producto.aumentarStock(this.cantidad);
+        this.producto.disminuirVendidos(this.cantidad);
     }
 
     cambiarCantidad(nuevaCantidad) {

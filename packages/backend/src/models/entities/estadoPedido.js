@@ -22,3 +22,25 @@ EstadoPedido.EN_PREPARACION.destinos = new Set([EstadoPedido.ENVIADO, EstadoPedi
 EstadoPedido.ENVIADO.destinos        = new Set([EstadoPedido.ENTREGADO]);
 EstadoPedido.ENTREGADO.destinos      = new Set([]);
 EstadoPedido.CANCELADO.destinos      = new Set([]);
+
+export function estadoPedidoFromString(estado) {
+  switch (estado) {
+    case "PENDIENTE": 
+      return EstadoPedido.PENDIENTE;
+
+    case "CONFIRMADO": 
+      return EstadoPedido.CONFIRMADO;
+
+    case "EN PREPARACION": 
+      return EstadoPedido.EN_PREPARACION;
+
+    case "ENVIADO": 
+      return EstadoPedido.ENVIADO;
+
+    case "ENTREGADO": 
+      return EstadoPedido.ENTREGADO;
+
+    case "CANCELADO": 
+      return EstadoPedido.CANCELADO;
+  }
+}

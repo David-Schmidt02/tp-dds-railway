@@ -1,9 +1,10 @@
 import { Pedido } from '../models/entities/pedido.js';
+import { EstadoPedido, estadoPedidoFromString } from '../models/entities/estadoPedido.js'
 import { ItemPedido } from '../models/entities/itemPedido.js';
 import { Producto } from '../models/entities/producto.js';
 import { DireccionEntrega } from '../models/entities/direccionEntrega.js';
 import { PedidoRepository } from '../models/repositories/pedidoRepository.js';
-import { PedidoInexistente } from '../excepciones/pedido.js';
+import { PedidoInexistente, EstadoPedidoInvalido } from '../excepciones/pedido.js';
 import { ProductoInexistente, ProductoStockInsuficiente, ProductoNoDisponible } from '../excepciones/producto.js';
 import { factoryNotificacionPedidos } from '../models/entities/FactoryNotificacion.js';
 import mongoose from 'mongoose';
@@ -75,30 +76,31 @@ export class PedidoService {
     }
 
    
-    async cancelarPedido(id, motivo, usuario) {
+    async cancelarPedido(pedidoId, motivo, usuarioId) {
         let pedidoActualizado;
         let pedido;
 
-        pedido = await this.pedidoRepository.obtenerPedidoPorId(id);
-        pedido.actualizarEstado('CANCELADO', usuario, motivo);
-
-        pedidoActualizado = await this.pedidoRepository.guardarPedido(pedido);
-
         try { 
-            for (const item of pedidoNuevo.getItems()) {
+            pedido = await this.pedidoRepository.obtenerPedidoPorId(pedidoId);
+            const usuario = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+            pedido.actualizarEstado(EstadoPedido.CANCELADO, usuario, motivo);
+            
+            console.log(pedido);
+            pedidoActualizado = await this.pedidoRepository.guardarPedidoModificado(pedido);
+            console.log(pedidoActualizado)
+            for (const item of pedidoActualizado.getItems()) {
                 await this.productoRepository.guardarProducto(item.getProducto());
             }     
         } catch (error) {
             if (error instanceof ProductoNoDisponible) throw error;
+            if (error instanceof EstadoPedidoInvalido) throw error;
             throw new Error('Error al renovar stock por cancelacion de pedido: ' + error.message);
         } 
 
         // Crear notificación de cancelación fuera de la transacción
         try {
             const notificacion = factoryNotificacionPedidos.cancelarPedido(pedidoActualizado);
-            if (notificacion) {
-                await this.notificacionRepository.guardarNotificacion(notificacion);
-            }
+            await this.notificacionRepository.saveNotificacionNueva(notificacion);
         } catch (notificacionError) {
             console.warn('Error al crear notificación de cancelación:', notificacionError.message);
         }

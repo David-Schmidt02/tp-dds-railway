@@ -248,7 +248,7 @@ export class PedidoRepository {
             throw new PedidoInexistente(id);
         }
         
-        return this.dePedidoDB(pedido.toObject());
+        return pedidoDocToDominio(pedido);
     }
 
     async obtenerPedidos(session = null) {
@@ -289,33 +289,26 @@ export class PedidoRepository {
      * Guarda un objeto de dominio Pedido modificado en la base de datos
      * Usado cuando se modifican propiedades del pedido (items, cantidades, etc.)
      */
-    async guardarPedidoModificado(pedidoDominio, session = null) {
+    async guardarPedidoModificado(pedidoDominio) {
         if (!mongoose.Types.ObjectId.isValid(pedidoDominio.id)) {
             throw new PedidoInexistente(pedidoDominio.id);
         }
 
-        // Transformar el objeto de dominio a formato DB
-        const pedidoDB = this.aPedidoDB(pedidoDominio);
+        const pedidoDB = pedidoToDoc(pedidoDominio);
 
-        // Actualizar el documento
-        const opciones = session ? { session, new: true } : { new: true };
         const resultado = await this.model.findByIdAndUpdate(
             pedidoDominio.id,
             pedidoDB,
-            opciones
         );
 
-        if (!resultado) {
-            throw new PedidoInexistente(pedidoDominio.id);
-        }
-
-        // Populate y devolver objeto de dominio
         const pedidoCompleto = await this.model.findById(resultado._id)
-            .populate('usuarioId')
-            .populate('items.productoId')
-            .session(session);
+                .populate('usuarioId')
+                .populate({
+                    path: 'items.productoId',
+                    populate: { path: 'vendedor' }
+                });
 
-        return this.dePedidoDB(pedidoCompleto.toObject());
+        return pedidoDocToDominio(pedidoCompleto);
     }
 
     async eliminarPedido(id) {

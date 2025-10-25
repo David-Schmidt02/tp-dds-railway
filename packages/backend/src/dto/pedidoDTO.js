@@ -57,10 +57,10 @@ export function pedidoToDoc(pedido) {
             ciudad: pedido.direccionEntrega.ciudad,
             codigoPostal: pedido.direccionEntrega.codigoPostal
         },
-        estado: pedido.estado.nobre,
+        estado: pedido.estado.nombre,
         historialEstados: pedido.historialEstados.map(he => ({
             estadoAnterior: he.estadoAnterior?.nombre,
-            estadoNuevo: he.estadoNuevo?.nombre,
+            estadoNuevo: he.nuevoEstado?.nombre,
             fecha: he.fecha || new Date(),
             motivo: he.motivo || undefined
         })),
@@ -105,8 +105,9 @@ export function pedidoDocToDominio(pedidoDoc) {
         direccionEntrega,
         estado,
         pedidoDoc.fechaPedido,
-        historial
+        historial,
+        pedidoDoc.id
     )
-
+    
     return pedido;
 }

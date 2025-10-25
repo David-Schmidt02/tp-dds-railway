@@ -3,7 +3,7 @@ import { CambioEstadoPedido } from "./cambioEstadoPedido.js"
 import { ItemPedido } from "./itemPedido.js"
 import { DireccionEntrega } from "./direccionEntrega.js"
 import { Usuario } from "./usuario.js"
-import { PedidoNoModificable } from "../../excepciones/pedido.js"
+import { PedidoNoModificable, EstadoPedidoInvalido } from "../../excepciones/pedido.js"
 
 export class Pedido {
     id;
@@ -15,26 +15,26 @@ export class Pedido {
     fechaCreacion;
     historialEstados;
 
-    constructor(comprador, items, moneda, direccionEntrega, id = null) {
+    constructor(comprador, items, moneda, direccionEntrega, estado = EstadoPedido.PENDIENTE,  fechaCreacion = new Date(), historial = [], id = null) {
         this.comprador = comprador;
         this.itemsPedido = items;
         this.moneda = moneda; 
         this.direccionEntrega = direccionEntrega; 
-        this.estado = EstadoPedido.PENDIENTE;
-        this.fechaCreacion = new Date();
-        this.historialEstados = []; 
+        this.estado = estado;
+        this.fechaCreacion = fechaCreacion;
+        this.historialEstados = historial;
+        this.id = id; 
     }
 
     calcularTotal() { return this.itemsPedido.reduce((acc, item) => acc + item.subtotal(), 0) }
 
     
     actualizarEstado(nuevoEstado, usuario, motivo ) {
-        this.historialEstados.push(this.estado)
-
-        if (this.estado.puedeTransicionarA(nuevoEstado)){ // Puede ser una excepcion.
-            this.estado = new CambioEstadoPedido(nuevoEstado, this, usuario, motivo);
-            this.historialEstados.push(new CambioEstadoPedido(nuevoEstado, this, usuario, motivo)) // Revisar
+        if (this.estado.puedeTransicionarA(nuevoEstado)){
+            this.historialEstados.push(new CambioEstadoPedido(this.estado, nuevoEstado, this, usuario, motivo))
             this.estado = nuevoEstado;
+        } else {
+            throw new EstadoPedidoInvalido(this.estado, nuevoEstado);
         }
 
         if (nuevoEstado.nombre == 'CANCELADO') {

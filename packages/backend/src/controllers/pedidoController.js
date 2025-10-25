@@ -57,12 +57,11 @@ export class PedidoController {
     }
     
     async cancelarPedido(req, res, next) {
-        const { id } = req.params;
-        const { motivo } = req.body;
-        const usuario = req.user; // Si usas autenticación, o lo obtienes del body
+        const { pedidoId } = req.params;
+        const { motivo, usuarioId } = req.body;
 
         try {
-            const pedidoCancelado = await this.pedidoService.cancelarPedido(id, motivo, usuario);
+            const pedidoCancelado = await this.pedidoService.cancelarPedido(pedidoId, motivo, usuarioId);
             res.status(200).json(pedidoToDTO(pedidoCancelado));
 
         } catch(error) {

@@ -22,12 +22,10 @@ export class NotificacionRepository {
 
         const notificacionDB = new NotificacionModel(data);
         const saved = await notificacionDB.save();
-        console.log(saved);
         return saved;
     }
 
     async guardarNotificacion(notificacion) {
-        console.log(notificacion);
         const data = {
             mensaje: notificacion.mensaje,
             receptorId: notificacion.receptor.id,
