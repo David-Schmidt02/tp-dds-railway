@@ -1,10 +1,6 @@
 import { pedidoSchema } from '../models/entities/validaciones.js';
 import { pedidoToDTO } from '../dto/pedidoDTO.js';
 
-export const pedidos = []
-
-//Versión con Service y Repository
-
 export class PedidoController {
     constructor(pedidoService){
         this.pedidoService = pedidoService;
@@ -40,8 +36,8 @@ export class PedidoController {
         }
     }
 
-    async consultarHistorialPedido(req, res, next) {
-        const { usuarioId } = req.query;
+    async pedidosDeUsuario(req, res, next) {
+        const { usuarioId } = req.params;
 
         if (!usuarioId) {
             return res.status(400).json({ message: 'El parámetro usuarioId es requerido' });

@@ -264,16 +264,12 @@ export class PedidoRepository {
     }
 
     async obtenerPedidosPorUsuario(usuarioId) {
-        if (!mongoose.Types.ObjectId.isValid(usuarioId)) {
-            return [];
-        }
-
         const pedidos = await this.model.find({ usuarioId })
             .populate('usuarioId')
             .populate('items.productoId')
             .sort({ fechaPedido: -1 });
 
-        return pedidos.map(pedido => this.dePedidoDB(pedido.toObject()));
+        return pedidos.map(pedido => pedidoDocToDominio(pedido));
     }
 
     async obtenerPedidosPorEstado(estado) {
