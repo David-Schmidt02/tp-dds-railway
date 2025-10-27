@@ -242,7 +242,12 @@ export class PedidoRepository {
         
         const pedido = await this.model.findById(id)
             .populate('usuarioId') // popula el usuario, es decir trae toda la info del usuario sabiendo que el usuarioId es una referencia a otro documento
-            .populate('items.productoId');
+            .populate({path: 'items.productoId',
+                populate: {
+                    path: 'vendedor',
+                    model: 'Usuario'
+                }
+            });
         
         if (!pedido) {
             throw new PedidoInexistente(id);

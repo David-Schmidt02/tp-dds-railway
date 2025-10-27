@@ -8,7 +8,7 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
     app.post('/pedidos', pedidoController.crearPedido.bind(pedidoController), pedidoErrorHandler)
     app.get('/usuarios/:usuarioId/pedidos', pedidoController.pedidosDeUsuario.bind(pedidoController), pedidoErrorHandler)
     app.patch('/pedidos/:pedidoId', pedidoController.cancelarPedido.bind(pedidoController), pedidoErrorHandler)
-    app.patch('/pedidos/:idPedido/itemsPedidos/:idItem', pedidoController.cambiarCantidadItem.bind(pedidoController), pedidoErrorHandler)
+    app.patch('/pedidos/:idPedido/itemsPedido/:idProducto', pedidoController.cambiarCantidadItem.bind(pedidoController), pedidoErrorHandler)
 
     app.get('vendedor/productos', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
 

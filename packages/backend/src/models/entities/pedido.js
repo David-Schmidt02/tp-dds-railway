@@ -64,17 +64,18 @@ export class Pedido {
         return nombre !== 'ENVIADO' && nombre !== 'ENTREGADO' && nombre !== 'CANCELADO';
     }
 
-    modificarCantidadItem(productoId, nuevaCantidad) {
+    modificarCantidadItem(idProducto, nuevaCantidad) {
         if (!this.puedeModificarItems()) {
             throw new PedidoNoModificable(this.estado);
         }
 
-        const item = this.itemsPedido.find(item => item.getId() === productoId);
+        let item = this.itemsPedido.find(item => item.producto.id == idProducto);
         if (!item) {
             throw new Error('Producto no encontrado en el pedido');
         }
 
         item.cambiarCantidad(nuevaCantidad);
+        return item;
     }
 
     reservarItems() {
@@ -90,7 +91,9 @@ export class Pedido {
 
     getItems() {
         return this.itemsPedido;
-    }   
+    }
+
+    getProducto
 }
 
 

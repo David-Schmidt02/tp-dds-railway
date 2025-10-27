@@ -85,9 +85,7 @@ export class PedidoService {
             const usuario = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
             pedido.actualizarEstado(EstadoPedido.CANCELADO, usuario, motivo);
             
-            console.log(pedido);
             pedidoActualizado = await this.pedidoRepository.guardarPedidoModificado(pedido);
-            console.log(pedidoActualizado)
             for (const item of pedidoActualizado.getItems()) {
                 await this.productoRepository.guardarProducto(item.getProducto());
             }     
@@ -108,18 +106,21 @@ export class PedidoService {
         return pedidoActualizado;
     }
 
-    async cambiarCantidadItem(idPedido, idItem, nuevaCantidad) {
+    async cambiarCantidadItem(idPedido, idProducto, nuevaCantidad) {
+        let pedido;
         try {
-            const pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
-            pedido.modificarCantidadItem(idItem, nuevaCantidad);
-            await this.pedidoRepository.actualizarPedido(pedido);
-            await this.productoRepository.guardarProducto(item.getProducto());
+            pedido = await this.pedidoRepository.obtenerPedidoPorId(idPedido);
+
+            const item = pedido.modificarCantidadItem(idProducto, nuevaCantidad);
+
+            await this.pedidoRepository.guardarPedidoModificado(pedido);
+            await this.productoRepository.guardarProducto(item.producto);
 
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
             throw error;
         }
-        return pedidoActualizado;
+        return pedido;
     }
 
     async obtenerPedidos() {

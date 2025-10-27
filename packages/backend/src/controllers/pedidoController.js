@@ -66,8 +66,8 @@ export class PedidoController {
     }
 
     async cambiarCantidadItem(req, res, next) {
-        const { idPedido, idItem } = req.params;
-        const { cantidad: nuevaCantidad } = req.body;
+        const { idPedido, idProducto } = req.params;
+        const { nuevaCantidad } = req.body;
 
         if (!nuevaCantidad || nuevaCantidad <= 0) {
             return res.status(400).json({
@@ -76,7 +76,7 @@ export class PedidoController {
         }
 
         try {
-            const pedidoActualizado = await this.pedidoService.cambiarCantidadItem(idPedido, idItem, nuevaCantidad);
+            const pedidoActualizado = await this.pedidoService.cambiarCantidadItem(idPedido, idProducto, nuevaCantidad);
             res.status(200).json(pedidoToDTO(pedidoActualizado));
 
         } catch (error) {
