@@ -39,7 +39,7 @@ export class ProductoService {
         }
     }
 
-    async obtenerProductoPorId(id, session = null) {
+    async obtenerProductoPorId(id) {
         try {
             return await this.productoRepository.obtenerProductoPorId(id, session);
         } catch (error) {
@@ -48,7 +48,7 @@ export class ProductoService {
         }
     }
 
-    async verificarStockDisponible(idProducto, session = null) {
+    async verificarStockDisponible(idProducto) {
         try {
             return await this.productoRepository.obtenerStockDisponible(idProducto, session);
         } catch (error) {

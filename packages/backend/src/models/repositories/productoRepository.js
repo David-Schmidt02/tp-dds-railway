@@ -26,10 +26,12 @@ export class ProductoRepository {
 
     }
 
-    async findByFilters(filters, page, limit, sort) {
+    async findByFilters(filters, page, limit, orden) {
         const skip = (page - 1) * limit;
+        let sort;
+        const mongoFilters = {};
 
-        const mongoFilters = { vendedor: filters.vendedor };
+        mongoFilters.vendedor = filters.vendedor;
 
         if (filters.min && filters.max) {
             mongoFilters.precio = { $gte: parseFloat(filters.min), $lte: parseFloat(filters.max) };

@@ -28,11 +28,11 @@ export function usuariosToDTO(usuarios) {
 
 export function usuarioDocToDominio(usuarioDoc) {
     return new Usuario(
-      usuarioDoc.id,
       usuarioDoc.nombre,
       usuarioDoc.email,
       usuarioDoc.telefono,
-      tipoUsuarioFromString(usuarioDoc.tipoUsuario)
+      tipoUsuarioFromString(usuarioDoc.tipoUsuario),
+      usuarioDoc.id,
     )
 }
 

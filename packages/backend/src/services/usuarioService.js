@@ -10,6 +10,7 @@ export class UsuarioService {
     const {nombre, email, telefono, tipoUsuario} = datosUsuario;
     const tipo =  tipoUsuarioFromString(tipoUsuario);
     const usuario = new Usuario(nombre, email, telefono, tipo);
+    console.log(usuario);
     const nuevoUsuario = await this.usuarioRepository.guardarUsuario(usuario);
     return nuevoUsuario;
   }

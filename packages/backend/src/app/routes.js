@@ -2,6 +2,7 @@ import { pedidoErrorHandler } from '../middlewares/pedidoErrorHandler.js';
 import { productoErrorHandler } from '../middlewares/productoErrorHandler.js';
 import { notificacionErrorHandler } from '../middlewares/notificacionErrorHandler.js';
 import { usuarioErrorHandler } from '../middlewares/usuarioErrorHandler.js';
+import { producto } from '../controllers/productoController.js';
 
 export const configureRoutes = (app, {pedidoController, productoController, notificacionController, usuarioController}) => {
     app.get('/pedidos', pedidoController.obtenerPedidos.bind(pedidoController), pedidoErrorHandler)
@@ -10,7 +11,7 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
     app.patch('/pedidos/:pedidoId', pedidoController.cancelarPedido.bind(pedidoController), pedidoErrorHandler)
     app.patch('/pedidos/:idPedido/itemsPedido/:idProducto', pedidoController.cambiarCantidadItem.bind(pedidoController), pedidoErrorHandler)
 
-    app.get('vendedor/productos', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
+    app.get('/vendedor/:idVendedor/productos', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
 
     app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController), notificacionErrorHandler);
     app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController), notificacionErrorHandler);

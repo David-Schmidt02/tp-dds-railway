@@ -11,8 +11,8 @@ export class ProductoController {
 
     async listarProductosVendedorConFiltros(req, res, next) {
         try {
+            const { idVendedor } = req.params
             const {
-                vendedorId,
                 min,
                 max,
                 nombre,
@@ -20,14 +20,14 @@ export class ProductoController {
                 categorias,
                 page = 1,
                 limit = 10,
-                orden
+                orden = "masVendido"
             } = req.query;
 
-            if (!vendedorId){
+            if (!idVendedor){
                 return res.status(400).json({ message: "Debe indicar el vendedor" });
             }
 
-            const filters = {vendedor: vendedorId}; 
+            const filters = {vendedor: idVendedor}; 
             if (min) filters.min = min;
             if (max) filters.max = max;
             if (nombre) filters.titulo = nombre;
