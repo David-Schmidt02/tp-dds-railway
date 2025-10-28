@@ -1,3 +1,6 @@
+import { Notificacion } from "../models/entities/notificacion.js"
+import { notificacionDocADominio } from "../dto/notificacionDTO.js";
+
 export class NotificacionService {
     constructor(notificacionRepository, usuarioRepository) {
         this.notificacionRepository = notificacionRepository;
@@ -12,11 +15,11 @@ export class NotificacionService {
     }
 
     async marcarComoLeida(notificacionId) {
-        let notificacion = await this.notificacionRepository.obtenerNotificacion(notificacionId);
+        let notificacionDoc = await this.notificacionRepository.obtenerNotificacion(notificacionId);
+        const notificacion = notificacionDocADominio(notificacionDoc);
 
-       notificacion.marcarComoLeida();
-
-       return await this.notificacionRepository.guardarNotificacion(notificacion);
-
+        notificacion.marcarComoLeida();
+        
+        return await this.notificacionRepository.guardarNotificacion(notificacion);
     }
 }

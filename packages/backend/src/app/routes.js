@@ -13,8 +13,8 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
 
     app.get('/vendedor/:idVendedor/productos', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
 
-    app.get('/notificaciones', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController), notificacionErrorHandler);
-    app.patch('/notificaciones', notificacionController.marcarNotificacionComoLeida.bind(notificacionController), notificacionErrorHandler);
+    app.get('/notificaciones/:idUsuario', notificacionController.obtenerNotificacionesDeUnUsuario.bind(notificacionController), notificacionErrorHandler);
+    app.patch('/notificaciones/:idNotificacion', notificacionController.marcarNotificacionComoLeida.bind(notificacionController), notificacionErrorHandler);
 
     app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController), usuarioErrorHandler);
     app.get('/usuarios', usuarioController.obtenerUsuarios.bind(usuarioController), usuarioErrorHandler);

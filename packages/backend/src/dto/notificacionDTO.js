@@ -1,3 +1,5 @@
+import { Notificacion } from "../models/entities/notificacion.js"
+
 export function notificacionToDTO(notificacion) {
     return {
         id: notificacion._id || notificacion.id,
@@ -15,4 +17,15 @@ export function notificacionToDTO(notificacion) {
 
 export function notificacionesToDTO(notificaciones) {
     return notificaciones.map(notificacionToDTO);
+}
+
+
+export function notificacionDocADominio(notiDoc) {
+    return new Notificacion (
+        notiDoc.id,
+        notiDoc.receptorId.id,
+        notiDoc.mensaje,
+        notiDoc.leida,
+        notiDoc.fechaAlta
+    )
 }
