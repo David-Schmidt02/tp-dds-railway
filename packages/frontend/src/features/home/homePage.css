@@ -1,0 +1,11 @@
+.banner-area {
+   background-image: url(../../../public/images/ropaGenerica.png);
+   background-size: cover;
+   background-position: center;
+    top: 100px;
+    height: 60vh;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+}
