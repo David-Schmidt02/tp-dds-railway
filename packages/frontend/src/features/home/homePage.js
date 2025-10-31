@@ -2,6 +2,7 @@
 import './homePage.css';
 import React from 'react';
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
+import Card from '../../components/card/card.jsx';
 
 const categoriasMock = [
     { id: 1, nombre: 'Remeras', imagen: 'images/camisa1.jpg' },
@@ -11,6 +12,12 @@ const categoriasMock = [
     { id: 5, nombre: 'Gorros', imagen: 'images/gorro1.jpg' },
     { id: 6, nombre: 'Camisas', imagen: 'images/camisa1.jpg' },
 ];
+
+const productoMock = {
+    image: 'images/camisa1.jpg',
+    name: 'Remera Básica',
+    price: 1200,
+};
 
 const HomePage = () => {
     return (
@@ -22,6 +29,12 @@ const HomePage = () => {
             <CarouselCategoria categories={categoriasMock}></CarouselCategoria>
             <h1>Nuestros Productos</h1>
             <p>Aquí encontrarás todas las prendas disponibles.</p>
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                <Card 
+                    product={productoMock}
+                    onAddToCart={(product) => alert(`${product.name} agregado al carrito`)}
+                />
+            </div>
         </div> 
         </>
     );
