@@ -7,6 +7,14 @@
 
 }
 
+.carousel-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  
+  color: #222;
+  font-family: 'Montserrat', sans-serif;
+}
+
 .categoria-item {
   width: 180px;
   height: 180px;
@@ -44,4 +52,3 @@
   gap: 24px;
   padding: 24px 0;
 }
-

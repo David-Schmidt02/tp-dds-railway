@@ -11,7 +11,7 @@ const Card = ({ product, onAddToCart }) => {
                 <div className="card-price">${price}</div>
             </div>
             <button className="card-add-btn" onClick={() => onAddToCart(product)}>
-                Add To Cart
+                Agregar
             </button>
         </div>
     );
