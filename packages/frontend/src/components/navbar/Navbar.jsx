@@ -1,15 +1,20 @@
 import React, { useContext } from 'react';
+
+import './Navbar.css'
+
 import { CartContext } from '../../context/CartContext';
+
+// FontAwesome
 import '../../fontawesome/fontawesome.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 
-import './Navbar.css';
+const Navbar = () => {
+  //const { productosSeleccionados } = useContext(CartContext);
+  //const haySeleccionados = productosSeleccionados().length > 0;
 
-export default function Navbar() {
-  const { productosSeleccionados } = useContext(CartContext);
-  const haySeleccionados = productosSeleccionados().length > 0;
+  //<FontAwesomeIcon icon={faShoppingCart} size="xl" style={{color: haySeleccionados ? "#0071ff" : "#d4c9be"}} aria-hidden="true" />
 
   return (
     <nav className="navbar" aria-label="Navegación principal">
@@ -45,7 +50,7 @@ export default function Navbar() {
           className="cart-btn"
           aria-label="Ver carrito"
         >
-          <FontAwesomeIcon icon={faShoppingCart} size="xl" style={{color: haySeleccionados ? "#0071ff" : "#d4c9be"}} aria-hidden="true" />
+          
         </button>
         <button
           className="login-btn"
@@ -57,3 +62,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export default Navbar
