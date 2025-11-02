@@ -5,7 +5,7 @@ import './Home.css';
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 
-import { categoriasMock } from '../../mockData/mockDataCategorias.js';
+import categoriasMock from '../../mockData/mockDataCategorias.js';
 
 const Home = () => {
     return (

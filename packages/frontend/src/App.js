@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, } from 'react-router-dom';
 import Layout from './features/layout/Layout';
 import Home from './features/home/Home';
+import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage';
 //import { CartProvider } from './context/CartContext';
 
 function App() {
@@ -8,7 +9,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />  
+            <Route index element={<Home />} />
+            <Route path="/producto/:id" element={<ProductoDetailPage />}/>
           </Route>
         </Routes>
       </BrowserRouter>

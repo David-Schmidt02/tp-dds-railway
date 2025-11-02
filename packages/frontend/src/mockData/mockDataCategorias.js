@@ -6,3 +6,5 @@ const categoriasMock = [
     { id: 5, nombre: 'Gorros', imagen: 'images/gorro1.jpg' },
     { id: 6, nombre: 'Camisas', imagen: 'images/camisa1.jpg' },
 ];
+
+export default categoriasMock;

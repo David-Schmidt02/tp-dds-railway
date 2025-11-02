@@ -11,9 +11,9 @@ const Grid = () => {
 				<ProductoCard
 					key={producto.id}
 					id={producto.id}
-					nombre={producto.title}
-					imagen={producto.image}
-					precio={producto.price}
+					nombre={producto.titulo}
+					imagen={producto.fotos}
+					precio={producto.precio}
 					stock={producto.stock}
 					seleccionado={producto.seleccionado}
 					onSeleccionar={() => {}}

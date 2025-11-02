@@ -7,7 +7,7 @@ import { CartContext } from '../../context/CartContext';
 // FontAwesome
 import '../../fontawesome/fontawesome.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { FaShoppingCart, FaSearch } from 'react-icons/fa'
 
 
 const Navbar = () => {
@@ -41,7 +41,7 @@ const Navbar = () => {
             type="submit"
             aria-label="Buscar"
           >
-            <FontAwesomeIcon icon={faMagnifyingGlass} aria-hidden="true" />
+            <FaSearch aria-hidden="true" />
           </button>
         </form>
       </div>
@@ -49,8 +49,9 @@ const Navbar = () => {
         <button
           className="cart-btn"
           aria-label="Ver carrito"
+
         >
-          
+          <FaShoppingCart className='navbar-cart'/>
         </button>
         <button
           className="login-btn"
