@@ -70,6 +70,42 @@ const productosItems  = [
     stock: 7,
     fotos: [process.env.PUBLIC_URL + "/images/pantalon1.jpg"],
     activo: true
+  },
+    {
+    id: "7",
+    vendedor: "Ana Lopez",
+    titulo: "Gorro",
+    descripcion: "Gorro de lana, color gris.",
+    categorias: ["Accesorios"],
+    precio: 450,
+    moneda: "ARS",
+    stock: 12,
+    fotos: [process.env.PUBLIC_URL + "/images/gorro2.jpg"],
+    activo: true
+  },
+  {
+    id: "8",
+    vendedor: "Sofia Torres",
+    titulo: "Medias",
+    descripcion: "Medias deportivas, color negro, pack x3.",
+    categorias: ["Ropa"],
+    precio: 450,
+    moneda: "ARS",
+    stock: 20,
+    fotos: [process.env.PUBLIC_URL + "/images/medias1.jpg"],
+    activo: true
+  },
+  {
+    id: "9",
+    vendedor: "Luis Fernandez",
+    titulo: "Pantalón",
+    descripcion: "Pantalón de jean, color celeste, talle 42.",
+    categorias: ["Ropa"],
+    precio: 450,
+    moneda: "ARS",
+    stock: 7,
+    fotos: [process.env.PUBLIC_URL + "/images/pantalon1.jpg"],
+    activo: true
   }
 ];
 

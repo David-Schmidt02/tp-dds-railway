@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Link } from "react-router-dom";
 
 import './Navbar.css'
 
@@ -19,15 +20,17 @@ const Navbar = () => {
   return (
     <nav className="navbar" aria-label="Navegación principal">
       <div className="navbar-left">
-        <div className="logo" aria-label="Logo de Tienda Sol">
-          <img
-            src={'images/tituloTiendaSol.png'}
-            alt="Logo de Tienda Sol"
-            className="logo-image"
-            role="img"
-            aria-hidden="false"
-          />
-        </div>
+        <Link to={`/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="logo" aria-label="Logo de Tienda Sol">
+            <img
+              src={'images/tituloTiendaSol.png'}
+              alt="Logo de Tienda Sol"
+              className="logo-image"
+              role="img"
+              aria-hidden="false"
+            />
+          </div>
+        </Link> 
       </div>
       <div className="navbar-center">
         <form className="search-box" role="search" aria-label="Buscar productos">
