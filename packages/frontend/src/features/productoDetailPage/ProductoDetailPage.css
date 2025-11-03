@@ -141,19 +141,16 @@
 .cantidad-btn {
   width: 36px;
   height: 36px;
-  border: 1px solid #cbd5e0;
-  background-color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
+  padding: 0;
   font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  border: 1px solid;
+  border-radius: 4px;
+  background-color: #fff;
+  border-color: var(--color-btn-border);
 }
 .cantidad-btn:hover {
-  background-color: #f7fafc;
-  border-color: #a0aec0;
+  background-color: var(--color-detail-btn-hover);
+  border-color: var(--color-btn-hover-border);
 }
 .cantidad-btn:disabled {
   opacity: 0.5;
@@ -167,41 +164,37 @@
 }
 
 .agregar-al-carrito-btn {
-  padding: 1rem ;
+  background-color: var(--color-btn-primary-cyan);
+  border-color: var(--color-btn-primary-cyan);
+  color: var(--color-white);
+  border-width: 1px;
+  padding: 1rem;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
  
 .agregar-al-carrito-btn:hover {
-  background-color: #0056b3;
+  background-color: var(--color-btn-secondary-blue);
 }
 
 .agregar-al-carrito-btn:disabled {
-  background-color: #cbd5e0;
+  background-color: var(--color-detail-btn-disable);
   cursor: not-allowed;
 }
 
 .comprar-ahora-btn {
+  background: transparent;
+  border-color: var(--color-btn-secondary-blue);
+  border-width: 2px;
+  color: var(--color-btn-secondary-blue);
   padding: 1rem 2rem;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #007bff;
-  background-color: transparent;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .comprar-ahora-btn:hover {
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--color-btn-secondary-blue);
+  color: var(--color-white);
 }
 
 /* Estado de stock */

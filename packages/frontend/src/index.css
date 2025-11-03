@@ -1,17 +1,44 @@
+:root {
+  --color-beige-light: #F1EFEC;
+  --color-beige-medium: #D4C9BE;
+  --color-blue-dark: #123458;
+  --color-black: #030303;
+  --color-white: #FFFFFF;
+
+  --color-btn-primary-cyan: #007bff;
+  --color-btn-primary-blue: #1d4ed8;
+  --color-btn-secondary-blue: #2563eb;
+
+
+  --color-detail-btn-primary-border: #cbd5e0;
+
+  --color-detail-btn-hover: #f7fafc;
+  --color-detail-btn-hover-border: #a0aec0;
+
+  --color-detail-btn-disable: #cbd5e0;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-button {
-  border: none;
-  background: none;
-  outline: none;
-  box-shadow: none;
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background: transparent;
+  color: inherit;
+  transition: transform 0.3s ease;
 }
-
-html, body, #root {
-  height: 100%;
-  width: 100%;
+.btn:hover{
+  cursor: pointer;
 }

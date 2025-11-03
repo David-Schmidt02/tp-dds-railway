@@ -13,7 +13,7 @@ const ProductoCard = ({ id, nombre, imagen, precio, stock, seleccionado, onSelec
     		<div className="producto-info">
     		 
    			  <p className="producto-stock">{stock > 0 ? "En stock" : "Sin stock"}</p>
-     		  <button className="add-cart-btn" onClick={onSeleccionar}>Agregar al carrito</button>
+     		  <button className="btn add-cart-btn" onClick={onSeleccionar}>Agregar al carrito</button>
       		  
     		</div>
 		</div>

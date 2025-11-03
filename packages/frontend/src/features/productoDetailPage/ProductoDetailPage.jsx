@@ -1,13 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './ProductoDetailPage.css'
 import productosItems from '../../mockData/mockDataProductos.js'
 
-const ProductoDetailPage = () => {
+const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const item = productosItems.find(item => item.id === id);
   const [cantidad, setcantidad] = useState(1);
+
+  useEffect(() => {
+    // Reset cantidad when product changes
+    setcantidad(1);
+  }, [id]);
 
   if (!item) {
     return (
@@ -31,13 +36,31 @@ const ProductoDetailPage = () => {
   };
 
   const handleAgregarAlCarrito = () => {
+    const itemCarrito = {
+      id: item.id,
+      titulo: item.titulo,
+      precio: item.precio,
+      moneda: item.moneda,
+      cantidad: cantidad,
+      foto: item.fotos[0]
+    };
+    actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
-    // Acá iría la lógica del carrito
+     navigate("/")
   };
 
   const handleComprarAhora = () => {
-    console.log(`Comprando ${cantidad} unidad(es) de ${item.titulo}`);
-    // Acá iría la lógica de compra directa
+    const itemCarrito = {
+      id: item.id,
+      titulo: item.titulo,
+      precio: item.precio,
+      moneda: item.moneda,
+      cantidad: cantidad,
+      foto: item.fotos[0]
+    };
+    actualizarCarrito(itemCarrito);
+    console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
+    navigate("/checkout");
   };
 
   const formatPrecio= (precio, moneda) => {
@@ -103,7 +126,7 @@ const ProductoDetailPage = () => {
               <span className="cantidad-label">Cantidad:</span>
               <div className="controlers-cantidad">
                 <button
-                  className="cantidad-btn"
+                  className="btn cantidad-btn"
                   onClick={() => handleCambioCantidad(-1)}
                   disabled={cantidad <= 1}
                 >
@@ -111,7 +134,7 @@ const ProductoDetailPage = () => {
                 </button>
                 <span className="cantidad-value">{cantidad}</span>
                 <button
-                  className="cantidad-btn"
+                  className="btn cantidad-btn"
                   onClick={() => handleCambioCantidad(1)}
                   disabled={cantidad >= item.stock}
                 >
@@ -121,7 +144,7 @@ const ProductoDetailPage = () => {
             </div>
 
             <button
-              className="agregar-al-carrito-btn"
+              className="btn agregar-al-carrito-btn"
               onClick={handleAgregarAlCarrito}
               disabled={!item.activo || item.stock === 0}
             >
@@ -129,7 +152,7 @@ const ProductoDetailPage = () => {
             </button>
 
             <button
-              className="comprar-ahora-btn"
+              className="btn comprar-ahora-btn"
               onClick={handleComprarAhora}
               disabled={!item.activo || item.stock === 0}
             >

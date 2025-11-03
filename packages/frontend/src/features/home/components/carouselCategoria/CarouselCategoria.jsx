@@ -26,13 +26,13 @@ const CarouselCategoria = ({ categories }) => {
         <>
             <h2 className="carousel-title">Categorias de la pagina</h2>
             <div className="categoria-carousel">
-                 <button className="carousel-btn" onClick={anterior} disabled={index === 0}>
+                 <button className="btn carousel-btn" onClick={anterior} disabled={index === 0}>
                 ◀
                 </button>
                 {categories.slice(index, index + visible).map((category) =>
                     <CategoriaItem categoria={category} key={category.id} />
                 )}
-                <button className="carousel-btn" onClick={siguiente} disabled={index >= categories.length - visible}>
+                <button className="btn carousel-btn" onClick={siguiente} disabled={index >= categories.length - visible}>
                 ▶
                 </button>
             </div>

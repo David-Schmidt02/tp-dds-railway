@@ -59,11 +59,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #ffffff;
+  color: var(--color-white);
   border-radius: 12px;
   opacity: 0;
   transition: opacity 0.3s ease;
-  background: #123458; /* azul semitransparente */
+  background: var(--color-blue-dark);
 
 }
 
