@@ -4,7 +4,7 @@ import CategoriaItem from '../categoria/CategoriaItem.jsx';
 
 const CarouselCategoria = ({ categories }) => {
     const [index, setIndex] = useState(0);
-    const visible = 6;
+    const visible = 4;
 
     useEffect(() => {
         setIndex(0);

@@ -10,7 +10,10 @@ import { CartContext } from '../../context/CartContext';
 // FontAwesome
 import '../../fontawesome/fontawesome.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { FaShoppingCart, FaSearch } from 'react-icons/fa'
+import { FaSearch, FaShoppingCart, FaUserAlt } from 'react-icons/fa'
+import Badge from '@mui/material/Badge';
+import IconButton from '@mui/material/IconButton';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 
 const Navbar = () => {
@@ -55,15 +58,16 @@ const Navbar = () => {
         <button
           className="btn cart-btn"
           aria-label="Ver carrito"
-
         >
-          <FaShoppingCart className='navbar-icon'/>
+          <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} badgeContent={4} color="primary">
+            <FaShoppingCart className='navbar-icon' id="cart-icon" />
+          </Badge>
         </button>
         <button
           className="btn login-btn"
           aria-label="Ingresar a la cuenta"
         >
-          Ingresar
+          <FaUserAlt className='navbar-icon'/>
         </button>
       </div>
     </nav>
