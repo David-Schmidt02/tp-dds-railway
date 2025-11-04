@@ -33,11 +33,15 @@ const Home = () => {
             {!productos.length ? <div className="spinner">
                 <CircularProgress/>
             </div> :
-            <div style={{ padding: "2rem" }} >
+            <div>
                 <CarouselCategoria categories={categoriasMock}></CarouselCategoria>
-                <h1>Nuestros Productos</h1>
-                <p>Aquí encontrarás todas las prendas disponibles.</p>
-                <Grid />
+                <div className="productos-section">
+                    <div className="productos-header">
+                        <h1 className="productos-title">Nuestros Productos</h1>
+                    </div>
+                    <p className="productos-descripcion">Aquí encontrarás todas las prendas disponibles.</p>
+                    <Grid />
+                </div>
             </div>}
         </>
     );

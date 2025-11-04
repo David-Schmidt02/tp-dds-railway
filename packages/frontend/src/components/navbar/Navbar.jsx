@@ -1,24 +1,35 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { Link } from "react-router-dom";
 
 import './Navbar.css'
 import { TextField } from '@mui/material';
 
-import { CartContext } from '../../context/CartContext';
-
 // FontAwesome
 import '../../fontawesome/fontawesome.js';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FaSearch, FaShoppingCart, FaUserAlt } from 'react-icons/fa'
 import Badge from '@mui/material/Badge';
-import IconButton from '@mui/material/IconButton';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useNavigate } from 'react-router-dom';
 
 
-const Navbar = () => {
-  
+const Navbar = ({carrito}) => {
+  const navigate = useNavigate()
   const [texto, setTexto] = useState("");
+
+  const irACarrito = () => {
+    navigate("/cart")
+  }
+
+  const cantProductosEnCarrito = () => {
+    if (!carrito || !Array.isArray(carrito)) {
+      return 0;
+    }
+    let suma = 0
+    for (const producto of carrito) {
+      suma += producto.cantidad || 1; // Si no tiene cantidad, cuenta como 1
+    }
+    return suma;
+  }
 
   return (
     <nav className="navbar" aria-label="Navegación principal">
@@ -58,8 +69,9 @@ const Navbar = () => {
         <button
           className="btn cart-btn"
           aria-label="Ver carrito"
+          onClick={irACarrito}
         >
-          <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} badgeContent={4} color="primary">
+          <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} badgeContent={cantProductosEnCarrito()} color="primary">
             <FaShoppingCart className='navbar-icon' id="cart-icon" />
           </Badge>
         </button>
