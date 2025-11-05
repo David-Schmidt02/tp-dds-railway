@@ -20,3 +20,4 @@ Tareas
 - Etiquetas Arias en el detalle producto
 - Las vistas a implementar:Carrito, 
 - Verificar los server.js dentro de backend y de backend/api
+- PEGARLE UN VISTA IMPORTATNE EL CSS DE LA CARTA PORQUE SE CAE A PEDAZOS
