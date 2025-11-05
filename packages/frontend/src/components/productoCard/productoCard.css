@@ -137,37 +137,6 @@
   color: white;
 }
 
-.remove {
-  width: calc(30% - 1px);
-  clear: both;
-  border-right: solid thin rgba(255, 255, 255, 0.3);
-  height: 50%;
-  background: #BC3B59;
-  transition: transform 0.5s, background 0.5s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.remove:hover {
-  background: #9B2847;
-}
-
-.remove:hover i {
-  transform: translateY(3px);
-}
-
-.remove i {
-  transition: transform 0.5s;
-  font-size: 24px;
-  color: white;
-}
-
-.right:hover .remove,
-.right:hover .done {
-  transform: translateY(-100%);
-}
 
 /* Material Icons support */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');

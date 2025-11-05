@@ -1,10 +1,52 @@
-form{
-    max-width: 80%;
+.checkout-root {
+  background-color: #F1EFEC;
+  min-height: 100vh;
+  padding: 32px;
 }
 
-.MuiPaper-root{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.stepper {
+  margin-bottom: 24px;
+}
+
+.checkout-card {
+  background-color: #FFFFFF;
+  padding: 32px;
+  max-width: 600px;
+  margin: auto;
+  border-radius: 12px;
+  border: 1px solid #D4C9BE;
+}
+
+.form .actions,
+.resumen .actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+h3, h4 {
+  color: #123458;
+  margin-bottom: 12px;
+}
+
+.section {
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #F1EFEC;
+  border-radius: 8px;
+}
+
+.line-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+button.MuiButton-contained {
+  background-color: #123458 !important;
+  color: #FFFFFF;
+}
+
+button.MuiButton-text {
+  color: #030303;
 }

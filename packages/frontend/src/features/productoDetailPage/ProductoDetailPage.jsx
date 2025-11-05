@@ -52,29 +52,25 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
 
   const handleAgregarAlCarrito = () => {
     const itemCarrito = crearItemCarrito();
-    if (typeof actualizarCarrito === 'function') {
-      actualizarCarrito(itemCarrito);
-    }
+    actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
     navigate("/");
   };
 
   const handleComprarAhora = () => {
     const itemCarrito = crearItemCarrito();
-    if (typeof actualizarCarrito === 'function') {
-      actualizarCarrito(itemCarrito);
-    }
+    actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
     navigate("/checkout");
   };
 
-  const formatPrecio= (precio, moneda) => {
+  /*const formatPrecio= (precio, moneda) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: moneda || 'ARS',
       minimumFractionDigits: 0
     }).format(precio);
-  };
+  };*/
 
   const obtenerEstadoStock = () => {
     if (!item.activo || item.stock === 0) {

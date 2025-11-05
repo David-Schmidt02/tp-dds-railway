@@ -10,7 +10,7 @@ import { CircularProgress } from '@mui/material';
 import categoriasMock from '../../mockData/mockDataCategorias.js';
 
 
-const Home = () => {
+const Home = ({actualizarCarrito}) => {
 
     
     const [productos, setProductos] = useState([]);
@@ -40,7 +40,7 @@ const Home = () => {
                         <h1 className="productos-title">Nuestros Productos</h1>
                     </div>
                     <p className="productos-descripcion">Aquí encontrarás todas las prendas disponibles.</p>
-                    <Grid />
+                    <Grid actualizarCarrito={actualizarCarrito} />
                 </div>
             </div>}
         </>

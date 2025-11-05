@@ -1,25 +1,27 @@
 import React from 'react';
 import './Cart.css';
+import { useNavigate } from "react-router";
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const Cart = ({ carrito }) => {
+const Cart = ({ carrito, eliminarDelCarrito }) => {
+  const navigate = useNavigate();
+
   const calcularTotal = () => {
-    if (!carrito || !Array.isArray(carrito)) {
-      return 0;
-    }
     return carrito.reduce((total, producto) => {
-      const cantidad = producto.cantidad || 1;
-      const precio = producto.precio || 0;
+      const cantidad = producto.cantidad;
+      const precio = producto.precio;
       return total + (cantidad * precio);
     }, 0);
   };
 
   const cantidadTotal = () => {
-    if (!carrito || !Array.isArray(carrito)) {
-      return 0;
-    }
     return carrito.reduce((total, producto) => {
       return total + (producto.cantidad || 1);
     }, 0);
+  };
+
+  const irCheckout = () => {
+    navigate('/checkout')
   };
 
   return (
@@ -40,8 +42,8 @@ const Cart = ({ carrito }) => {
             {carrito.map((producto, index) => (
               <div key={index} className="cart-item">
                 <div className="item-image">
-                  <img 
-                    src={producto.imagen || '/images/placeholder.jpg'} 
+                  <img
+                    src={producto.imagen || '/images/placeholder.jpg'}
                     alt={producto.nombre}
                   />
                 </div>
@@ -57,6 +59,13 @@ const Cart = ({ carrito }) => {
                   <span className="subtotal">
                     Subtotal: ${(producto.precio * (producto.cantidad || 1)).toFixed(2)}
                   </span>
+                  <button
+                    className="delete-btn"
+                    onClick={() => eliminarDelCarrito(producto.id)}
+                  >
+                    <DeleteIcon style={{ marginRight: "5px" }} />
+                    Eliminar
+                  </button>
                 </div>
               </div>
             ))}
@@ -73,7 +82,7 @@ const Cart = ({ carrito }) => {
                 <span>Total</span>
                 <span>${calcularTotal().toFixed(2)}</span>
               </div>
-              <button className="checkout-btn">
+              <button className="checkout-btn" onClick={irCheckout}>
                 Proceder al Checkout
               </button>
             </div>
@@ -85,3 +94,6 @@ const Cart = ({ carrito }) => {
 };
 
 export default Cart;
+
+
+

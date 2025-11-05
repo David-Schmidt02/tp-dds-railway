@@ -167,6 +167,26 @@
   background: #1e3f73;
 }
 
+.delete-btn {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: #c62828;
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
   .cart-content {

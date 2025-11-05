@@ -11,19 +11,23 @@ function App() {
 
   const [carrito, setCarrito] = useState([]);
 
-  const actualizarCarrito = (hotel) => {
-    setCarrito([...carrito, hotel]);
+  const actualizarCarrito = (producto) => {
+    setCarrito([...carrito, producto]);
   };
 
   const limpiarCarrito = () => {
     setCarrito([]);
   };
 
+  const eliminarDelCarrito = (id) => {
+  setCarrito(carrito.filter(producto => producto.id !== id));
+};
+
   return (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout carrito={carrito} />}>
-            <Route index element={<Home />} />
+            <Route index element={<Home actualizarCarrito = {actualizarCarrito} />} />
             <Route path="/producto/:id" element={<ProductoDetailPage 
                   carrito={carrito}
                   actualizarCarrito={actualizarCarrito}
@@ -33,6 +37,7 @@ function App() {
               element={
                 <Cart 
                   carrito={carrito}
+                  eliminarDelCarrito={eliminarDelCarrito}
                 />} 
             />
             <Route 
