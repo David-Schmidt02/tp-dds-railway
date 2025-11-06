@@ -43,7 +43,7 @@ const Cart = ({ carrito, eliminarDelCarrito }) => {
               <div key={index} className="cart-item">
                 <div className="item-image">
                   <img
-                    src={producto.imagen || '/images/placeholder.jpg'}
+                    src={producto.foto}
                     alt={producto.nombre}
                   />
                 </div>

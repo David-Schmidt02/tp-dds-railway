@@ -5,14 +5,31 @@ body {
 }
 
 .banner-area {
-   background-image: url(../../../public/images/ropaGenerica.png);
-   background-size: cover;
-   background-position: center;
-    top: 100px;
-    height: 81vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  background-image: url(../../../public/images/ropaGenerica.png);
+  background-size: cover;           /* cubre todo el ancho sin deformar */
+  background-position: center;      /* centra la imagen */
+  height: 60vh;                     /* altura del banner */
+  width: 100%;
+  display: flex;
+  align-items: flex-end;            /* coloca el texto cerca del borde inferior */
+  justify-content: center;          /* centra horizontalmente el texto */
+  position: relative;
 }
+
+.banner-text {
+  background: rgba(255, 255, 255, 0.7); /* blanco translúcido */
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  margin-bottom: 30px;                /* separación desde el borde inferior */
+  text-align: center;
+  backdrop-filter: blur(5px);         /* opcional: desenfoca el fondo */
+}
+
+.banner-text h2 {
+  color: #333;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
 
 

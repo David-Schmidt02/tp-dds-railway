@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 
 import './Navbar.css'
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 const Navbar = ({carrito}) => {
   const navigate = useNavigate()
   const [texto, setTexto] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const irACarrito = () => {
     navigate("/cart")
@@ -31,8 +32,16 @@ const Navbar = ({carrito}) => {
     return suma;
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50); // cuando se baja más de 50px
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <nav className="navbar" aria-label="Navegación principal">
+    <nav className={`navbar ${isScrolled ? "scrolled" : ""}`} aria-label="Navegación principal">
       <div className="navbar-left">
         <Link to={`/`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className="logo" aria-label="Logo de Tienda Sol">

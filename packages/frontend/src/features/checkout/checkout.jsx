@@ -10,14 +10,12 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
 
   const [paso, setPaso] = useState(0);
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
-  const [pedidoId, setPedidoId] = useState(null);
 
   const [datos, setDatos] = useState({
     nombre: '',
     apellido: '',
     email: '',
-    telefono: '',
-    dni: ''
+    telefono: ''
   });
 
   const [direccion, setDireccion] = useState({
@@ -57,19 +55,147 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
   const calcularEnvio = () => 0;
   const calcularImpuestos = () => 0;
 
-  const handleCrearPedido = () => {
-    // Generar un ID de pedido simulado
-    const nuevoPedidoId = `ORD-${Date.now()}`;
-    setPedidoId(nuevoPedidoId);
+  // Función para preparar los datos del comprador
+  const prepararDatosComprador = () => {
+    return {
+      nombre: datos.nombre,
+      apellido: datos.apellido,
+      email: datos.email,
+      telefono: datos.telefono,
+    };
+  };
+
+  // Función para preparar los items del pedido (según schema backend)
+  const prepararItemsPedido = () => {
+    return carrito.map(producto => ({
+      productoId: producto.id,
+      cantidad: producto.cantidad || 1
+      // Backend no espera precioUnitario aquí
+    }));
+  };
+
+  // Función para procesar la dirección de entrega (según schema backend)
+  const prepararDireccionEntrega = () => {
+    const [piso, depto] = direccion.departamento 
+      ? direccion.departamento.split('/').map(s => s.trim())
+      : [undefined, undefined];
+
+    return {
+      calle: direccion.calle,
+      numero: parseInt(direccion.numero),
+      piso: piso ? parseInt(piso) : undefined,
+      departamento: depto ? parseInt(depto) : undefined, // Backend espera number
+      codigoPostal: parseInt(direccion.codigoPostal), // Backend espera number
+      ciudad: direccion.ciudad
+      // Backend no espera provincia ni referencias
+    };
+  };
+
+  // Función para obtener/crear usuarioId
+  // NOTA: Esta función necesita ser implementada según tu sistema de autenticación
+  const obtenerUsuarioId = () => {
+    // Por ahora retornamos un ID simulado
+    // En una implementación real, esto vendría del contexto de autenticación
+    // o se crearía un usuario temporal
+    return "usuario_temp_" + Date.now();
+  };
+
+  // Función para construir el objeto completo del pedido (según schema backend)
+  const construirPedidoData = () => {
+    return {
+      usuarioId: obtenerUsuarioId(), // Backend espera usuarioId como string
+      items: prepararItemsPedido(),
+      moneda: 'PESO_ARG',
+      direccionEntrega: prepararDireccionEntrega()
+      // Backend no espera: comprador, metodoPago, total
+    };
+  };
+
+  // Función para guardar datos adicionales del usuario (para uso futuro)
+  const guardarDatosUsuarioAdicionales = () => {
+    const datosAdicionales = {
+      datosPersonales: {
+        nombre: datos.nombre,
+        apellido: datos.apellido,
+        email: datos.email,
+        telefono: datos.telefono,
+        dni: datos.dni
+      },
+      metodoPago: {
+        tipo: metodoPago,
+        ...(metodoPago === 'tarjeta' && {
+          datosAdicionales: {
+            tipoTarjeta: datosTarjeta.tipoTarjeta,
+            numeroTarjeta: datosTarjeta.numeroTarjeta.replace(/\s/g, ''),
+            nombreTitular: datosTarjeta.nombreTitular,
+            fechaVencimiento: datosTarjeta.fechaVencimiento
+          }
+        })
+      },
+      direccionCompleta: {
+        ...direccion
+      }
+    };
+    
+    // Aquí podrías enviar estos datos a otro endpoint o localStorage
+    localStorage.setItem('datosCheckout', JSON.stringify(datosAdicionales));
+    return datosAdicionales;
+  };
+
+  // Función para enviar el pedido al backend
+  const enviarPedidoAlBackend = 
+
+  // Función para manejar el éxito del pedido
+  const manejarExitoPedido = (pedidoCreado) => {
+    setPedidoId(pedidoCreado.id);
     setPedidoConfirmado(true);
     limpiarCarrito();
+  };
+
+  // Función para manejar errores
+  const manejarErrorPedido = (error) => {
+    console.error('Error al crear pedido:', error);
+    
+    // Determinar el mensaje de error específico
+    let mensajeError = 'Error al procesar el pedido. Por favor intente nuevamente.';
+    
+    if (error.message.includes('400')) {
+      mensajeError = 'Datos del pedido inválidos. Verifique la información ingresada.';
+    } else if (error.message.includes('401')) {
+      mensajeError = 'No tiene autorización para realizar esta operación.';
+    } else if (error.message.includes('500')) {
+      mensajeError = 'Error interno del servidor. Intente más tarde.';
+    }
+    
+    alert(mensajeError);
+  };
+
+  // Función principal para crear el pedido
+  const handleCrearPedido = async () => {
+    try {
+      // Paso 1: Guardar datos adicionales del usuario
+      const datosAdicionales = guardarDatosUsuarioAdicionales();
+      
+      // Paso 2: Construir los datos del pedido según schema backend
+      const pedidoData = construirPedidoData();
+      
+      // Paso 3: Enviar al backend
+      const pedidoCreado = await enviarPedidoAlBackend(pedidoData);
+      
+      // Paso 4: Manejar el éxito
+      manejarExitoPedido(pedidoCreado);
+      
+    } catch (error) {
+      // Paso 5: Manejar errores
+      manejarErrorPedido(error);
+    }
   };
 
   const handleVolverAHome = () => {
     navigate('/');
   };
 
-  const paso1Completo = datos.nombre && datos.apellido && datos.email && datos.telefono && datos.dni;
+  const paso1Completo = datos.nombre && datos.apellido && datos.email && datos.telefono;
   const paso2Completo = direccion.calle && direccion.numero && direccion.ciudad && direccion.provincia && direccion.codigoPostal;
   const tarjetaCompleta = metodoPago !== 'tarjeta' || (
     datosTarjeta.numeroTarjeta && 
@@ -99,7 +225,6 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
             <div className="success-content">
               <div className="success-icon">✓</div>
               <h2>Pedido confirmado</h2>
-              <p>Numero de orden: <strong>{pedidoId}</strong></p>
               <p>Total <strong>${calcularTotal().toFixed(2)}</strong></p>
               
               <div className="order-details">
@@ -170,14 +295,6 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
                   margin="normal" 
                   value={datos.telefono} 
                   onChange={e => setDatos({ ...datos, telefono: e.target.value })}
-                  className="form-field"
-                />
-                <TextField 
-                  label="DNI" 
-                  fullWidth 
-                  margin="normal" 
-                  value={datos.dni} 
-                  onChange={e => setDatos({ ...datos, dni: e.target.value })}
                   className="form-field"
                 />
               </div>

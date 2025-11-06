@@ -1,9 +1,10 @@
 import './Header.css'; 
+import NavBar from "../../components/navbar/Navbar";
 
-const Header = (props) => {
+const Header = ({carrito}) => {
   return (
     <header className="header">
-         {props.username}, te otorgamos 3 y 6 cuotas sin interés👕
+        <NavBar carrito={carrito}/>
     </header>
   );
 };
