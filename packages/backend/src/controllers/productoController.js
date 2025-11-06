@@ -54,6 +54,50 @@ export class ProductoController {
         }
 
     }
+
+    async productosConFiltros(req, res, next) {
+        try {
+            const {
+                min,
+                max,
+                nombre,
+                descripcion,
+                categorias,
+                page = 1,
+                limit = 10,
+                orden = "masVendido",
+                idVendedor
+            } = req.query;
+
+
+            const filters = {} 
+            if (idVendedor) filters.vendedor = idVendedor;
+            if (min) filters.min = min;
+            if (max) filters.max = max;
+            if (nombre) filters.titulo = nombre;
+            if (descripcion) filters.descripcion = descripcion;
+            if (categorias) filters.categorias = categorias;
+
+            if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1) {
+            throw new Error("Los parámetros de paginación deben ser números positivos");
+            }
+
+            const resultado = await this.productoService.ProductosConFiltros(
+                filters,
+                parseInt(page),
+                parseInt(limit),
+                orden
+            );
+
+            res.status(200).json({
+                ...resultado,
+                items: resultado.items.map(productoToDTO)
+            });
+        }catch(error){
+            next(error);
+        }
+    }
+
 }
 
 export default ProductoController;

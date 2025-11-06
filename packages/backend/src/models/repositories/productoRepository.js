@@ -31,7 +31,7 @@ export class ProductoRepository {
         let sort;
         const mongoFilters = {};
 
-        mongoFilters.vendedor = filters.vendedor;
+        if (filters.vendedor) mongoFilters.vendedor = filters.vendedor;
 
         if (filters.min && filters.max) {
             mongoFilters.precio = { $gte: parseFloat(filters.min), $lte: parseFloat(filters.max) };

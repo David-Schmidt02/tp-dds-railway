@@ -39,6 +39,37 @@ export class ProductoService {
         }
     }
 
+    async ProductosConFiltros(filters, page, limit, orden) {
+        const {vendedor, categorias} = filters;
+        
+        if (vendedor) {
+            await this.usuarioRepository.obtenerUsuarioPorId(vendedor);
+        }
+        
+        if (categorias) {
+            const categoriasArray = typeof categorias === "string"
+                ? categorias.split(",")
+                : categorias;
+
+            filters.categorias = categoriasArray;
+        }
+
+        try {
+            const productos = await this.productoRepository.findByFilters(
+                filters,
+                page,
+                limit,
+                orden
+            );
+            return productos;
+        } catch (error) {
+            console.error('Error al listar productos con filtros:', error.message);
+            throw error;
+        }
+    }
+
+
+    
     async obtenerProductoPorId(id) {
         try {
             return await this.productoRepository.obtenerProductoPorId(id, session);

@@ -2,7 +2,7 @@
 import React from 'react';
 import './Home.css';
 import { useState, useEffect } from 'react';
-import { getProductsSlowly } from '../../services/services.js';
+import { getProductos } from '../../services/productoService.js';
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 import { CircularProgress } from '@mui/material';
@@ -16,8 +16,8 @@ const Home = ({actualizarCarrito}) => {
     const [productos, setProductos] = useState([]);
 
     const cargarProductos = async () => {
-      const productosCargados = await getProductsSlowly();
-      setProductos(productosCargados)
+      const productosCargados = await getProductos();
+      setProductos(productosCargados.data)
     }
 
     // Para que cuando se monte el componente los cargue

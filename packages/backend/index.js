@@ -1,12 +1,22 @@
-import express from 'express'
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
 import { startServer } from "./src/app/server.js";
 import { connectToDB } from "./src/app/db.js";
 import { buildAppContext } from "./src/app/context.js";
 import { setupSwagger } from "./src/app/swagger.js"; 
 
+dotenv.config();
+
 const app = express();
-const PORT = 3000;
-const DB_URI = "mongodb://localhost:27017/TiendaSol";
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  METHODS : ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+const PORT = process.env.PORT;
+const DB_URI = process.env.DB_URI;
 
 let appContext = {};
 try {
