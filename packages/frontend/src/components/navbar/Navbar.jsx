@@ -57,7 +57,7 @@ const Navbar = ({carrito}) => {
           />
 
           <button
-            className="btn search-btn"
+            className="search-navbar-btn"
             type="submit"
             aria-label="Buscar"
           >

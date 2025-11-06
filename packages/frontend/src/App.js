@@ -12,7 +12,18 @@ function App() {
   const [carrito, setCarrito] = useState([]);
 
   const actualizarCarrito = (producto) => {
-    setCarrito([...carrito, producto]);
+    const productoExistente = carrito.find(item => item.id === producto.id);
+    if (productoExistente) {
+      setCarrito(
+      carrito.map(item =>
+        item.id === producto.id
+        ? { ...item, cantidad: item.cantidad + (producto.cantidad) }
+        : item
+      )
+      );
+    } else {
+      setCarrito([...carrito, { ...producto, cantidad: producto.cantidad || 1 }]);
+    }
   };
 
   const limpiarCarrito = () => {
