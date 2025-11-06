@@ -47,7 +47,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
     precio: item.precio,
     moneda: item.moneda,
     cantidad: cantidad,
-    foto: mainPhoto || item.fotos?.[0]
+    foto: mainPhoto || item.fotos?.[0],
     stock: item.stock
   });
 
