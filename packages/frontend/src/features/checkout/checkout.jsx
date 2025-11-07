@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Button, TextField, Stepper, Step, StepLabel, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Select, MenuItem, InputLabel, Checkbox } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { postPedido } from '../../services/productoService';
 import './checkout.css';
 
 const pasos = ['Usuario', 'Direccion', 'Pago'];
@@ -10,6 +11,7 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
 
   const [paso, setPaso] = useState(0);
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
+  const [pedidoId, setPedidoId] = useState(null);
 
   const [datos, setDatos] = useState({
     nombre: '',
@@ -82,28 +84,23 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
 
     return {
       calle: direccion.calle,
-      numero: parseInt(direccion.numero),
+      numero: parseInt(direccion.numero) || 1, // Si es NaN, usa 1
       piso: piso ? parseInt(piso) : undefined,
-      departamento: depto ? parseInt(depto) : undefined, // Backend espera number
-      codigoPostal: parseInt(direccion.codigoPostal), // Backend espera number
+      departamento: depto ? parseInt(depto) : undefined,
+      codigoPostal: parseInt(direccion.codigoPostal) || 1000, // Si es NaN, usa 1000
       ciudad: direccion.ciudad
-      // Backend no espera provincia ni referencias
     };
   };
 
-  // Función para obtener/crear usuarioId
-  // NOTA: Esta función necesita ser implementada según tu sistema de autenticación
+  // Usuario hardcodeado para testing
   const obtenerUsuarioId = () => {
-    // Por ahora retornamos un ID simulado
-    // En una implementación real, esto vendría del contexto de autenticación
-    // o se crearía un usuario temporal
-    return "usuario_temp_" + Date.now();
+    return "507f1f77bcf86cd799439011"; // ObjectId válido hardcodeado
   };
 
   // Función para construir el objeto completo del pedido (según schema backend)
-  const construirPedidoData = () => {
+  const construirPedidoData = (usuarioId) => {
     return {
-      usuarioId: obtenerUsuarioId(), // Backend espera usuarioId como string
+      usuarioId: usuarioId, // Backend espera usuarioId como string
       items: prepararItemsPedido(),
       moneda: 'PESO_ARG',
       direccionEntrega: prepararDireccionEntrega()
@@ -142,9 +139,6 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
     return datosAdicionales;
   };
 
-  // Función para enviar el pedido al backend
-  const enviarPedidoAlBackend = 
-
   // Función para manejar el éxito del pedido
   const manejarExitoPedido = (pedidoCreado) => {
     setPedidoId(pedidoCreado.id);
@@ -173,14 +167,16 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
   // Función principal para crear el pedido
   const handleCrearPedido = async () => {
     try {
-      // Paso 1: Guardar datos adicionales del usuario
-      const datosAdicionales = guardarDatosUsuarioAdicionales();
+      // Paso 1: Obtener ID de usuario (temporal - ID fijo)
+      const usuarioId = obtenerUsuarioId();
       
       // Paso 2: Construir los datos del pedido según schema backend
-      const pedidoData = construirPedidoData();
+      const pedidoData = construirPedidoData(usuarioId);
+      
+      console.log('Enviando pedido:', pedidoData);
       
       // Paso 3: Enviar al backend
-      const pedidoCreado = await enviarPedidoAlBackend(pedidoData);
+      const pedidoCreado = await postPedido(pedidoData);
       
       // Paso 4: Manejar el éxito
       manejarExitoPedido(pedidoCreado);

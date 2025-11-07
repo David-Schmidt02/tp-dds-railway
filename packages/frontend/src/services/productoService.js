@@ -13,6 +13,33 @@ export const getProductos = async () => {
     }
 }
 
+export const postUsuario = async (usuarioData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/usuarios`, usuarioData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error creating usuario: ", error);
+        throw error;
+    }
+}
+
+export const getUsuarios = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/usuarios`, {headers:{'Cache-Control' : 'no-cache'}});
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error fetching usuarios: ", error);
+        throw error;
+    }
+}
+
 export const postPedido = async (pedidoData) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/pedidos`, pedidoData, {

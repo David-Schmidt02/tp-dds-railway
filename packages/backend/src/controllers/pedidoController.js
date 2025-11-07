@@ -7,6 +7,9 @@ export class PedidoController {
     }
 
     async crearPedido(req, res, next) {
+        // Log incoming body to help debug 500 errors
+        console.log('POST /pedidos body:', JSON.stringify(req.body));
+
         const body = pedidoSchema.safeParse(req.body);
         
         if(body.error){
@@ -23,6 +26,8 @@ export class PedidoController {
             res.status(201).json(pedidoDTO);
 
         } catch(error) {
+            // Log full error here to capture stack trace in backend console
+            console.error('Error en crearPedido:', error && error.stack ? error.stack : error);
             next(error);
         }
     }

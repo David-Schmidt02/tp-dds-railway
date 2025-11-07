@@ -45,6 +45,7 @@ const Cart = ({ carrito, eliminarDelCarrito }) => {
                   <img
                     src={producto.foto}
                     alt={producto.nombre}
+                    className="cart-item-image"
                   />
                 </div>
                 <div className="item-details">

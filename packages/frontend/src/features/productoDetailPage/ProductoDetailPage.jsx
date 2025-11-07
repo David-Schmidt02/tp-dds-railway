@@ -1,25 +1,30 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import './ProductoDetailPage.css'
-import productosItems from '../../mockData/mockDataProductos.js'
 
 const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
-  const { id } = useParams();
   const navigate = useNavigate();
 
-  // Lookup robusto: compara como string para evitar problemas number vs string
-  const item = productosItems.find(item => String(item.id) === String(id));
+  const location = useLocation();
 
-  // estado de cantidad y foto principal
+  // Estados
   const [cantidad, setcantidad] = useState(1);
-  const [mainPhoto, setMainPhoto] = useState(item ? item.fotos?.[0] || '' : '');
+  const [mainPhoto, setMainPhoto] = useState('');
+
+  // Obtener el producto del state del router
+  const item = location.state?.producto;
+  
+  console.log('Item keys:', item ? Object.keys(item) : 'No item');
+  console.log('Item._id:', item?._id);
+  console.log('Item.id:', item?.id);
 
   useEffect(() => {
-    // Reset cantidad y foto principal cuando cambia el id/item
+    // Reset cantidad y foto principal cuando cambia el producto
     setcantidad(1);
     if (item) setMainPhoto(item.fotos?.[0] || '');
-  }, [id, item]);
+  }, [item]);
 
+  // Mostrar error si no se encuentra el producto
   if (!item) {
     return (
       <div className="item-detalles-page">
@@ -42,7 +47,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   };
 
   const crearItemCarrito = () => ({
-    id: item.id,
+    id: item._id || item.id,
     titulo: item.titulo,
     precio: item.precio,
     moneda: item.moneda,
@@ -98,7 +103,11 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
               aria-label={`Ver foto ${idx + 1}`}
               type="button"
             >
-              <img src={f} alt={`${item.titulo} ${idx + 1}`} className="thumb-img" />
+              <img 
+                src={f} 
+                alt={`${item.titulo} ${idx + 1}`} 
+                className="thumb-img" 
+              />
             </button>
           ))}
         </div>
@@ -108,7 +117,6 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
             src={mainPhoto || item.fotos?.[0]}
             alt={item.titulo}
             className="item-main-imagen"
-            loading="lazy"
           />
         </div>
 

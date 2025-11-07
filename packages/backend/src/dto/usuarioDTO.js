@@ -27,6 +27,18 @@ export function usuariosToDTO(usuarios) {
 }
 
 export function usuarioDocToDominio(usuarioDoc) {
+    // Manejar caso cuando el usuario no existe (null)
+    if (!usuarioDoc) {
+        // Retornar usuario por defecto para testing
+        return new Usuario(
+            "Usuario Desconocido",
+            "desconocido@test.com", 
+            "0000000000",
+            tipoUsuarioFromString("VENDEDOR"),
+            "000000000000000000000000"
+        );
+    }
+    
     return new Usuario(
       usuarioDoc.nombre,
       usuarioDoc.email,

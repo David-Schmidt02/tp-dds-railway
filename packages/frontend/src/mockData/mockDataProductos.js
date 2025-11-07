@@ -8,7 +8,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 10,
-    fotos: [process.env.PUBLIC_URL + "/images/buzo1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1556821840-3a9fbc86339e?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -20,7 +20,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 15,
-    fotos: [process.env.PUBLIC_URL + "/images/camisa1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -32,7 +32,7 @@ const productosItems  = [
     precio: 500,
     moneda: "ARS",
     stock: 8,
-    fotos: [process.env.PUBLIC_URL + "/images/gorro1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1514327605112-b887c0e61c4a?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -44,7 +44,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 12,
-    fotos: [process.env.PUBLIC_URL + "/images/gorro2.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -56,7 +56,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 20,
-    fotos: [process.env.PUBLIC_URL + "/images/medias1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -68,7 +68,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 7,
-    fotos: [process.env.PUBLIC_URL + "/images/pantalon1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop"],
     activo: true
   },
     {
@@ -80,7 +80,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 12,
-    fotos: [process.env.PUBLIC_URL + "/images/gorro2.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -92,7 +92,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 20,
-    fotos: [process.env.PUBLIC_URL + "/images/medias1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400&h=400&fit=crop"],
     activo: true
   },
   {
@@ -104,7 +104,7 @@ const productosItems  = [
     precio: 450,
     moneda: "ARS",
     stock: 7,
-    fotos: [process.env.PUBLIC_URL + "/images/pantalon1.jpg"],
+    fotos: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop"],
     activo: true
   }
 ];
