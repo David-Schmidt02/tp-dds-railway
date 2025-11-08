@@ -3,6 +3,7 @@ import React from 'react';
 import './Home.css';
 import { useState, useEffect } from 'react';
 import { getProductos } from '../../services/productoService.js';
+
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 import { CircularProgress } from '@mui/material';

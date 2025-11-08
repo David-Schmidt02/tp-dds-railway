@@ -81,7 +81,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
       precio: 10000,
       moneda: 'ARS',
       stock: 10,
-      fotos: [{ url: 'http://img/p1.png' }],
+      fotos: ['http://img/p1.png'],
       activo: true,
       vendidos: 25
     });
@@ -94,7 +94,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
       precio: 15000,
       moneda: 'ARS',
       stock: 5,
-      fotos: [{ url: 'http://img/p2.png' }],
+      fotos: ['http://img/p2.png'],
       activo: true,
       vendidos: 5
     });
@@ -107,7 +107,7 @@ describe('BDD: Creación de un pedido (POST /pedidos)', () => {
       precio: 8000,
       moneda: 'ARS',
       stock: 20,
-      fotos: [{ url: 'http://img/p3.png' }],
+      fotos: ['http://img/p3.png'],
       activo: false,
       vendidos: 0
     });

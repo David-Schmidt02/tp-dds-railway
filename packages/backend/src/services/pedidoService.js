@@ -25,30 +25,13 @@ export class PedidoService {
         const itemsPedidos = await Promise.all(items.map(async (itemData) => {
             let { productoId, cantidad } = itemData;
             const producto = await this.productoRepository.obtenerProductoPorId(productoId);
-            
-            // Debug: verificar precio del producto
-            console.log(`Producto ${productoId}: precio = ${producto.precio}`);
-            
-            const precioUnitario = producto.precio || 100; // Precio por defecto si no existe
+
+            const precioUnitario = producto.precio || 100;
             return new ItemPedido(producto, parseInt(cantidad), precioUnitario);
         }));
 
-        // Intentar obtener usuario de BD, si falla usar uno hardcodeado
-        let comprador;
-        try {
-            const compradorDoc = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
-            comprador = usuarioDocToDominio(compradorDoc);
-        } catch (error) {
-            // Usuario hardcodeado para testing
-            comprador = {
-                id: usuarioId,
-                nombre: "Usuario Test",
-                email: "test@example.com",
-                telefono: "1123456789",
-                tipoUsuario: "COMPRADOR"
-            };
-            console.log('Usando usuario hardcodeado para testing');
-        }
+        const compradorDoc = await this.usuarioRepository.obtenerUsuarioPorId(usuarioId);
+        const comprador = usuarioDocToDominio(compradorDoc);
 
         const direccion = new DireccionEntrega(
             direccionEntrega.calle,
@@ -80,7 +63,7 @@ export class PedidoService {
             throw new Error('Error al reservar stock: ' + error.message);
         }
 
-        // Guardar el pedido (aPedidoDB transformará a formato DB)
+        // Guardar el pedido (el repository usa pedidoToDoc del DTO para transformar a formato DB)
         let pedidoGuardado = await this.pedidoRepository.guardarPedido(pedidoNuevo);
 
         try {

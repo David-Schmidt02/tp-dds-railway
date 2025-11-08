@@ -20,7 +20,7 @@ export let factoryNotificacionPedidos = {
 
         const mensaje = formatearMensajeNotificacion(datosMensaje);
 
-        return new Notificacion(null, vendedor.id, mensaje);
+        return new Notificacion(vendedor.id, mensaje);
     },
 
     pedidoEnviado(pedido) {
@@ -43,7 +43,7 @@ export let factoryNotificacionPedidos = {
 
         // El receptor debe ser el id del comprador, no el objeto completo
         const receptorId = pedido.comprador?.id || pedido.comprador?._id;
-        return new Notificacion({ id: receptorId }, mensaje);
+        return new Notificacion(receptorId, mensaje);
     },
 
     cancelarPedido(pedido) {
@@ -64,7 +64,7 @@ export let factoryNotificacionPedidos = {
 
         const mensaje = formatearMensajeNotificacion(datosMensaje);
 
-        return new Notificacion(null, vendedor.id, mensaje);
+        return new Notificacion(vendedor.id, mensaje);
     },
 
    confirmarPedido(pedido) {
@@ -107,10 +107,18 @@ function formatearMensajeNotificacion(datos) {
     if(comprador) partes.push(`Comprador: ${comprador} \n`);
     if(productos) partes.push(`Productos: ${productos} \n`);
     if(total) partes.push(`Total: ${total} \n`);
-    if(direccionEntrega) {partes.push(`Direccion: ${direccionEntrega.calle}, 
-        ${direccionEntrega.altura},
-        ${direccionEntrega.ciudad} \n`); }
-    if(direccionEntrega.departamento) partes.push(`Departamento: ${direccionEntrega.departamento}, Piso: ${direccionEntrega.FactoryNotificacionPedidos}`);
+    if(direccionEntrega) {
+        partes.push(`Direccion: ${direccionEntrega.calle}, ${direccionEntrega.altura}, ${direccionEntrega.ciudad} \n`);
+
+        // Agregar piso y departamento si existen
+        if(direccionEntrega.piso && direccionEntrega.departamento) {
+            partes.push(`Piso: ${direccionEntrega.piso}, Departamento: ${direccionEntrega.departamento}`);
+        } else if(direccionEntrega.piso) {
+            partes.push(`Piso: ${direccionEntrega.piso}`);
+        } else if(direccionEntrega.departamento) {
+            partes.push(`Departamento: ${direccionEntrega.departamento}`);
+        }
+    }
     if(vendedor) partes.push(`Vendedor: ${vendedor} \n`);
     
     return partes.join('\n');

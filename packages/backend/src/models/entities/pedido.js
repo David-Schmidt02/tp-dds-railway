@@ -93,7 +93,10 @@ export class Pedido {
         return this.itemsPedido;
     }
 
-    getProducto
+    getProducto(idProducto) {
+        const item = this.itemsPedido.find(item => item.producto.id === idProducto);
+        return item ? item.producto : null;
+    }
 }
 
 

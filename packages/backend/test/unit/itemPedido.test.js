@@ -9,7 +9,9 @@ describe('Clase ItemPedido', () => {
   beforeEach(() => {
     mockProducto = {
       id: 'p001',
-      getVendedor: jest.fn(() => 'vendedor123')
+      getVendedor: jest.fn(() => 'vendedor123'),
+      disminuirStock: jest.fn(),
+      aumentarStock: jest.fn()
     };
 
     item = new ItemPedido(mockProducto, 3, 200);

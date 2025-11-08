@@ -7,15 +7,16 @@ describe('Clase Producto', () => {
 
   beforeEach(() => {
     producto = new Producto(
-      'Vendedor1',
-      'Remera',
-      'Remera negra de algodon',
-      ['Ropa', 'Hombre'],
-      1000,
-      'ARS',
-      10,
-      ['foto1.jpg'],
-      true
+      null,  // id
+      'Vendedor1',  // vendedor
+      'Remera',  // titulo
+      'Remera negra de algodon',  // descripcion
+      ['Ropa', 'Hombre'],  // categorias
+      1000,  // precio
+      'ARS',  // moneda
+      10,  // stock
+      ['foto1.jpg'],  // fotos
+      true  // activo
     );
   });
 
@@ -34,7 +35,7 @@ describe('Clase Producto', () => {
   });
 
   test('Reducir el stock', () => {
-    producto.reducirStock(3);
+    producto.disminuirStock(3);
     expect(producto.stock).toBe(7);
   });
 

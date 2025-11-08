@@ -4,25 +4,52 @@ import Home from './features/home/Home';
 import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage';
 import Checkout from './features/checkout/checkout';
 import Cart from './features/carrito/Cart';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 //import { CartProvider } from './context/CartContext';
 
 function App() {
 
-  const [carrito, setCarrito] = useState([]);
+  // Cargar carrito desde localStorage al inicializar
+  const [carrito, setCarrito] = useState(() => {
+    try {
+      const carritoGuardado = localStorage.getItem('carrito');
+      return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+    } catch (error) {
+      console.error('Error al cargar carrito desde localStorage:', error);
+      return [];
+    }
+  });
+
+  // Guardar carrito en localStorage cada vez que cambie
+  useEffect(() => {
+    try {
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+    } catch (error) {
+      console.error('Error al guardar carrito en localStorage:', error);
+    }
+  }, [carrito]);
+
+  // Normalizar producto para asegurar que siempre tenga 'id'
+  const normalizarProducto = (producto) => {
+    return {
+      ...producto,
+      id: producto.id || producto._id
+    };
+  };
 
   const actualizarCarrito = (producto) => {
-    const productoExistente = carrito.find(item => item.id === producto.id);
+    const productoNormalizado = normalizarProducto(producto);
+    const productoExistente = carrito.find(item => item.id === productoNormalizado.id);
     if (productoExistente) {
       setCarrito(
       carrito.map(item =>
-        item.id === producto.id
-        ? { ...item, cantidad: item.cantidad + (producto.cantidad) }
+        item.id === productoNormalizado.id
+        ? { ...item, cantidad: item.cantidad + (productoNormalizado.cantidad) }
         : item
       )
       );
     } else {
-      setCarrito([...carrito, { ...producto, cantidad: producto.cantidad || 1 }]);
+      setCarrito([...carrito, { ...productoNormalizado, cantidad: productoNormalizado.cantidad || 1 }]);
     }
   };
 

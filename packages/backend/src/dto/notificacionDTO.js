@@ -22,10 +22,10 @@ export function notificacionesToDTO(notificaciones) {
 
 export function notificacionDocADominio(notiDoc) {
     return new Notificacion (
-        notiDoc.id,
         notiDoc.receptorId.id,
         notiDoc.mensaje,
         notiDoc.leida,
-        notiDoc.fechaAlta
+        notiDoc.fechaAlta,
+        notiDoc.id
     )
 }

@@ -14,12 +14,12 @@ export class Notificacion{
     leida;
     fechaLeida;
 
-    constructor(id, receptorId, mensaje, leida = false, fechaAlta = new Date()) {
-        this.id = id
+    constructor(receptorId, mensaje, leida = false, fechaAlta = new Date(), id = null) {
         this.receptorId = receptorId;
         this.mensaje = mensaje;
-        this.fechaAlta = fechaAlta;
         this.leida = leida;
+        this.fechaAlta = fechaAlta;
+        this.id = id;
         this.fechaLeida = null;
     }
 
