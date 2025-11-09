@@ -70,6 +70,7 @@ export class ProductoRepository {
 
         const items = await ProductoModel
         .find(mongoFilters)
+        .populate('vendedor')
         .sort(sort)
         .skip(skip)
         .limit(limit)

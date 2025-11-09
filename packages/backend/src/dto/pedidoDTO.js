@@ -10,15 +10,15 @@ export function pedidoToDTO(pedido) {
     const items = pedido.itemsPedido || pedido.items || [];
 
     return {
-        id: pedido._id || pedido.id,
+        id: pedido._id,
         comprador: {
-            id: pedido.comprador?.id || pedido.usuarioId,
+            id: pedido.comprador?._id || pedido.usuarioId,
             nombre: pedido.comprador?.nombre,
             email: pedido.comprador?.email
         },
         items: items.map(item => ({
             producto: {
-                id: item.producto?.id || item.productoId,
+                id: item.producto?._id || item.productoId,
                 titulo: item.producto?.titulo,
                 descripcion: item.producto?.descripcion,
                 precio: item.producto?.precio || item.precioUnitario,

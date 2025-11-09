@@ -4,7 +4,7 @@ import { Usuario } from "../models/entities/usuario.js"
 
 export function productoToDTO(producto) {
     return {
-        id: producto._id || producto.id,
+        id: producto._id,
         titulo: producto.titulo,
         descripcion: producto.descripcion,
         precio: producto.precio,
@@ -15,7 +15,7 @@ export function productoToDTO(producto) {
         fotos: producto.fotos || [],
         activo: producto.activo !== false,
         vendedor: producto.vendedor ? {
-            id: producto.vendedor._id || producto.vendedor.id || producto.vendedor,
+            id: producto.vendedor._id?.toString() || producto.vendedor.id || producto.vendedor,
             nombre: producto.vendedor.nombre,
             email: producto.vendedor.email
         } : null,

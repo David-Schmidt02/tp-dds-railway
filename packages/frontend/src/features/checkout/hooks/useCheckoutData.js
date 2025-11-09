@@ -69,10 +69,9 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   const prepararItemsPedido = () => {
     console.log('Carrito en prepararItemsPedido:', carrito);
     return carrito.map(producto => {
-      const id = producto.id || producto._id;
-      console.log('Producto:', producto, 'ID extraído:', id);
+      console.log('Producto:', producto, 'ID extraído:', producto.id);
       return {
-        productoId: id,
+        productoId: producto.id,
         cantidad: producto.cantidad || 1
       };
     });

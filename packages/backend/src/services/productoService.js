@@ -72,7 +72,7 @@ export class ProductoService {
     
     async obtenerProductoPorId(id) {
         try {
-            return await this.productoRepository.obtenerProductoPorId(id, session);
+            return await this.productoRepository.obtenerProductoPorId(id);
         } catch (error) {
             console.error('Error al obtener producto por ID:', error.message);
             throw error;
@@ -81,7 +81,7 @@ export class ProductoService {
 
     async verificarStockDisponible(idProducto) {
         try {
-            return await this.productoRepository.obtenerStockDisponible(idProducto, session);
+            return await this.productoRepository.obtenerStockDisponible(idProducto);
         } catch (error) {
             console.error('Error al verificar stock:', error.message);
             throw error;

@@ -2,9 +2,9 @@ import { Notificacion } from "../models/entities/notificacion.js"
 
 export function notificacionToDTO(notificacion) {
     return {
-        id: notificacion._id || notificacion.id,
+        id: notificacion._id,
         receptor: {
-            id: notificacion.receptor?.id || notificacion.receptorId || notificacion.usuarioId,
+            id: notificacion.receptor?._id || notificacion.receptorId || notificacion.usuarioId,
             nombre: notificacion.receptor?.nombre,
             email: notificacion.receptor?.email
         },

@@ -2,7 +2,7 @@ import { Usuario, TipoUsuario } from '../models/entities/usuario.js'
 
 export function usuarioToDTO(usuario) {
     return {
-        id: usuario._id || usuario.id,
+        id: usuario._id,
         nombre: usuario.nombre,
         email: usuario.email,
         telefono: usuario.telefono || null,
@@ -16,7 +16,7 @@ export function usuarioSimpleDTO(usuario) {
     if (!usuario) return null;
 
     return {
-        id: usuario._id || usuario.id,
+        id: usuario._id,
         nombre: usuario.nombre || 'N/A',
         email: usuario.email || 'N/A'
     };

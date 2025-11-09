@@ -70,7 +70,7 @@ export class ProductoController {
             } = req.query;
 
 
-            const filters = {} 
+            const filters = {}
             if (idVendedor) filters.vendedor = idVendedor;
             if (min) filters.min = min;
             if (max) filters.max = max;
@@ -94,6 +94,16 @@ export class ProductoController {
                 items: resultado.items.map(productoToDTO)
             });
         }catch(error){
+            next(error);
+        }
+    }
+
+    async obtenerProductoPorId(req, res, next) {
+        try {
+            const { id } = req.params;
+            const producto = await this.productoService.obtenerProductoPorId(id);
+            res.status(200).json(productoToDTO(producto));
+        } catch (error) {
             next(error);
         }
     }

@@ -29,27 +29,18 @@ function App() {
     }
   }, [carrito]);
 
-  // Normalizar producto para asegurar que siempre tenga 'id'
-  const normalizarProducto = (producto) => {
-    return {
-      ...producto,
-      id: producto.id || producto._id
-    };
-  };
-
   const actualizarCarrito = (producto) => {
-    const productoNormalizado = normalizarProducto(producto);
-    const productoExistente = carrito.find(item => item.id === productoNormalizado.id);
+    const productoExistente = carrito.find(item => item.id === producto.id);
     if (productoExistente) {
       setCarrito(
-      carrito.map(item =>
-        item.id === productoNormalizado.id
-        ? { ...item, cantidad: item.cantidad + (productoNormalizado.cantidad) }
-        : item
-      )
+        carrito.map(item =>
+          item.id === producto.id
+            ? { ...item, cantidad: item.cantidad + (producto.cantidad) }
+            : item
+        )
       );
     } else {
-      setCarrito([...carrito, { ...productoNormalizado, cantidad: productoNormalizado.cantidad || 1 }]);
+      setCarrito([...carrito, { ...producto, cantidad: producto.cantidad || 1 }]);
     }
   };
 
@@ -62,11 +53,10 @@ function App() {
   };
 
   const actualizarCantidadCarrito = (producto) => {
-    const productoNormalizado = normalizarProducto(producto);
     setCarrito(
       carrito.map(item =>
-        item.id === productoNormalizado.id
-          ? { ...item, cantidad: productoNormalizado.cantidad }
+        item.id === producto.id
+          ? { ...item, cantidad: producto.cantidad }
           : item
       )
     );

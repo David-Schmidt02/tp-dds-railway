@@ -1,31 +1,59 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import axios from 'axios'
 import './ProductoDetailPage.css'
 
 const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const navigate = useNavigate();
-
   const location = useLocation();
+  const { id } = useParams();
 
   // Estados
   const [cantidad, setcantidad] = useState(1);
   const [mainPhoto, setMainPhoto] = useState('');
-
-  // Obtener el producto del state del router
-  const item = location.state?.producto;
-  
-  console.log('Item keys:', item ? Object.keys(item) : 'No item');
-  console.log('Item._id:', item?._id);
-  console.log('Item.id:', item?.id);
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Reset cantidad y foto principal cuando cambia el producto
-    setcantidad(1);
-    if (item) setMainPhoto(item.fotos?.[0] || '');
-  }, [item]);
+    const fetchProducto = async () => {
+      try {
+        setLoading(true);
+        // Si viene del state y tiene datos completos (fotos array), úsalo
+        if (location.state?.producto?.fotos && Array.isArray(location.state.producto.fotos)) {
+          setItem(location.state.producto);
+          setMainPhoto(location.state.producto.fotos[0] || '');
+          setLoading(false);
+        } else {
+          // Si no, fetch del backend
+          const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+          const response = await axios.get(`${API_BASE_URL}/productos/${id}`);
+          setItem(response.data);
+          setMainPhoto(response.data.fotos?.[0] || '');
+          setLoading(false);
+        }
+        setcantidad(1);
+      } catch (err) {
+        console.error('Error al cargar producto:', err);
+        setError(err);
+        setLoading(false);
+      }
+    };
 
-  // Mostrar error si no se encuentra el producto
-  if (!item) {
+    fetchProducto();
+  }, [id, location.state]);
+
+  if (loading) {
+    return (
+      <div className="item-detalles-page">
+        <div className="error-container">
+          <p>Cargando producto...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !item) {
     return (
       <div className="item-detalles-page">
         <div className="error-container">
@@ -47,7 +75,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   };
 
   const crearItemCarrito = () => ({
-    id: item._id || item.id,
+    id: item.id,
     titulo: item.titulo,
     precio: item.precio,
     moneda: item.moneda,
@@ -123,7 +151,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
         {/* Sección de información */}
         <div className="item-info">
           <h1 className="item-titulo">{item.titulo}</h1>
-          <div className="item-vendedor">Vendido por: {item.vendedor}</div>
+          <div className="item-vendedor">Vendido por: {item.vendedor?.nombre || item.vendedor?.id || 'Desconocido'}</div>
           
           {/* Tags de categorías */}
           {item.categorias && item.categorias.length > 0 && (

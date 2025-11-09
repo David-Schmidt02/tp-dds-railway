@@ -28,28 +28,15 @@ const ProductoCard = ({ id, nombre, imagen, precio, producto, actualizarCarrito}
 		<div className="wrapper">
 			<div className="container">
 				<div className="top">
-					<Link 
-						to={`/producto/${id}`} 
-						state={{ 
-							producto: {
-								_id: String(producto._id),
-								titulo: String(producto.titulo),
-								descripcion: String(producto.descripcion || ''),
-								precio: Number(producto.precio),
-								moneda: String(producto.moneda || 'ARS'),
-								stock: Number(producto.stock || 0),
-								fotos: Array.isArray(producto.fotos) ? producto.fotos : [],
-								categorias: Array.isArray(producto.categorias) ? producto.categorias : [],
-								vendedor: String(producto.vendedor || ''),
-								activo: Boolean(producto.activo)
-							}
-						}}
+					<Link
+						to={`/producto/${id}`}
+						state={{ producto }}
 						style={{ textDecoration: 'none', color: 'inherit' }}
 					>
-						<img 
-							src={Array.isArray(imagen) ? imagen[0] : imagen} 
-							alt={nombre} 
-							className="producto-image" 
+						<img
+							src={Array.isArray(imagen) ? imagen[0] : imagen}
+							alt={nombre}
+							className="producto-image"
 						/>
 					</Link>
 				</div>

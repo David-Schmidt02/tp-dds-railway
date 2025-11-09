@@ -7,7 +7,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 const CartItem = ({ producto, onIncrease, onDecrease, onDelete }) => {
   return (
     <div className="cart-item">
-      <Link to={`/producto/${producto.id}`} className="item-image-link">
+      <Link to={`/producto/${producto.id}`} state={{ producto }} className="item-image-link">
         <div className="item-image">
           <img
             src={producto.foto}
@@ -18,7 +18,7 @@ const CartItem = ({ producto, onIncrease, onDecrease, onDelete }) => {
       </Link>
 
       <div className="item-details">
-        <Link to={`/producto/${producto.id}`} className="item-title-link">
+        <Link to={`/producto/${producto.id}`} state={{ producto }} className="item-title-link">
           <h3>{producto.titulo || producto.nombre}</h3>
         </Link>
         <p className="item-price-unit">${producto.precio.toLocaleString('es-AR')}</p>

@@ -8,20 +8,17 @@ const Grid = ({productos, actualizarCarrito}) => {
 	return (
 		<div className="grid-container">
 			{productos && productos.length > 0 ? (
-				productos.map((producto, index) => {
-					const productoId = producto._id || producto.id || index;
-					
-					// Validar que las props sean del tipo correcto
+				productos.map((producto) => {
 					const props = {
-						key: productoId,
-						id: productoId,
+						key: producto.id,
+						id: producto.id,
 						nombre: String(producto.titulo || ''),
 						imagen: producto.fotos || [],
 						precio: Number(producto.precio) || 0,
 						producto: producto,
 						actualizarCarrito: actualizarCarrito
 					};
-					
+
 					return <ProductoCard {...props} />;
 				})
 			) : (
