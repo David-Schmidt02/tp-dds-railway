@@ -6,14 +6,15 @@ body {
 
 .banner-area {
   background-image: url(../../../public/images/ropaGenerica.png);
-  background-size: cover;           /* cubre todo el ancho sin deformar */
-  background-position: center;      /* centra la imagen */
-  height: 60vh;                     /* altura del banner */
+  background-size: cover;
+  background-position: center;
+  height: 60vh;
   width: 100%;
   display: flex;
-  align-items: flex-end;            /* coloca el texto cerca del borde inferior */
-  justify-content: center;          /* centra horizontalmente el texto */
+  align-items: flex-end;
+  justify-content: center;
   position: relative;
+  margin-top: 70px;
 }
 
 .banner-text {

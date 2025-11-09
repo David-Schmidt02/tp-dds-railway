@@ -2,7 +2,8 @@
 .item-detalles-page {
   background: #f5f6f7;
   padding: 20px;
-  min-height: calc(100vh - 70px);
+  padding-top: 90px;
+  min-height: 100vh;
   font-family: Inter, "Helvetica Neue", Arial, sans-serif;
   color: #1f2937;
 }
@@ -192,7 +193,7 @@
 .cantidad-btn:disabled { opacity: .55; cursor: not-allowed; }
 .cantidad-value { min-width:34px; text-align:center; font-weight:800; }
 
-/* Botones principales ocupan todo el ancho de la columna de info */
+/* Botones principales - Clase base */
 .btn {
   display: inline-flex;
   justify-content: center;
@@ -204,17 +205,41 @@
   border: none;
   width: 100%;
   font-size: 15px;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
+
+/* Botón primario (Agregar al carrito) */
 .agregar-al-carrito-btn {
   background: #111827;
   color: #fff;
-  border-color: #111827;
+  border: 2px solid #111827;
 }
-.agregar-al-carrito-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.agregar-al-carrito-btn:hover:not(:disabled) {
+  background: #1f2937;
+  border-color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 24, 39, 0.3);
+}
+
+.agregar-al-carrito-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botón secundario (Comprar ahora) */
 .comprar-ahora-btn {
   background: transparent;
   color: #0b79ff;
   border: 2px solid #0b79ff;
+}
+
+.comprar-ahora-btn:hover:not(:disabled) {
+  background: #0b79ff;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 121, 255, 0.3);
 }
 
 /* Cajas de info adicionales (delivery/returns) estilo */
@@ -241,13 +266,30 @@
 
 /* Contenedor error */
 .error-container {
-  max-width:720px;
+  max-width: 720px;
   margin: 40px auto;
-  background:#fff;
-  padding:28px;
-  border-radius:12px;
-  text-align:center;
+  background: #fff;
+  padding: 28px;
+  border-radius: 12px;
+  text-align: center;
   box-shadow: 0 8px 24px rgba(16,24,40,0.05);
+}
+
+.error-container h2 {
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 1.8rem;
+}
+
+.error-container p {
+  color: #666;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+
+.error-container .btn {
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 /* -------------------------

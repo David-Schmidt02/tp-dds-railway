@@ -31,7 +31,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
         <div className="error-container">
           <h2>Producto no encontrado</h2>
           <p>El producto que buscás no existe.</p>
-          <button onClick={() => navigate('/')} className="comprar-ahora-btn">
+          <button onClick={() => navigate('/')} className="btn agregar-al-carrito-btn">
             Volver al inicio
           </button>
         </div>

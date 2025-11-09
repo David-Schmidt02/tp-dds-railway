@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './features/layout/Layout';
 import Home from './features/home/Home';
 import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage';
-import Checkout from './features/checkout/checkout';
+import Checkout from './features/checkout/Checkout';
 import Cart from './features/carrito/Cart';
 import { useState, useEffect } from 'react';
 //import { CartProvider } from './context/CartContext';
@@ -58,8 +58,19 @@ function App() {
   };
 
   const eliminarDelCarrito = (id) => {
-  setCarrito(carrito.filter(producto => producto.id !== id));
-};
+    setCarrito(carrito.filter(producto => producto.id !== id));
+  };
+
+  const actualizarCantidadCarrito = (producto) => {
+    const productoNormalizado = normalizarProducto(producto);
+    setCarrito(
+      carrito.map(item =>
+        item.id === productoNormalizado.id
+          ? { ...item, cantidad: productoNormalizado.cantidad }
+          : item
+      )
+    );
+  };
 
   return (
       <BrowserRouter>
@@ -70,21 +81,22 @@ function App() {
                   carrito={carrito}
                   actualizarCarrito={actualizarCarrito}
              />} />
-            <Route 
-              path="/cart" 
+            <Route
+              path="/cart"
               element={
-                <Cart 
+                <Cart
                   carrito={carrito}
                   eliminarDelCarrito={eliminarDelCarrito}
-                />} 
+                  actualizarCarrito={actualizarCantidadCarrito}
+                />}
             />
-            <Route 
-              path="/checkout" 
+            <Route
+              path="/checkout/*"
               element={
-                <Checkout 
+                <Checkout
                   carrito={carrito}
                   limpiarCarrito={limpiarCarrito}
-                />} 
+                />}
             />
           </Route>
         </Routes>
