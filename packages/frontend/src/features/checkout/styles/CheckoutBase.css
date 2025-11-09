@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+:root {
+  --checkout-bg: #f4f1ec;
+  --checkout-card-bg: #f8f5f1;
+  --checkout-white: #ffffff;
+  --checkout-blue: #123458;
+  --checkout-red: #e32121;
+  --checkout-green: #a2e198;
+  --checkout-text: #1f1c19;
+  --checkout-gray: #8c8680;
+}
+
+.checkout-root {
+  background-color: var(--checkout-bg);
+  min-height: 100vh;
+  padding: 80px 20px;
+}
+
+.checkout-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.checkout-header {
+  color: var(--checkout-text);
+  padding-bottom: 32px;
+}
+
+.checkout-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 44px;
+  letter-spacing: 6px;
+  font-family: 'Bebas Neue', cursive;
+}
+
+.step-indicators {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.step-chip {
+  text-decoration: none;
+  background: transparent;
+  color: var(--checkout-text);
+  border: 2px solid var(--checkout-text);
+  border-radius: 999px;
+  padding: 6px 22px;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px;
+  letter-spacing: 1px;
+  transition: background 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.step-chip.active {
+  background-color: var(--checkout-green);
+  border-color: var(--checkout-green);
+}
+
+.step-chip.completed {
+  background-color: rgba(162, 225, 152, 0.35);
+}
+
+.step-chip.disabled,
+.step-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.step-chip:hover {
+  transform: translateY(-1px);
+}
+
+.divider {
+  flex: 1;
+  max-width: 70px;
+  height: 2px;
+  background-color: var(--checkout-text);
+}
+
+.checkout-content {
+  background-color: var(--checkout-card-bg);
+  border-radius: 36px;
+  padding: 48px;
+  box-shadow: 0 25px 45px rgba(31, 28, 25, 0.08);
+}

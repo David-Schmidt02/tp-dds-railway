@@ -35,6 +35,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [pedidoId, setPedidoId] = useState(null);
+  const [pedidoCreado, setPedidoCreado] = useState(null);
 
   // Funciones de cálculo
   const calcularTotal = () => {
@@ -96,7 +97,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   };
 
   const obtenerUsuarioId = () => {
-    return "507f1f77bcf86cd799439011"; // ObjectId válido hardcodeado
+    return "690ec5610179aefbee3e53b1"; // ObjectId válido hardcodeado
   };
 
   const construirPedidoData = (usuarioId) => {
@@ -106,35 +107,6 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
       moneda: 'PESO_ARG',
       direccionEntrega: prepararDireccionEntrega()
     };
-  };
-
-  // Guardar datos adicionales en localStorage
-  const guardarDatosUsuarioAdicionales = () => {
-    const datosAdicionales = {
-      datosPersonales: {
-        nombre: datos.nombre,
-        apellido: datos.apellido,
-        email: datos.email,
-        telefono: datos.telefono
-      },
-      metodoPago: {
-        tipo: metodoPago,
-        ...(metodoPago === 'tarjeta' && {
-          datosAdicionales: {
-            tipoTarjeta: datosTarjeta.tipoTarjeta,
-            numeroTarjeta: datosTarjeta.numeroTarjeta.replace(/\s/g, ''),
-            nombreTitular: datosTarjeta.nombreTitular,
-            fechaVencimiento: datosTarjeta.fechaVencimiento
-          }
-        })
-      },
-      direccionCompleta: {
-        ...direccion
-      }
-    };
-
-    localStorage.setItem('datosCheckout', JSON.stringify(datosAdicionales));
-    return datosAdicionales;
   };
 
   // Crear pedido
@@ -148,6 +120,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
       const pedidoCreado = await postPedido(pedidoData);
 
       setPedidoId(pedidoCreado.id);
+      setPedidoCreado(pedidoCreado);
       setPedidoConfirmado(true);
       limpiarCarrito();
 
@@ -157,15 +130,21 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     } catch (error) {
       console.error('Error al crear pedido:', error);
 
-      let mensajeError = 'Error al procesar el pedido. Por favor intente nuevamente.';
+      const respuesta = error.response?.data;
+      const mensajeBackend =
+        typeof respuesta === 'string'
+          ? respuesta
+          : respuesta?.message || respuesta?.error;
 
-      if (error.message.includes('400')) {
-        mensajeError = 'Datos del pedido inválidos. Verifique la información ingresada.';
-      } else if (error.message.includes('401')) {
-        mensajeError = 'No tiene autorización para realizar esta operación.';
-      } else if (error.message.includes('500')) {
-        mensajeError = 'Error interno del servidor. Intente más tarde.';
-      }
+      const mensajeError =
+        mensajeBackend ||
+        (error.message.includes('400')
+          ? 'Datos del pedido inválidos. Verifique la información ingresada.'
+          : error.message.includes('401')
+          ? 'No tiene autorización para realizar esta operación.'
+          : error.message.includes('500')
+          ? 'Error interno del servidor. Intente más tarde.'
+          : 'Error al procesar el pedido. Por favor intente nuevamente.');
 
       alert(mensajeError);
       throw error;
@@ -186,6 +165,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     setDatosTarjeta,
     pedidoConfirmado,
     pedidoId,
+    pedidoCreado,
 
     // Validaciones
     paso1Completo,
@@ -199,7 +179,6 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     calcularImpuestos,
 
     // Funciones
-    handleCrearPedido,
-    guardarDatosUsuarioAdicionales
+    handleCrearPedido
   };
 };

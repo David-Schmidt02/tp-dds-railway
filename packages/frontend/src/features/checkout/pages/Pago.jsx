@@ -1,6 +1,14 @@
 import React from 'react';
-import { TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl, Checkbox } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import CheckoutInput from '../components/ui/CheckoutInput';
+import CheckoutButton from '../components/ui/CheckoutButton';
+import CheckoutCheckbox from '../components/ui/CheckoutCheckbox';
+
+const paymentOptions = [
+  { value: 'tarjeta', label: 'Tarjeta de crédito / débito' },
+  { value: 'transferencia', label: 'Transferencia bancaria' },
+  { value: 'efectivo', label: 'Efectivo / Pago en ventanilla' }
+];
 
 const Pago = ({
   metodoPago,
@@ -13,155 +21,128 @@ const Pago = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleNext = () => {
-    navigate('/checkout/revision');
+  const handleNext = () => navigate('/checkout/revision');
+  const handleBack = () => navigate('/checkout/direccion');
+
+  const formatCardNumber = (valor) => {
+    const limpio = valor.replace(/\s/g, '').replace(/\D/g, '');
+    const visible = limpio.replace(/(\d{4})(?=\d)/g, '$1 ');
+    return limpio.length <= 16 ? visible : datosTarjeta.numeroTarjeta;
   };
 
-  const handleBack = () => {
-    navigate('/checkout/direccion');
+  const formatExpiry = (valor) => {
+    const limpio = valor.replace(/\D/g, '').slice(0, 4);
+    if (limpio.length <= 2) return limpio;
+    return `${limpio.slice(0, 2)}/${limpio.slice(2, 4)}`;
   };
+
+  const handleCardField = (field, value) => {
+    setDatosTarjeta({ ...datosTarjeta, [field]: value });
+  };
+
+  const cardDetails = metodoPago !== 'tarjeta' ? null : (
+    <div className="card-details">
+      <div className="card-type-selection">
+        {['credito', 'debito'].map((tipo) => (
+          <label key={tipo} className={`checkout-radio small ${datosTarjeta.tipoTarjeta === tipo ? 'checked' : ''}`}>
+            <input
+              type="radio"
+              value={tipo}
+              checked={datosTarjeta.tipoTarjeta === tipo}
+              onChange={e => handleCardField('tipoTarjeta', e.target.value)}
+            />
+            <span>{tipo === 'credito' ? 'Crédito' : 'Débito'}</span>
+          </label>
+        ))}
+      </div>
+
+      <div className="card-form">
+        <CheckoutInput
+          label="Número de tarjeta"
+          id="numero-tarjeta"
+          value={datosTarjeta.numeroTarjeta}
+          onChange={e => handleCardField('numeroTarjeta', formatCardNumber(e.target.value))}
+          placeholder="1234 5678 9012 3456"
+          maxLength={19}
+        />
+
+        <CheckoutInput
+          label="Nombre del titular"
+          id="nombre-titular"
+          value={datosTarjeta.nombreTitular}
+          onChange={e => handleCardField('nombreTitular', e.target.value.toUpperCase())}
+          placeholder="JUAN PÉREZ"
+        />
+
+        <div className="card-row">
+          <CheckoutInput
+            label="Fecha de vencimiento"
+            id="fecha-vencimiento"
+            value={datosTarjeta.fechaVencimiento}
+            onChange={e => handleCardField('fechaVencimiento', formatExpiry(e.target.value))}
+            placeholder="MM/AA"
+            maxLength={5}
+            className="form-field-half"
+          />
+
+          <CheckoutInput
+            label="Código de seguridad"
+            id="codigo-seguridad"
+            value={datosTarjeta.codigoSeguridad}
+            onChange={e => handleCardField('codigoSeguridad', e.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder="123"
+            className="form-field-half"
+          />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="payment-section">
-      <h2>ELIGE TU MÉTODO DE PAGO</h2>
+      <h2>ELEGÍ TU MÉTODO DE PAGO</h2>
 
-      <FormControl component="fieldset" className="payment-methods">
-        <RadioGroup
-          value={metodoPago}
-          onChange={(e) => setMetodoPago(e.target.value)}
-        >
-          <FormControlLabel
-            value="tarjeta"
-            control={<Radio />}
-            label="Tarjeta de crédito o débito"
-            className="payment-option"
-          />
-
-          {metodoPago === 'tarjeta' && (
-            <div className="card-details">
-              <div className="card-type-selection">
-                <FormControl component="fieldset" className="card-type-radio">
-                  <RadioGroup
-                    row
-                    value={datosTarjeta.tipoTarjeta}
-                    onChange={(e) => setDatosTarjeta({ ...datosTarjeta, tipoTarjeta: e.target.value })}
-                  >
-                    <FormControlLabel
-                      value="credito"
-                      control={<Radio size="small" />}
-                      label="Crédito"
-                      className="card-type-option"
-                    />
-                    <FormControlLabel
-                      value="debito"
-                      control={<Radio size="small" />}
-                      label="Débito"
-                      className="card-type-option"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-
-              <div className="card-form">
-                <TextField
-                  label="Número de tarjeta"
-                  fullWidth
-                  margin="normal"
-                  value={datosTarjeta.numeroTarjeta}
-                  onChange={(e) => {
-                    const valor = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
-                    const valorFormateado = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
-                    if (valor.length <= 16) {
-                      setDatosTarjeta({ ...datosTarjeta, numeroTarjeta: valorFormateado });
-                    }
-                  }}
-                  placeholder="1234 5678 9012 3456"
-                  inputProps={{ maxLength: 19 }}
-                  className="card-field"
-                />
-
-                <TextField
-                  label="Nombre del titular"
-                  fullWidth
-                  margin="normal"
-                  value={datosTarjeta.nombreTitular}
-                  onChange={(e) => setDatosTarjeta({ ...datosTarjeta, nombreTitular: e.target.value.toUpperCase() })}
-                  placeholder="JUAN PÉREZ"
-                  className="card-field"
-                />
-
-                <div className="card-row">
-                  <TextField
-                    label="Fecha de vencimiento"
-                    margin="normal"
-                    value={datosTarjeta.fechaVencimiento}
-                    onChange={(e) => {
-                      const valor = e.target.value.replace(/\D/g, '');
-                      let valorFormateado = valor;
-                      if (valor.length >= 2) {
-                        valorFormateado = valor.substring(0, 2) + '/' + valor.substring(2, 4);
-                      }
-                      if (valor.length <= 4) {
-                        setDatosTarjeta({ ...datosTarjeta, fechaVencimiento: valorFormateado });
-                      }
-                    }}
-                    placeholder="MM/YY"
-                    inputProps={{ maxLength: 5 }}
-                    className="card-field-half"
-                  />
-
-                  <TextField
-                    label="Código de seguridad"
-                    margin="normal"
-                    value={datosTarjeta.codigoSeguridad}
-                    onChange={(e) => {
-                      const valor = e.target.value.replace(/\D/g, '');
-                      if (valor.length <= 4) {
-                        setDatosTarjeta({ ...datosTarjeta, codigoSeguridad: valor });
-                      }
-                    }}
-                    placeholder="123"
-                    inputProps={{ maxLength: 4, type: 'password' }}
-                    className="card-field-half"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          <FormControlLabel
-            value="transferencia"
-            control={<Radio />}
-            label="Transferencia bancaria"
-            className="payment-option"
-          />
-          <FormControlLabel
-            value="efectivo"
-            control={<Radio />}
-            label="Efectivo / Pago en ventanilla"
-            className="payment-option"
-          />
-        </RadioGroup>
-      </FormControl>
+      <div className="payment-methods">
+        {paymentOptions.map(option => (
+          <div key={option.value} className="payment-option">
+            <label className={`checkout-radio ${metodoPago === option.value ? 'checked' : ''}`}>
+              <input
+                type="radio"
+                value={option.value}
+                checked={metodoPago === option.value}
+                onChange={e => setMetodoPago(e.target.value)}
+              />
+              <span>{option.label}</span>
+            </label>
+            {option.value === 'tarjeta' && cardDetails}
+          </div>
+        ))}
+      </div>
 
       <div className="terms-notice">
-        <p>POR FAVOR METES LOS DATOS DE LA TARJETA (GENÉRICO)</p>
+        <p>Por acá cargás los datos de la tarjeta (genérico).</p>
       </div>
 
       <div className="form-checkbox">
-        <FormControlLabel
-          control={<Checkbox checked={aceptaTerminos} onChange={(e) => setAceptaTerminos(e.target.checked)} />}
+        <CheckoutCheckbox
+          id="acepta-terminos"
           label="Acepto términos y condiciones"
+          checked={aceptaTerminos}
+          onChange={e => setAceptaTerminos(e.target.checked)}
         />
       </div>
 
       <div className="form-actions">
-        <Button variant="outlined" onClick={handleBack} className="back-button">
+        <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
           ATRÁS
-        </Button>
-        <Button variant="contained" disabled={!paso3Completo} onClick={handleNext} className="next-button">
+        </CheckoutButton>
+        <CheckoutButton
+          type="button"
+          disabled={!paso3Completo}
+          onClick={handleNext}
+        >
           AVANZAR
-        </Button>
+        </CheckoutButton>
       </div>
     </div>
   );

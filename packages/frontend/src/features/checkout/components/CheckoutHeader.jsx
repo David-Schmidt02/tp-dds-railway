@@ -1,18 +1,32 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const CheckoutHeader = () => {
+const CheckoutHeader = ({ stepAccess = {} }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
 
   const pasos = [
-    { nombre: 'Usuario', ruta: '/checkout/usuario' },
-    { nombre: 'Direccion', ruta: '/checkout/direccion' },
-    { nombre: 'Pago', ruta: '/checkout/pago' },
-    { nombre: 'Revision', ruta: '/checkout/revision' }
+    { nombre: 'Usuario', ruta: '/checkout/usuario', slug: 'usuario' },
+    { nombre: 'Direccion', ruta: '/checkout/direccion', slug: 'direccion' },
+    { nombre: 'Pago', ruta: '/checkout/pago', slug: 'pago' },
+    { nombre: 'Revision', ruta: '/checkout/revision', slug: 'revision' }
   ];
 
-  const pasoActualIndex = pasos.findIndex(p => path.includes(p.ruta.split('/')[2]));
+  const pasoActualIndex = pasos.findIndex(p => path.includes(p.slug));
+  const indexActivo = pasoActualIndex === -1 ? pasos.length - 1 : pasoActualIndex;
+  const checkoutFinalizado = path.includes('exito');
+
+  const canAccess = (index) => {
+    if (index === 0) return true;
+    const slug = pasos[index].slug;
+    return Boolean(stepAccess[slug]);
+  };
+
+  const handleStepClick = (paso, index) => {
+    if (!canAccess(index)) return;
+    navigate(paso.ruta);
+  };
 
   return (
     <div className="checkout-header">
@@ -20,9 +34,18 @@ const CheckoutHeader = () => {
       <div className="step-indicators">
         {pasos.map((paso, index) => (
           <React.Fragment key={paso.nombre}>
-            <span className={`step ${pasoActualIndex >= index ? 'active' : ''} ${path.includes('exito') ? 'completed' : ''}`}>
-              {paso.nombre}
-            </span>
+            <button
+              type="button"
+              className={`step-chip ${
+                checkoutFinalizado || index < indexActivo ? 'completed' : ''
+              } ${index === indexActivo && !checkoutFinalizado ? 'active' : ''} ${
+                canAccess(index) ? '' : 'disabled'
+              }`}
+              onClick={() => handleStepClick(paso, index)}
+              disabled={!canAccess(index)}
+            >
+              <span>{paso.nombre}</span>
+            </button>
             {index < pasos.length - 1 && <span className="divider"></span>}
           </React.Fragment>
         ))}

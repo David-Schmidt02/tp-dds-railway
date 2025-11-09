@@ -1,0 +1,75 @@
+.summary-section {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.summary-content {
+  display: flex;
+  gap: 32px;
+}
+
+.summary-left {
+  flex: 1;
+  background-color: var(--checkout-white);
+  border-radius: 32px;
+  padding: 36px;
+  box-shadow: 0 25px 45px rgba(31, 28, 25, 0.05);
+}
+
+.summary-block {
+  border: 1px solid #e8e2db;
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 24px;
+  background-color: var(--checkout-card-bg);
+}
+
+.summary-block h3 {
+  margin: 0 0 16px 0;
+  font-size: 22px;
+  font-family: 'Bebas Neue', cursive;
+  letter-spacing: 1px;
+}
+
+.summary-block p {
+  margin: 4px 0;
+  color: var(--checkout-text);
+}
+
+.summary-right {
+  width: 320px;
+}
+
+.price-summary {
+  background-color: var(--checkout-blue);
+  color: var(--checkout-white);
+  border-radius: 32px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.price-summary h3 {
+  margin: 0 0 10px 0;
+  font-size: 26px;
+  letter-spacing: 1px;
+  font-family: 'Bebas Neue', cursive;
+}
+
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.price-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 26px;
+  font-weight: 700;
+}

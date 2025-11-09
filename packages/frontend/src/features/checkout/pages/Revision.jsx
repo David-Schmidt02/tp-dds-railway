@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import CheckoutButton from '../components/ui/CheckoutButton';
 import CheckoutSummary from '../components/CheckoutSummary';
 
 const Revision = ({
@@ -15,13 +15,12 @@ const Revision = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    navigate('/checkout/pago');
-  };
-
+  const handleBack = () => navigate('/checkout/pago');
   const handleConfirmar = async () => {
     await handleCrearPedido();
   };
+
+  const tarjetaSeleccionada = metodoPago === 'tarjeta';
 
   return (
     <div className="summary-section">
@@ -31,15 +30,15 @@ const Revision = ({
 
           <div className="summary-block">
             <h3>DIRECCIÓN DE ENTREGA</h3>
-            <p>{direccion.calle} {direccion.numero}</p>
-            <p>{direccion.ciudad}, {direccion.provincia} {direccion.codigoPostal}</p>
+            <p>{`${direccion.calle} ${direccion.numero}`.trim()}</p>
+            <p>{`${direccion.ciudad || ''}${direccion.ciudad ? ',' : ''} ${direccion.provincia || ''} ${direccion.codigoPostal || ''}`.trim()}</p>
             {direccion.departamento && <p>Depto: {direccion.departamento}</p>}
             {direccion.referencias && <p>Ref: {direccion.referencias}</p>}
           </div>
 
           <div className="summary-block">
             <h3>MÉTODO DE PAGO</h3>
-            {metodoPago === 'tarjeta' ? (
+            {tarjetaSeleccionada ? (
               <>
                 <p>Tarjeta de {datosTarjeta.tipoTarjeta === 'credito' ? 'crédito' : 'débito'}</p>
                 <p>**** **** **** {datosTarjeta.numeroTarjeta.slice(-4)}</p>
@@ -47,18 +46,22 @@ const Revision = ({
                 <p>Vence: {datosTarjeta.fechaVencimiento}</p>
               </>
             ) : (
-              <p>{metodoPago === 'transferencia' ? 'Transferencia bancaria' : 'Efectivo / Pago en ventanilla'}</p>
+              <p>
+                {metodoPago === 'transferencia'
+                  ? 'Transferencia bancaria'
+                  : 'Efectivo / Pago en ventanilla'}
+              </p>
             )}
-            <p>Acepta términos y condiciones</p>
+            <p>Acepto términos y condiciones</p>
           </div>
 
           <div className="form-actions">
-            <Button variant="outlined" onClick={handleBack} className="back-button">
+            <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
               ATRÁS
-            </Button>
-            <Button variant="contained" onClick={handleConfirmar} className="confirm-button">
+            </CheckoutButton>
+            <CheckoutButton variant="danger" type="button" onClick={handleConfirmar}>
               ACEPTAR
-            </Button>
+            </CheckoutButton>
           </div>
         </div>
 

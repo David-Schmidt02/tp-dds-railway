@@ -1,0 +1,40 @@
+@media (max-width: 900px) {
+  .checkout-content {
+    padding: 32px 24px;
+  }
+
+  .summary-content {
+    flex-direction: column;
+  }
+
+  .summary-right {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 600px) {
+  .checkout-root {
+    padding: 40px 12px;
+  }
+
+  .checkout-content,
+  .form-section,
+  .payment-section,
+  .summary-section {
+    padding: 24px;
+  }
+
+  .card-row,
+  .form-row {
+    flex-direction: column;
+  }
+
+  .step-indicators {
+    flex-wrap: wrap;
+  }
+}

@@ -1,25 +1,30 @@
 import React from 'react';
 
-const CheckoutSummary = ({ calcularSubtotal, calcularEnvio, calcularImpuestos, calcularTotal }) => {
+const CheckoutSummary = ({
+  calcularSubtotal,
+  calcularEnvio,
+  calcularImpuestos,
+  calcularTotal
+}) => {
+  const rows = [
+    { label: 'Subtotal', value: calcularSubtotal() },
+    { label: 'Envío', value: calcularEnvio() },
+    { label: 'Impuestos', value: calcularImpuestos() }
+  ];
+
   return (
     <div className="summary-right">
       <div className="price-summary">
         <h3>PAGO TOTAL</h3>
-        <div className="price-line">
-          <span>Subtotal</span>
-          <span>${calcularSubtotal().toFixed(2)}</span>
-        </div>
-        <div className="price-line">
-          <span>Envío/ID:</span>
-          <span>${calcularEnvio().toFixed(2)}</span>
-        </div>
-        <div className="price-line">
-          <span>Impuestos/ID:</span>
-          <span>${calcularImpuestos().toFixed(2)}</span>
-        </div>
+        {rows.map((row) => (
+          <div key={row.label} className="price-line">
+            <span>{row.label}</span>
+            <span>${row.value.toFixed(2)}</span>
+          </div>
+        ))}
         <div className="price-total">
-          <span><strong>Total</strong></span>
-          <span><strong>${calcularTotal().toFixed(2)}</strong></span>
+          <span>Total</span>
+          <span>${calcularTotal().toFixed(2)}</span>
         </div>
       </div>
     </div>

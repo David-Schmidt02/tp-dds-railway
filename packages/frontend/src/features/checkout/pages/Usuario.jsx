@@ -1,6 +1,8 @@
 import React from 'react';
-import { TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import CheckoutInput from '../components/ui/CheckoutInput';
+import CheckoutButton from '../components/ui/CheckoutButton';
+import CheckoutCheckbox from '../components/ui/CheckoutCheckbox';
 
 const Usuario = ({ datos, setDatos, paso1Completo }) => {
   const navigate = useNavigate();
@@ -13,52 +15,49 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
     <div className="form-section">
       <h2>INTRODUCE TUS DATOS</h2>
       <div className="form-grid">
-        <TextField
+        <CheckoutInput
           label="Nombre"
-          fullWidth
-          margin="normal"
+          id="nombre"
           value={datos.nombre}
           onChange={e => setDatos({ ...datos, nombre: e.target.value })}
-          className="form-field"
         />
-        <TextField
+        <CheckoutInput
           label="Apellido"
-          fullWidth
-          margin="normal"
+          id="apellido"
           value={datos.apellido}
           onChange={e => setDatos({ ...datos, apellido: e.target.value })}
-          className="form-field"
         />
-        <TextField
+        <CheckoutInput
           label="Email"
+          id="email"
           type="email"
-          fullWidth
-          margin="normal"
           value={datos.email}
           onChange={e => setDatos({ ...datos, email: e.target.value })}
-          className="form-field"
         />
-        <TextField
+        <CheckoutInput
           label="Teléfono"
-          fullWidth
-          margin="normal"
+          id="telefono"
+          type="tel"
           value={datos.telefono}
           onChange={e => setDatos({ ...datos, telefono: e.target.value })}
-          className="form-field"
         />
       </div>
 
       <div className="form-checkbox">
-        <FormControlLabel
-          control={<Checkbox />}
+        <CheckoutCheckbox
+          id="guardar-datos"
           label="Guardar mis datos"
         />
       </div>
 
       <div className="form-actions">
-        <Button variant="contained" disabled={!paso1Completo} onClick={handleNext} className="next-button">
+        <CheckoutButton
+          type="button"
+          disabled={!paso1Completo}
+          onClick={handleNext}
+        >
           AVANZAR
-        </Button>
+        </CheckoutButton>
       </div>
     </div>
   );

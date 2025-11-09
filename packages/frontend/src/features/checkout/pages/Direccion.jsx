@@ -1,95 +1,97 @@
 import React from 'react';
-import { TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import CheckoutInput from '../components/ui/CheckoutInput';
+import CheckoutButton from '../components/ui/CheckoutButton';
+import CheckoutSelect from '../components/ui/CheckoutSelect';
+
+const ciudades = [
+  { value: 'Buenos Aires', label: 'Buenos Aires' },
+  { value: 'Cordoba', label: 'Córdoba' },
+  { value: 'Rosario', label: 'Rosario' },
+  { value: 'La Plata', label: 'La Plata' }
+];
+
+const provincias = [
+  { value: 'Buenos Aires', label: 'Buenos Aires' },
+  { value: 'Cordoba', label: 'Córdoba' },
+  { value: 'Santa Fe', label: 'Santa Fe' },
+  { value: 'Mendoza', label: 'Mendoza' }
+];
 
 const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
   const navigate = useNavigate();
 
-  const handleNext = () => {
-    navigate('/checkout/pago');
-  };
-
-  const handleBack = () => {
-    navigate('/checkout/usuario');
-  };
+  const handleNext = () => navigate('/checkout/pago');
+  const handleBack = () => navigate('/checkout/usuario');
 
   return (
     <div className="form-section">
       <h2>DAR DIRECCIÓN DE ENTREGA</h2>
       <div className="form-grid">
-        <TextField
+        <CheckoutInput
           label="Calle"
-          fullWidth
-          margin="normal"
+          id="calle"
           value={direccion.calle}
           onChange={e => setDireccion({ ...direccion, calle: e.target.value })}
-          className="form-field"
         />
-        <TextField
+        <CheckoutInput
           label="Altura"
-          fullWidth
-          margin="normal"
+          id="altura"
           value={direccion.numero}
           onChange={e => setDireccion({ ...direccion, numero: e.target.value })}
-          className="form-field"
         />
         <div className="form-row">
-          <TextField
+          <CheckoutInput
             label="Piso / Departamento"
-            margin="normal"
+            id="departamento"
             value={direccion.departamento}
             onChange={e => setDireccion({ ...direccion, departamento: e.target.value })}
             className="form-field-half"
           />
-          <TextField
+          <CheckoutInput
             label="Código postal"
-            margin="normal"
+            id="codigo-postal"
             value={direccion.codigoPostal}
             onChange={e => setDireccion({ ...direccion, codigoPostal: e.target.value })}
             className="form-field-half"
           />
         </div>
-        <FormControl fullWidth margin="normal" className="form-field">
-          <InputLabel>Localidad</InputLabel>
-          <Select
-            value={direccion.ciudad}
-            onChange={e => setDireccion({ ...direccion, ciudad: e.target.value })}
-          >
-            <MenuItem value="Buenos Aires">Buenos Aires</MenuItem>
-            <MenuItem value="Córdoba">Córdoba</MenuItem>
-            <MenuItem value="Rosario">Rosario</MenuItem>
-            <MenuItem value="La Plata">La Plata</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin="normal" className="form-field">
-          <InputLabel>Provincia</InputLabel>
-          <Select
-            value={direccion.provincia}
-            onChange={e => setDireccion({ ...direccion, provincia: e.target.value })}
-          >
-            <MenuItem value="Buenos Aires">Buenos Aires</MenuItem>
-            <MenuItem value="Córdoba">Córdoba</MenuItem>
-            <MenuItem value="Santa Fe">Santa Fe</MenuItem>
-            <MenuItem value="Mendoza">Mendoza</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
+
+        <CheckoutSelect
+          label="Localidad"
+          id="ciudad"
+          value={direccion.ciudad}
+          onChange={e => setDireccion({ ...direccion, ciudad: e.target.value })}
+          options={ciudades}
+        />
+
+        <CheckoutSelect
+          label="Provincia"
+          id="provincia"
+          value={direccion.provincia}
+          onChange={e => setDireccion({ ...direccion, provincia: e.target.value })}
+          options={provincias}
+        />
+
+        <CheckoutInput
           label="Referencias"
-          fullWidth
-          margin="normal"
+          id="referencias"
           value={direccion.referencias}
           onChange={e => setDireccion({ ...direccion, referencias: e.target.value })}
-          className="form-field"
         />
       </div>
 
       <div className="form-actions">
-        <Button variant="outlined" onClick={handleBack} className="back-button">
+        <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
           ATRÁS
-        </Button>
-        <Button variant="contained" disabled={!paso2Completo} onClick={handleNext} className="next-button">
+        </CheckoutButton>
+        <CheckoutButton
+          type="button"
+          disabled={!paso2Completo}
+          onClick={handleNext}
+        >
           AVANZAR
-        </Button>
+        </CheckoutButton>
       </div>
     </div>
   );

@@ -10,7 +10,6 @@ const Grid = ({productos, actualizarCarrito}) => {
 			{productos && productos.length > 0 ? (
 				productos.map((producto) => {
 					const props = {
-						key: producto.id,
 						id: producto.id,
 						nombre: String(producto.titulo || ''),
 						imagen: producto.fotos || [],
@@ -19,7 +18,7 @@ const Grid = ({productos, actualizarCarrito}) => {
 						actualizarCarrito: actualizarCarrito
 					};
 
-					return <ProductoCard {...props} />;
+					return <ProductoCard key={producto.id} {...props} />;
 				})
 			) : (
 				<p>No hay productos</p>
