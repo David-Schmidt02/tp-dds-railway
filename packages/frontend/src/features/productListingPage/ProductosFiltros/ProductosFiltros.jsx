@@ -11,13 +11,21 @@ const categorias = [
     'Calzado',
 ];
 
+const vendedores = [
+    'Vendedor 1',
+    'Vendedor 2',
+    'Vendedor 3',
+    'Vendedor 4',
+    'Vendedor 5',
+];
+
 const precios = [
     { label: 'Menos de $1000', value: 'menos-1000' },
     { label: '$1000 - $5000', value: '1000-5000' },
     { label: 'Más de $5000', value: 'mas-5000' },
 ];
 
-function ProductosFiltros({ filtros, handleFiltroChange }) {
+function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiarFiltros }) {
     
     const handleCategoriaChange = (categoria) => {
         const categoriasActuales = filtros.categorias || [];
@@ -28,6 +36,14 @@ function ProductosFiltros({ filtros, handleFiltroChange }) {
         handleFiltroChange('categorias', nuevasCategorias);
     };
 
+    const handleVendedorChange = (vendedor) => {
+        const vendedoresActuales = filtros.vendedores || [];
+        const nuevosVendedores = vendedoresActuales.includes(vendedor)
+            ? vendedoresActuales.filter(ven => ven !== vendedor)
+            : [...vendedoresActuales, vendedor];
+        
+        handleFiltroChange('vendedores', nuevosVendedores);
+    };
 
     const handlePrecioChange = (tipo, valor) => {
     const valorNumerico = valor ? parseFloat(valor) : '';
@@ -71,7 +87,7 @@ function ProductosFiltros({ filtros, handleFiltroChange }) {
                                     sx={{
                                         color: '#030303',
                                         '&.Mui-checked': {
-                                            color: '#007bff',
+                                            color: '#0f345cff',
                                         },
                                     }}
                                 />
@@ -81,6 +97,40 @@ function ProductosFiltros({ filtros, handleFiltroChange }) {
                         />
                     ))}
                 </FormGroup>
+            </div>
+
+            <div className="filtros-seccion">
+                <label className="filtros-label">Vendedores:</label>
+                <FormGroup>
+                    {vendedores.map((ven) => (
+                        <FormControlLabel
+                            key={ven}
+                            control={
+                                <Checkbox
+                                    checked={filtros.vendedores?.includes(ven) || false}
+                                    onChange={() => handleVendedorChange(ven)}
+                                    sx={{
+                                        color: '#030303',
+                                        '&.Mui-checked': {
+                                            color: '#0f345cff',
+                                        },
+                                    }}
+                                />
+                            }
+                            label={ven}
+                            className="filtros-checkbox-label"
+                        />
+                    ))}
+                </FormGroup>
+            </div>
+
+            <div className="filtros-botones">
+                <button className="btn btn-buscar" onClick={aplicarFiltros}>
+                    Buscar
+                </button>
+                <button className="btn btn-limpiar" onClick={limpiarFiltros}>
+                    Limpiar
+                </button>
             </div>
         </div>
     );

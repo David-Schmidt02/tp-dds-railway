@@ -12,18 +12,19 @@ import Stack from '@mui/material/Stack';
 const ProductListingPage = ({ actualizarCarrito }) => {
   const location = useLocation();
   const [productos, setProductos] = useState();
-  const [filtros, setFiltros] = useState({
-
+  const [filtrosAplicados, setFiltrosAplicados] = useState({
     nombre: '',
     descripcion: '',
     precioMin: '',
     precioMax: '',
     categorias: [],
+    vendedores: [],
     vendedor: '',
     page: 1,
     limit: 10,
     ordenar: ''
   });
+  const [filtrosTemp, setFiltrosTemp] = useState({ ...filtrosAplicados });
 
     const cargarProductos = async ({ filtros }) => {
         const productosCargados = await getProductos(filtros);
@@ -31,40 +32,69 @@ const ProductListingPage = ({ actualizarCarrito }) => {
         setProductos(productosCargados)
     }
   
-    // Para que cuando se monte el componente los cargue
+    // Solo se dispara cuando se aplican los filtros
     useEffect(() => {
-        cargarProductos({ filtros });
-    }, [filtros]);
+        console.log("Filtros aplicados:", filtrosAplicados);
+        cargarProductos({ filtros: filtrosAplicados });
+    }, [filtrosAplicados]);
     
+  const aplicarFiltros = () => {
+    setFiltrosAplicados({ ...filtrosTemp, page: 1 });
+  };
 
   const limpiarFiltros = () => {
-    setFiltros({
-      busqueda: '',
+    const filtrosVacios = {
+      nombre: '',
+      descripcion: '',
       precioMin: '',
       precioMax: '',
       categorias: [],
+      vendedores: [],
+      vendedor: '',
+      page: 1,
+      limit: 10,
       ordenar: ''
-    });
+    };
+    setFiltrosTemp(filtrosVacios);
+    setFiltrosAplicados(filtrosVacios);
   };
 
   const handleFiltroChange = (tipo, valor) => {
-    setFiltros(prev => ({
-      ...prev,
-      [tipo]: valor
-    }));
+    // Ordenar y página se aplican directamente
+    if (tipo === 'ordenar' || tipo === 'page') {
+      setFiltrosAplicados(prev => ({
+        ...prev,
+        [tipo]: valor
+      }));
+      setFiltrosTemp(prev => ({
+        ...prev,
+        [tipo]: valor
+      }));
+    } else {
+      // Categorías y precios se guardan temporalmente
+      setFiltrosTemp(prev => ({
+        ...prev,
+        [tipo]: valor
+      }));
+    }
   };
 
   return (      
     <div className="ProductListingPage">
         <div className="products-main">
             <div className="filters-sidebar">
-                <ProductosFiltros filtros={filtros} handleFiltroChange={handleFiltroChange} />
+                <ProductosFiltros 
+                    filtros={filtrosTemp} 
+                    handleFiltroChange={handleFiltroChange}
+                    aplicarFiltros={aplicarFiltros}
+                    limpiarFiltros={limpiarFiltros}
+                />
             </div>
             <div className="products-content">
                 <div className="parte-arriba">
                     <h1>NUESTROS PRODUCTOS</h1>
                     <SortSelect 
-                    value={filtros.ordenar}
+                    value={filtrosAplicados.ordenar}
                     onChange={handleFiltroChange}                  
                     />
                 </div> 
@@ -74,7 +104,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
         <Stack spacing={2} alignItems="center" sx={{ marginTop: 3 }}>
             <Pagination 
                 count={10} 
-                page={filtros.page}
+                page={filtrosAplicados.page}
                 onChange={(event, value) => handleFiltroChange('page', value)}
                 color="primary" 
             />

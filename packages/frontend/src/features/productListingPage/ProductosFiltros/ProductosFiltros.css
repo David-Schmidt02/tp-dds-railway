@@ -1,23 +1,17 @@
-:root {
-  --bg: #F1EFEC;
-  --sand: #D4C9BE;
-  --navy: #123458;
-  --ink: #030303;
-  --muted: #6b7280;
-}
+
 
 .filtros-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   font-family: "Inter", system-ui, sans-serif;
-  color: var(--ink);
+  color: var(--color-black);
 }
 
 .filtros-titulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--color-black);
   margin: 0;
   letter-spacing: 0.03em;
 }
@@ -31,19 +25,12 @@
 .filtros-label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--muted);
-}
-
-
-.filtros-precio {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: #6b7280;
 }
 
 .filtros-precio {
   display: flex;
-  flex-direction: column; /* uno debajo del otro */
+  flex-direction: column;
   gap: 0.6rem;
 }
 
@@ -53,9 +40,9 @@
   padding: 0 0.8rem;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-  background-color: #fff;
+  background-color: var(--color-white);
   font-size: 0.95rem;
-  color: var(--ink);
+  color: var(--color-black);
   transition: all 0.2s ease;
 }
 
@@ -66,43 +53,58 @@
   margin: 0;
 }
 .filtros-precio input[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
 .filtros-precio input:focus {
   outline: none;
-  border-color: var(--navy);
-  box-shadow: 0 0 0 2px rgba(18, 52, 88, 0.15);
-}
-
-.filtros-precio input:focus {
-  outline: none;
-  border-color: var(--navy);
+  border-color: var(--color-blue-dark);
   box-shadow: 0 0 0 2px rgba(18, 52, 88, 0.15);
 }
 
 .filtros-precio-separador {
-  color: var(--muted);
+  color: #6b7280;
   font-weight: 600;
 }
 
 /* Checkboxes */
 .filtros-checkbox-label {
   font-size: 0.9rem;
-  color: var(--ink);
+  color: var(--color-black);
 }
 
 /* Hover del label */
 .filtros-checkbox-label:hover {
-  color: var(--navy);
+  color: var(--color-blue-dark);
 }
 
-.filtros-precio input::-webkit-outer-spin-button,
-.filtros-precio input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.filtros-precio input[type=number] {
-  -moz-appearance: textfield;
+.filtros-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
+.btn-buscar {
+  background: var(--color-blue-dark);
+  color: var(--color-white);
+  border: 1px solid var(--color-blue-dark);
+}
+
+.btn-buscar:hover {
+  background: var(--color-btn-primary-blue);
+  transform: translateY(-1px);
+}
+
+.btn-limpiar {
+  background: transparent;
+  color: var(--color-blue-dark);
+  border: 1px solid var(--color-blue-dark);
+}
+
+.btn-limpiar:hover {
+  background: var(--color-rojo-no-disponible);
+  color: var(--color-white);
+  transform: translateY(-1px);
+}
