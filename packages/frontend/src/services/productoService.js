@@ -2,9 +2,8 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
-export const getProductos = async (filtros) => {
+export const getProductos = async (filtros = {}) => {
     try {
-        // Mapear nombres del frontend a los que espera el backend
         const params = {
             min: filtros.precioMin,
             max: filtros.precioMax,

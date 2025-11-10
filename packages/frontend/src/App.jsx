@@ -5,7 +5,6 @@ import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage
 import Checkout from './features/checkout/checkout';
 import Cart from './features/carrito/Cart';
 import ProductListingPage from './features/productListingPage/ProductListingPage';
-import ProductosFiltrados from './features/productosFiltrados/ProductosFiltrados';
 import { useState, useEffect } from 'react';
 //import { CartProvider } from './context/CartContext';
 
@@ -97,7 +96,6 @@ function App() {
                   actualizarCarrito={actualizarCarrito}
                 />}
             />
-            <Route path="/productosFiltrados" element={<ProductosFiltrados/>} />
           </Route>
         </Routes>
       </BrowserRouter>

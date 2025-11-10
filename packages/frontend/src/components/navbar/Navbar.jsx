@@ -24,7 +24,7 @@ const Navbar = ({ carrito }) => {
     e.preventDefault();
     const query = texto.trim();
     if (query.length > 0) {
-      navigate(`/productosFiltrados?q=${encodeURIComponent(query)}`);
+      navigate(`/productos?q=${encodeURIComponent(query)}`);
     }
   };
   
