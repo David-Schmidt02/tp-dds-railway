@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import './Navbar.css'
 import { TextField } from '@mui/material';
 
-// FontAwesome
-import '../../fontawesome/fontawesome.js';
 import { FaSearch, FaShoppingCart, FaUserAlt } from 'react-icons/fa'
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';

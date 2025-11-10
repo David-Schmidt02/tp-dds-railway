@@ -2,23 +2,23 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import "./productoCard.css";
 
-const ProductoCard = ({ id, nombre, imagen, precio, producto, actualizarCarrito}) => {
+const ProductoCard = ({ producto, actualizarCarrito}) => {
 	const [isAdded, setIsAdded] = useState(false);
 
 	const crearItemCarrito = () => {
 		return {
-			id: id,
-			titulo: nombre,
-			precio: precio,
+			id: producto.id,
+			titulo: producto.titulo,
+			precio: producto.precio,
 			cantidad: 1,
-			foto: Array.isArray(imagen) ? imagen[0] : imagen
+			foto: producto.fotos[0]
 		};
 	};
 
 	const handleAgregarAlCarrito = () => {
 		const itemCarrito = crearItemCarrito();
 		actualizarCarrito(itemCarrito);
-		console.log(`Agregando 1 unidad de ${nombre} al carrito`);
+		console.log(`Agregando 1 unidad de ${producto.titulo} al carrito`);
 
 		setIsAdded(true);
   		setTimeout(() => setIsAdded(false), 3000);
@@ -29,13 +29,12 @@ const ProductoCard = ({ id, nombre, imagen, precio, producto, actualizarCarrito}
 			<div className="container">
 				<div className="top">
 					<Link
-						to={`/producto/${id}`}
+						to={`/producto/${producto.id}`}
 						state={{ producto }}
-						style={{ textDecoration: 'none', color: 'inherit' }}
 					>
 						<img
-							src={Array.isArray(imagen) ? imagen[0] : imagen}
-							alt={nombre}
+							src={producto.fotos[0] }
+							alt={producto.titulo}
 							className="producto-image"
 						/>
 					</Link>
@@ -43,8 +42,8 @@ const ProductoCard = ({ id, nombre, imagen, precio, producto, actualizarCarrito}
 				<div className={`bottom ${isAdded ? 'clicked' : ''}`}>
 					<div className="left">
 						<div className="details">
-							<h1>{String(nombre)}</h1>
-							<p>${String(precio)}</p>
+							<h1>{String(producto.titulo)}</h1>
+							<p>${String(producto.precio)}</p>
 						</div>
 						<div className="buy" onClick={handleAgregarAlCarrito}>
 							<i className="material-icons">add_shopping_cart</i>
@@ -55,7 +54,7 @@ const ProductoCard = ({ id, nombre, imagen, precio, producto, actualizarCarrito}
 							<i className="material-icons">done</i>
 						</div>
 						<div className="details">
-							<h1>{String(nombre)}</h1>
+							<h1>{String(producto.titulo)}</h1>
 							<p>Agregado al carrito</p>
 						</div>
 					</div>

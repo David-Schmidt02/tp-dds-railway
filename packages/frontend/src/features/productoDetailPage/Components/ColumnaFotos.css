@@ -1,0 +1,123 @@
+/* ===== COLUMNA FOTOS - SECCIÓN IMAGEN ===== */
+.seccion-imagen {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* -------------------------
+   COLUMNA MINIATURAS
+   ------------------------- */
+.columna-miniaturas {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  padding-top: 6px;
+}
+
+.minuatura-btn {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  padding: 8px;
+  border-radius: 8px;
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.minuatura-btn:hover {
+  border-color: rgba(11, 79, 160, 0.2);
+  box-shadow: 0 4px 12px rgba(11, 79, 160, 0.08);
+}
+
+.minuatura-activa { 
+  box-shadow: 0 10px 28px rgba(11, 79, 160, 0.12); 
+  border-color: rgba(11, 79, 160, 0.12); 
+}
+
+.minuatura-img { 
+  max-width: 100%; 
+  max-height: 100%; 
+  object-fit: cover; 
+  border-radius: 6px; 
+}
+
+/* -------------------------
+   IMAGEN PRINCIPAL
+   ------------------------- */
+.contenedor-imagen-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px solid #f0f2f4;
+  padding: 28px;
+  min-height: 520px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.imagen-principal {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+/* -------------------------
+   RESPONSIVE
+   ------------------------- */
+@media (max-width: 1080px) {
+  .seccion-imagen { 
+    grid-template-columns: 64px 1fr; 
+    gap: 18px; 
+  }
+  .contenedor-imagen-principal { 
+    min-height: 440px; 
+  }
+}
+
+@media (max-width: 880px) {
+  .seccion-imagen {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .columna-miniaturas { 
+    flex-direction: row; 
+    gap: 8px; 
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0 4px;
+  }
+  
+  .minuatura-btn { 
+    width: 56px; 
+    height: 56px; 
+    flex-shrink: 0;
+  }
+  
+  .contenedor-imagen-principal { 
+    min-height: 420px; 
+  }
+}
+
+@media (max-width: 520px) {
+  .contenedor-imagen-principal { 
+    min-height: 300px; 
+    padding: 14px; 
+  }
+  
+  .minuatura-btn {
+    width: 48px;
+    height: 48px;
+  }
+}

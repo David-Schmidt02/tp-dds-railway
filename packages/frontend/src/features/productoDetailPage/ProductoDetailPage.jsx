@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import axios from 'axios'
 import './ProductoDetailPage.css'
+import ColumnaFotos from './Components/ColumnaFotos'
 
 const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const navigate = useNavigate();
@@ -10,40 +10,24 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
 
   // Estados
   const [cantidad, setcantidad] = useState(1);
-  const [mainPhoto, setMainPhoto] = useState('');
+  const [fotoprincipal, setFotoprincipal] = useState('');
   const [item, setItem] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProducto = async () => {
-      try {
-        setLoading(true);
-        // Si viene del state y tiene datos completos (fotos array), úsalo
-        if (location.state?.producto?.fotos && Array.isArray(location.state.producto.fotos)) {
-          setItem(location.state.producto);
-          setMainPhoto(location.state.producto.fotos[0] || '');
-          setLoading(false);
-        } else {
-          // Si no, fetch del backend
-          const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
-          const response = await axios.get(`${API_BASE_URL}/productos/${id}`);
-          setItem(response.data);
-          setMainPhoto(response.data.fotos?.[0] || '');
-          setLoading(false);
-        }
-        setcantidad(1);
-      } catch (err) {
-        console.error('Error al cargar producto:', err);
-        setError(err);
-        setLoading(false);
-      }
-    };
+    
+    if (location.state?.producto?.fotos ){
+      setItem(location.state.producto);
+      setFotoprincipal(location.state.producto.fotos[0] || '');
+      setcantidad(1);
+    } else {
+      // Si por alguna razón no viene del state, mostrar error
+      setError(new Error('No se recibieron datos del producto'));
+      setError(false);
+    }
+  }, [location.state]);
 
-    fetchProducto();
-  }, [id, location.state]);
-
-  if (loading) {
+  if (!item) {
     return (
       <div className="item-detalles-page">
         <div className="error-container">
@@ -80,7 +64,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
     precio: item.precio,
     moneda: item.moneda,
     cantidad: cantidad,
-    foto: mainPhoto || item.fotos?.[0],
+    foto: fotoprincipal || item.fotos?.[0],
     stock: item.stock
   });
 
@@ -100,9 +84,9 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
 
   const formatPrecio = (precio, moneda) => {
     return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: moneda || 'ARS',
-      minimumFractionDigits: 0
+      style: 'currency',  // estilo de moneda de formato precio 
+      currency: moneda || 'ARS',  // moneda por defecto ARS
+      minimumFractionDigits: 0  // setea sin decimeales
     }).format(precio);
   };
 
@@ -121,34 +105,15 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   return (
     <div className="item-detalles-page">
       <div className="item-detalles-container">
-        {/* Sección de imágenes (thumbnails + imagen principal) */}
-        <div className="thumbnails-column" role="tablist" aria-label="Miniaturas">
-          {item.fotos?.map((f, idx) => (
-            <button
-              key={idx}
-              className={`thumb-btn ${f === mainPhoto ? 'thumb-active' : ''}`}
-              onClick={() => setMainPhoto(f)}
-              aria-label={`Ver foto ${idx + 1}`}
-              type="button"
-            >
-              <img 
-                src={f} 
-                alt={`${item.titulo} ${idx + 1}`} 
-                className="thumb-img" 
-              />
-            </button>
-          ))}
-        </div>
-
-        <div className="main-image-wrap">
-          <img
-            src={mainPhoto || item.fotos?.[0]}
-            alt={item.titulo}
-            className="item-main-imagen"
-          />
-        </div>
-
-        {/* Sección de información */}
+        
+        
+      <ColumnaFotos
+          fotos={item.fotos || []}
+          fotoprincipal={fotoprincipal}
+          setFotoprincipal={setFotoprincipal}
+          item={item}
+        />
+       
         <div className="item-info">
           <h1 className="item-titulo">{item.titulo}</h1>
           <div className="item-vendedor">Vendido por: {item.vendedor?.nombre || item.vendedor?.id || 'Desconocido'}</div>
