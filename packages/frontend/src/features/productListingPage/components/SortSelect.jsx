@@ -1,4 +1,5 @@
 import React from 'react';
+import './SortSelect.css';
 
 const SortSelect = ({ value, onChange }) => {
   const handleFiltroChange = (tipo, valor) => {
@@ -17,7 +18,6 @@ const SortSelect = ({ value, onChange }) => {
         <option value="precio-asc">Precio Mas Bajo</option>
         <option value="precio-desc">Precio Mas Alto</option>
         <option value="vendidos-asc">Más Vendidos</option>
-        <option value="ultimo-desc">Más Recientes</option>
       </select>
     </div>
   );

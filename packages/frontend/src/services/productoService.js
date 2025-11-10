@@ -2,9 +2,11 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
-export const getProductos = async () => {
+export const getProductos = async (filtros) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/productos`, {headers:{'Cache-Control' : 'no-cache'}});// el header porque si no hubo cambios en el back no los va a mostrar.
+        const response = await axios.get(`${API_BASE_URL}/productos`, {
+            params: { filtros },
+            headers:{'Cache-Control' : 'no-cache'}});// el header porque si no hubo cambios en el back no los va a mostrar.
         console.log(response.data.items);
         return response.data.items;
     } catch (error) {
@@ -54,4 +56,6 @@ export const postPedido = async (pedidoData) => {
         console.log("Error creating pedido: ", error);
         throw error;
     }
+
+    
 }

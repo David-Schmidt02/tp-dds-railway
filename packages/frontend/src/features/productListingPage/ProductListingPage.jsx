@@ -3,17 +3,26 @@ import { useLocation } from 'react-router-dom';
 import './ProductListingPage.css';
 import Grid from '../../components/grid/grid.jsx';
 import { getProductos } from '../../services/productoService.js';
-import SortSelect from './SortSelect';
+import SortSelect from './components/SortSelect.jsx';
+import ProductosFiltros from './ProductosFiltros/ProductosFiltros.jsx';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+
 
 const ProductListingPage = ({ actualizarCarrito }) => {
   const location = useLocation();
   const [productos, setProductos] = useState();
   const [filtros, setFiltros] = useState({
-    busqueda: '',
+
+    nombre: '',
+    descripcion: '',
     precioMin: '',
     precioMax: '',
     categorias: [],
-    ordenar: 'ultimo-desc'
+    vendedor: '',
+    page: 1,
+    limit: 10,
+    ordenar: ''
   });
 
     const cargarProductos = async ({ filtros }) => {
@@ -34,7 +43,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
       precioMin: '',
       precioMax: '',
       categorias: [],
-      ordenar: 'ultimo-desc'
+      ordenar: ''
     });
   };
 
@@ -49,7 +58,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
     <div className="ProductListingPage">
         <div className="products-main">
             <div className="filters-sidebar">
-                <h1>FILTROS</h1>
+                <ProductosFiltros filtros={filtros} handleFiltroChange={handleFiltroChange} />
             </div>
             <div className="products-content">
                 <div className="parte-arriba">
@@ -62,6 +71,14 @@ const ProductListingPage = ({ actualizarCarrito }) => {
             <Grid productos={productos} actualizarCarrito={actualizarCarrito} />
             </div>
         </div>
+        <Stack spacing={2} alignItems="center" sx={{ marginTop: 3 }}>
+            <Pagination 
+                count={10} 
+                page={filtros.page}
+                onChange={(event, value) => handleFiltroChange('page', value)}
+                color="primary" 
+            />
+        </Stack>
     </div>
   )
 };

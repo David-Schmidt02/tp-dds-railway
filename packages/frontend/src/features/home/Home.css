@@ -32,5 +32,57 @@ body {
   font-size: 1.5rem;
 }
 
+/* ==== BOTÓN "VER MÁS" PREMIUM ==== */
+
+.ver-mas-btn {
+  display: block;
+  margin: 40px auto;
+  padding: 12px 40px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #F1EFEC; /* texto claro */
+  background: linear-gradient(135deg, #123458 0%, #030303 100%);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  letter-spacing: 0.6px;
+  box-shadow: 0 4px 12px rgba(3, 3, 3, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.ver-mas-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #D4C9BE 0%, #F1EFEC 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.ver-mas-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.ver-mas-btn:hover::before {
+  opacity: 1;
+}
+
+.ver-mas-btn:hover {
+  color: #030303; /* texto oscuro */
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 16px rgba(3, 3, 3, 0.3);
+}
+
+.ver-mas-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(3, 3, 3, 0.25);
+}
+
 
 

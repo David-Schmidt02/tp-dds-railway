@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 
 import "./Navbar.css";
 import { TextField } from "@mui/material";
-import CategoryIcon from "@mui/icons-material/Category";
 
 import { FaSearch, FaShoppingCart, FaUserAlt } from "react-icons/fa";
 import Badge from "@mui/material/Badge";
@@ -19,6 +18,14 @@ const Navbar = ({ carrito }) => {
     navigate("/cart");
   };
 
+
+  const manejarBusqueda = (e) => {
+    e.preventDefault();
+    const query = texto.trim();
+    if (query.length > 0) {
+      navigate(`/productosFiltrados?q=${encodeURIComponent(query)}`);
+    }
+  };
   
 
   const cantProductosEnCarrito = () => {
@@ -57,20 +64,13 @@ const Navbar = ({ carrito }) => {
             />
           </div>
         </Link>
-        <button
-          className="btn categorias-btn"
-          onClick={() => navigate("/productosFiltrados")}
-          aria-label="Ver categorías"
-        >
-          <CategoryIcon className="navbar-icon" />
-          <span className="categorias-texto">Categorías</span>
-        </button>
       </div>
       <div className="navbar-center">
         <form
           className="search-box"
           role="search"
           aria-label="Buscar productos"
+          onSubmit={manejarBusqueda}
         >
           <TextField
             value={texto}
