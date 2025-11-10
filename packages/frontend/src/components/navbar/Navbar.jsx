@@ -1,34 +1,36 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import './Navbar.css'
-import { TextField } from '@mui/material';
+import "./Navbar.css";
+import { TextField } from "@mui/material";
+import CategoryIcon from "@mui/icons-material/Category";
 
-import { FaSearch, FaShoppingCart, FaUserAlt } from 'react-icons/fa'
-import Badge from '@mui/material/Badge';
-import { useNavigate } from 'react-router-dom';
+import { FaSearch, FaShoppingCart, FaUserAlt } from "react-icons/fa";
+import Badge from "@mui/material/Badge";
+import { useNavigate } from "react-router-dom";
 
-
-const Navbar = ({carrito}) => {
-  const navigate = useNavigate()
+const Navbar = ({ carrito }) => {
+  const navigate = useNavigate();
   const [texto, setTexto] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
 
   const irACarrito = () => {
-    navigate("/cart")
-  }
+    navigate("/cart");
+  };
+
+  
 
   const cantProductosEnCarrito = () => {
     if (!carrito || !Array.isArray(carrito)) {
       return 0;
     }
-    let suma = 0
+    let suma = 0;
     for (const producto of carrito) {
       suma += producto.cantidad || 1; // Si no tiene cantidad, cuenta como 1
     }
     return suma;
-  }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,22 +41,37 @@ const Navbar = ({carrito}) => {
   }, []);
 
   return (
-    <nav className={`navbar ${isScrolled ? "scrolled" : ""}`} aria-label="Navegación principal">
+    <nav
+      className={`navbar ${isScrolled ? "scrolled" : ""}`}
+      aria-label="Navegación principal"
+    >
       <div className="navbar-left">
-        <Link to={`/`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link to={`/`} style={{ textDecoration: "none", color: "inherit" }}>
           <div className="logo" aria-label="Logo de Tienda Sol">
             <img
-              src={'images/tituloTiendaSol.png'}
+              src={"images/tituloTiendaSol.png"}
               alt="Logo de Tienda Sol"
               className="logo-image"
               role="img"
               aria-hidden="false"
             />
           </div>
-        </Link> 
+        </Link>
+        <button
+          className="btn categorias-btn"
+          onClick={() => navigate("/productosFiltrados")}
+          aria-label="Ver categorías"
+        >
+          <CategoryIcon className="navbar-icon" />
+          <span className="categorias-texto">Categorías</span>
+        </button>
       </div>
       <div className="navbar-center">
-        <form className="search-box" role="search" aria-label="Buscar productos">
+        <form
+          className="search-box"
+          role="search"
+          aria-label="Buscar productos"
+        >
           <TextField
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
@@ -78,19 +95,20 @@ const Navbar = ({carrito}) => {
           aria-label="Ver carrito"
           onClick={irACarrito}
         >
-          <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} badgeContent={cantProductosEnCarrito()} color="primary">
-            <FaShoppingCart className='navbar-icon' id="cart-icon" />
+          <Badge
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            badgeContent={cantProductosEnCarrito()}
+            color="primary"
+          >
+            <FaShoppingCart className="navbar-icon" id="cart-icon" />
           </Badge>
         </button>
-        <button
-          className="btn login-btn"
-          aria-label="Ingresar a la cuenta"
-        >
-          <FaUserAlt className='navbar-icon'/>
+        <button className="btn login-btn" aria-label="Ingresar a la cuenta">
+          <FaUserAlt className="navbar-icon" />
         </button>
       </div>
     </nav>
   );
-}
+};
 
-export default Navbar
+export default Navbar;
