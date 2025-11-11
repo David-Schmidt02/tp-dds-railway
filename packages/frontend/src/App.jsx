@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './features/layout/Layout';
 import Home from './features/home/Home';
 import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage';
-import Checkout from './features/checkout/Checkout';
+import Checkout from './features/checkout/checkout';
 import Cart from './features/carrito/Cart';
 import ProductListingPage from './features/productListingPage/ProductListingPage';
 import { useState, useEffect } from 'react';

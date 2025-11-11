@@ -14,11 +14,12 @@ const ProductListingPage = ({ actualizarCarrito }) => {
   const searchParams = new URLSearchParams(location.search);
   const queryParam = searchParams.get('q') || '';
   const categoriaDesdeNavegacion = location.state?.categoriaSeleccionada;
+  const nombreDesdeNavegacion = location.state?.nombreSeleccionado || '';
 
   const [productos, setProductos] = useState([]);
   const [paginacion, setPaginacion] = useState({ totalPages: 1, page: 1, totalItems: 0 });
   const [filtrosAplicados, setFiltrosAplicados] = useState({
-    nombre: '',
+    nombre: nombreDesdeNavegacion ? nombreDesdeNavegacion : '',
     descripcion: '',
     precioMin: '',
     precioMax: '',
@@ -76,6 +77,16 @@ const ProductListingPage = ({ actualizarCarrito }) => {
             }));
         }
     }, [categoriaDesdeNavegacion]);
+
+    useEffect(() => {
+       if (nombreDesdeNavegacion) {
+            setFiltrosTemp(prev => ({
+              ...prev,
+              nombre: nombreDesdeNavegacion,
+              page: 1
+            }));
+        }
+    }, [nombreDesdeNavegacion]);
 
     useEffect(() => {
         // Actualizar filtros cuando cambie el parámetro de búsqueda en la URL
