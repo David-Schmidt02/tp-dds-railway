@@ -1,5 +1,4 @@
-ipor
-
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 /* Contenedor de la página */
 .ProductListingPage {
@@ -35,6 +34,7 @@ ipor
   font-weight: 800;
   color: var(--color-black);
   margin: 0;
+  font-family: "Bebas neue";
 }
 
 /* Sidebar (tarjeta limpia) */
