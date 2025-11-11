@@ -135,9 +135,9 @@ const ProductListingPage = ({ actualizarCarrito }) => {
   };
 
   return (      
-    <div className="ProductListingPage">
+    <div className="ProductListingPage" role="main" aria-labelledby="products-heading">
         <div className="products-main">
-            <div className="filters-sidebar">
+            <div className="filters-sidebar" role="complementary" aria-label="Filtros">
                 <ProductosFiltros 
                     filtros={filtrosTemp} 
                     handleFiltroChange={handleFiltroChange}
@@ -145,10 +145,12 @@ const ProductListingPage = ({ actualizarCarrito }) => {
                     limpiarFiltros={limpiarFiltros}
                 />
             </div>
-            <div className="products-content">
+            <div className="products-content" role="region" aria-labelledby="products-heading" aria-live="polite">
                 <div className="parte-arriba">
-                    <h1>NUESTROS PRODUCTOS</h1>
+                    <h1 id="products-heading">NUESTROS PRODUCTOS</h1>
                     <SortSelect 
+                    id="sort-select"
+                    aria-label="Ordenar productos"
                     value={filtrosAplicados.ordenar}
                     onChange={handleFiltroChange}                  
                     />
@@ -156,15 +158,27 @@ const ProductListingPage = ({ actualizarCarrito }) => {
             <Grid productos={productos} actualizarCarrito={actualizarCarrito} />
             </div>
         </div>
-        <Stack spacing={2} alignItems="center" sx={{ marginTop: 3 }}>
-            <Pagination
-                count={paginacion.totalPages}
-                page={filtrosAplicados.page}
-                onChange={(event, value) => handleFiltroChange('page', value)}
-                color="primary"
-            />
-        </Stack>
+        <div aria-label="Paginación de productos">
+          <Stack spacing={2} alignItems="center" sx={{ marginTop: 3 }}>
+              <Pagination
+                  count={paginacion.totalPages}
+                  page={filtrosAplicados.page}
+                  onChange={(event, value) => handleFiltroChange('page', value)}
+                  color="primary"
+                  aria-label="Paginación"
+                  getItemAriaLabel={(type, page, selected) => {
+                    if (type === 'page') return `${selected ? 'Página actual' : 'Ir a la página'} ${page}`;
+                    if (type === 'first') return 'Ir a la primera página';
+                    if (type === 'last') return 'Ir a la última página';
+                    if (type === 'next') return 'Ir a la página siguiente';
+                    if (type === 'previous') return 'Ir a la página anterior';
+                    return '';
+                  }}
+              />
+          </Stack>
+        </div>
     </div>
+
   )
 };
 
