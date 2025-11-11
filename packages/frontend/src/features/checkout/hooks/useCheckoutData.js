@@ -35,6 +35,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [pedidoId, setPedidoId] = useState(null);
   const [pedidoCreado, setPedidoCreado] = useState(null);
+  const [pedidoError, setPedidoError] = useState(null);
 
   // Funciones de cálculo
   const calcularTotal = () => {
@@ -129,6 +130,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
       const pedidoCreado = await postPedido(pedidoData);
 
+      setPedidoError(null);
       setPedidoId(pedidoCreado.id);
       setPedidoCreado(pedidoCreado);
       setPedidoConfirmado(true);
@@ -156,10 +158,17 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
           ? 'Error interno del servidor. Intente más tarde.'
           : 'Error al procesar el pedido. Por favor intente nuevamente.');
 
-      alert(mensajeError);
-      throw error;
+      setPedidoError({
+        message: mensajeError,
+        detail: respuesta,
+      });
+
+      navigate('/checkout/error');
+      return null;
     }
   };
+
+  const clearPedidoError = () => setPedidoError(null);
 
   return {
     // Estados
@@ -176,6 +185,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     pedidoConfirmado,
     pedidoId,
     pedidoCreado,
+    pedidoError,
 
     // Validaciones
     paso1Completo,
@@ -189,6 +199,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     calcularImpuestos,
 
     // Funciones
-    handleCrearPedido
+    handleCrearPedido,
+    clearPedidoError
   };
 };

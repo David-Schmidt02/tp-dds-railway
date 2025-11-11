@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useCheckoutData } from './hooks/useCheckoutData';
 import CheckoutHeader from './components/CheckoutHeader';
 import SuccessConfirmation from './components/SuccessConfirmation';
+import FailureConfirmation from './components/FailureConfirmation';
 import Usuario from './pages/Usuario';
 import Direccion from './pages/Direccion';
 import Pago from './pages/Pago';
@@ -21,7 +22,8 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
     direccion: checkoutData.paso1Completo,
     pago: checkoutData.paso2Completo,
     revision: checkoutData.paso3Completo,
-    exito: checkoutData.pedidoConfirmado
+    exito: checkoutData.pedidoConfirmado,
+    error: Boolean(checkoutData.pedidoError)
   };
 
   return (
@@ -106,6 +108,20 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
                     pedido={checkoutData.pedidoCreado}
                     calcularTotal={checkoutData.calcularTotal}
                     fallbackDireccion={checkoutData.direccion}
+                  />
+                ) : (
+                  <Navigate to="/checkout/revision" replace />
+                )
+              }
+            />
+
+            <Route
+              path="error"
+              element={
+                stepAccess.error ? (
+                  <FailureConfirmation
+                    error={checkoutData.pedidoError}
+                    onRetry={checkoutData.clearPedidoError}
                   />
                 ) : (
                   <Navigate to="/checkout/revision" replace />
