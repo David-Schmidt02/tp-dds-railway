@@ -17,4 +17,8 @@ export class UsuarioService {
   async obtenerTodosUsuarios() {
     return await this.usuarioRepository.obtenerTodosUsuarios();
   }
+
+  async obtenerVendedores() {
+    return await this.usuarioRepository.obtenerUsuariosPorTipo('VENDEDOR');
+  }
 }

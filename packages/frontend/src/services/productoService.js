@@ -13,10 +13,10 @@ export const getProductos = async (filtros = {}) => {
             page: filtros.page,
             limit: filtros.limit,
             orden: filtros.ordenar,
-            idVendedor: filtros.vendedor
+            idVendedor: filtros.idVendedor,
+            q: filtros.q
         };
-        
-        // Eliminar parámetros vacíos
+
         Object.keys(params).forEach(key => {
             if (params[key] === '' || params[key] === undefined || (Array.isArray(params[key]) && params[key].length === 0)) {
                 delete params[key];
@@ -25,9 +25,12 @@ export const getProductos = async (filtros = {}) => {
         
         const response = await axios.get(`${API_BASE_URL}/productos`, {
             params: params,
-            headers:{'Cache-Control' : 'no-cache'}});// el header porque si no hubo cambios en el back no los va a mostrar.
-        console.log(response.data.items);
-        return response.data.items;
+            headers:{'Cache-Control' : 'no-cache'},
+            paramsSerializer: {
+                indexes: null
+            }
+        });
+        return response.data;
     } catch (error) {
         console.log("Error fetching productos: ", error);
         throw error;
@@ -75,6 +78,28 @@ export const postPedido = async (pedidoData) => {
         console.log("Error creating pedido: ", error);
         throw error;
     }
+}
 
-    
+export const getVendedores = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/vendedores`, {
+            headers: {'Cache-Control': 'no-cache'}
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error fetching vendedores: ", error);
+        throw error;
+    }
+}
+
+export const getCategorias = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/categorias`, {
+            headers: {'Cache-Control': 'no-cache'}
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error fetching categorias: ", error);
+        throw error;
+    }
 }

@@ -12,6 +12,7 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
     app.patch('/pedidos/:idPedido/itemsPedido/:idProducto', pedidoController.cambiarCantidadItem.bind(pedidoController), pedidoErrorHandler)
 
     app.get('/vendedor/:idVendedor/productos', productoController.listarProductosVendedorConFiltros.bind(productoController), productoErrorHandler);
+    app.get('/categorias', productoController.obtenerCategorias.bind(productoController), productoErrorHandler);
     app.get('/productos/:id', productoController.obtenerProductoPorId.bind(productoController), productoErrorHandler);
     app.get('/productos', productoController.productosConFiltros.bind(productoController), productoErrorHandler);
 
@@ -20,5 +21,6 @@ export const configureRoutes = (app, {pedidoController, productoController, noti
 
     app.post('/usuarios', usuarioController.crearUsuario.bind(usuarioController), usuarioErrorHandler);
     app.get('/usuarios', usuarioController.obtenerUsuarios.bind(usuarioController), usuarioErrorHandler);
+    app.get('/vendedores', usuarioController.obtenerVendedores.bind(usuarioController), usuarioErrorHandler);
 
 }

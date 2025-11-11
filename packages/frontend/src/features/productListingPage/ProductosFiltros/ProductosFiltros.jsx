@@ -1,47 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import './ProductosFiltros.css';
-
-
-const categorias = [
-    'Buzo',
-    'Remera',
-    'Pantalones',
-    'Shorts',
-    'Calzado',
-];
-
-const vendedores = [
-    'Vendedor 1',
-    'Vendedor 2',
-    'Vendedor 3',
-    'Vendedor 4',
-    'Vendedor 5',
-];
-
-const precios = [
-    { label: 'Menos de $1000', value: 'menos-1000' },
-    { label: '$1000 - $5000', value: '1000-5000' },
-    { label: 'Más de $5000', value: 'mas-5000' },
-];
+import { getVendedores, getCategorias } from '../../../services/productoService.js';
 
 function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiarFiltros }) {
+    const [categorias, setCategorias] = useState([]);
+    const [vendedores, setVendedores] = useState([]);
+
+    useEffect(() => {
+        const cargarDatos = async () => {
+            try {
+                const categoriasData = await getCategorias();
+                const vendedoresData = await getVendedores();
+                setCategorias(categoriasData.sort((a, b) => a.localeCompare(b)));
+                setVendedores(vendedoresData);
+            } catch (error) {
+                console.error('Error cargando datos de filtros:', error);
+            }
+        };
+        cargarDatos();
+    }, []);
     
     const handleCategoriaChange = (categoria) => {
         const categoriasActuales = filtros.categorias || [];
         const nuevasCategorias = categoriasActuales.includes(categoria)
             ? categoriasActuales.filter(cat => cat !== categoria)
             : [...categoriasActuales, categoria];
-        
+
         handleFiltroChange('categorias', nuevasCategorias);
     };
 
-    const handleVendedorChange = (vendedor) => {
+    const handleVendedorChange = (vendedorId) => {
         const vendedoresActuales = filtros.vendedores || [];
-        const nuevosVendedores = vendedoresActuales.includes(vendedor)
-            ? vendedoresActuales.filter(ven => ven !== vendedor)
-            : [...vendedoresActuales, vendedor];
-        
+        const nuevosVendedores = vendedoresActuales.includes(vendedorId)
+            ? vendedoresActuales.filter(ven => ven !== vendedorId)
+            : [...vendedoresActuales, vendedorId];
+
         handleFiltroChange('vendedores', nuevosVendedores);
     };
 
@@ -92,7 +86,7 @@ function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiar
                                     }}
                                 />
                             }
-                            label={cat}
+                            label={cat.toUpperCase()}
                             className="filtros-checkbox-label"
                         />
                     ))}
@@ -104,11 +98,11 @@ function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiar
                 <FormGroup>
                     {vendedores.map((ven) => (
                         <FormControlLabel
-                            key={ven}
+                            key={ven.id}
                             control={
                                 <Checkbox
-                                    checked={filtros.vendedores?.includes(ven) || false}
-                                    onChange={() => handleVendedorChange(ven)}
+                                    checked={filtros.vendedores?.includes(ven.id) || false}
+                                    onChange={() => handleVendedorChange(ven.id)}
                                     sx={{
                                         color: '#030303',
                                         '&.Mui-checked': {
@@ -117,7 +111,7 @@ function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiar
                                     }}
                                 />
                             }
-                            label={ven}
+                            label={ven.nombre}
                             className="filtros-checkbox-label"
                         />
                     ))}

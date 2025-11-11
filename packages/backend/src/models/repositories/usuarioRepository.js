@@ -19,6 +19,10 @@ export class UsuarioRepository {
         return await UsuarioModel.find();
     }
 
+    async obtenerUsuariosPorTipo(tipoUsuario) {
+        return await UsuarioModel.find({ tipoUsuario });
+    }
+
     async eliminarUsuario(id) {
         const usuario = await UsuarioModel.findByIdAndDelete(id);
         if (!usuario) {

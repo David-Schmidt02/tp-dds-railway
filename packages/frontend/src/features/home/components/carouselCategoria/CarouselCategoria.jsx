@@ -38,8 +38,8 @@ const CarouselCategoria = ({ categories }) => {
                 </div>
             </div>
             <div className="categoria-carousel">
-                {categories.slice(index, index + visible).map((category) =>
-                    <CategoriaItem categoria={category} key={category.id} />
+                {categories.slice(index, index + visible).map((category, idx) =>
+                    <CategoriaItem categoria={category} key={idx} />
                 )}
             </div>
         </div>

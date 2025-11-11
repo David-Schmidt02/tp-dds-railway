@@ -11,18 +11,19 @@ const ciudades = [
   { value: 'La Plata', label: 'La Plata' }
 ];
 
-const provincias = [
-  { value: 'Buenos Aires', label: 'Buenos Aires' },
-  { value: 'Cordoba', label: 'Córdoba' },
-  { value: 'Santa Fe', label: 'Santa Fe' },
-  { value: 'Mendoza', label: 'Mendoza' }
-];
-
 const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
   const navigate = useNavigate();
 
   const handleNext = () => navigate('/checkout/pago');
   const handleBack = () => navigate('/checkout/usuario');
+
+  const getNumericFieldError = (fieldValue) => {
+    if (!fieldValue) return '';
+    if (isNaN(Number(fieldValue)) || Number(fieldValue) <= 0) {
+      return 'Debe ser un número mayor a 0';
+    }
+    return '';
+  };
 
   return (
     <div className="form-section">
@@ -37,8 +38,11 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
         <CheckoutInput
           label="Altura"
           id="altura"
+          type="number"
+          min="1"
           value={direccion.numero}
           onChange={e => setDireccion({ ...direccion, numero: e.target.value })}
+          error={getNumericFieldError(direccion.numero)}
         />
         <div className="form-row">
           <CheckoutInput
@@ -51,9 +55,12 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
           <CheckoutInput
             label="Código postal"
             id="codigo-postal"
+            type="number"
+            min="1"
             value={direccion.codigoPostal}
             onChange={e => setDireccion({ ...direccion, codigoPostal: e.target.value })}
             className="form-field-half"
+            error={getNumericFieldError(direccion.codigoPostal)}
           />
         </div>
 
@@ -63,14 +70,6 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
           value={direccion.ciudad}
           onChange={e => setDireccion({ ...direccion, ciudad: e.target.value })}
           options={ciudades}
-        />
-
-        <CheckoutSelect
-          label="Provincia"
-          id="provincia"
-          value={direccion.provincia}
-          onChange={e => setDireccion({ ...direccion, provincia: e.target.value })}
-          options={provincias}
         />
 
         <CheckoutInput

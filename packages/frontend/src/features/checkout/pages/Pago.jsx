@@ -119,10 +119,6 @@ const Pago = ({
         ))}
       </div>
 
-      <div className="terms-notice">
-        <p>Por acá cargás los datos de la tarjeta (genérico).</p>
-      </div>
-
       <div className="form-checkbox">
         <CheckoutCheckbox
           id="acepta-terminos"

@@ -18,7 +18,6 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     departamento: '',
     codigoPostal: '',
     ciudad: '',
-    provincia: '',
     referencias: ''
   });
 
@@ -52,10 +51,26 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   const calcularImpuestos = () => 0;
 
   // Validaciones por paso
-  const paso1Completo = datos.nombre && datos.apellido && datos.email && datos.telefono;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const telefonoRegex = /^\d{8,15}$/;
 
-  const paso2Completo = direccion.calle && direccion.numero && direccion.ciudad &&
-                        direccion.provincia && direccion.codigoPostal;
+  const paso1Completo = datos.nombre &&
+                        datos.nombre.length >= 2 &&
+                        datos.apellido &&
+                        datos.apellido.length >= 2 &&
+                        datos.email &&
+                        emailRegex.test(datos.email) &&
+                        datos.telefono &&
+                        telefonoRegex.test(datos.telefono);
+
+  const paso2Completo = direccion.calle &&
+                        direccion.numero &&
+                        !isNaN(Number(direccion.numero)) &&
+                        Number(direccion.numero) > 0 &&
+                        direccion.ciudad &&
+                        direccion.codigoPostal &&
+                        !isNaN(Number(direccion.codigoPostal)) &&
+                        Number(direccion.codigoPostal) > 0;
 
   const tarjetaCompleta = metodoPago !== 'tarjeta' || (
     datosTarjeta.numeroTarjeta &&
@@ -80,15 +95,10 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
   const prepararDireccionEntrega = () => {
     console.log('Dirección antes de preparar:', direccion);
-    const [piso, depto] = direccion.departamento
-      ? direccion.departamento.split('/').map(s => s.trim())
-      : [undefined, undefined];
 
     const direccionPreparada = {
       calle: direccion.calle,
       numero: parseInt(direccion.numero) || 1,
-      piso: piso ? parseInt(piso) : undefined,
-      departamento: depto ? parseInt(depto) : undefined,
       codigoPostal: parseInt(direccion.codigoPostal) || 1000,
       ciudad: direccion.ciudad
     };

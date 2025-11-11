@@ -1,72 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
-
-.content-categoria {
-  font-family: 'Bebas Neue', sans-serif;
-}
-.categoria-item {
-  width: 200px;
-  height: 210px;
-  flex: 0 0 auto;
-  text-align: center;
-  padding: 1rem;
-  margin-right: 1rem;
-
-}
-
-.categoria-item img {
-  width: 100%;
-  max-width: 150px;
-  height: 150px;
-  object-fit: cover;
-  display: block;
-  margin: 0 auto 0.5rem auto;
-  position: absolute;
-}
-
-.categoria-nombre {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-
 .categoria-wrapper {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 1rem;
 }
 
-.image {
-  width: 130px;
-  position: relative;
-}
-
-.image img {
-  width: 200px;
-  height: 200px;
-  display: block;
-  border-radius: 12px;
-}
-
-.content-categoria {
-  font-family: 'Bebas Neue', sans-serif;
-  position: absolute;
-  top: 0;
-  left: 0;
+.categoria-box {
   width: 200px;
   height: 200px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: var(--color-white);
-  border-radius: 12px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   background: var(--color-blue-dark);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.image:hover .content-categoria {
-  opacity: 1;
+.categoria-box:hover {
+  background: var(--color-white);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.categoria-texto {
+  font-family: 'Bebas Neue', sans-serif;
+  color: var(--color-white);
+  font-size: 2rem;
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  letter-spacing: 2px;
+  transition: color 0.3s ease;
+}
+
+.categoria-box:hover .categoria-texto {
+  color: var(--color-blue-dark);
 }

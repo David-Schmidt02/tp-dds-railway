@@ -72,6 +72,8 @@
 .filtros-checkbox-label {
   font-size: 0.9rem;
   color: var(--color-black);
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 /* Hover del label */

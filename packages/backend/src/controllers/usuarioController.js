@@ -33,4 +33,13 @@ export class UsuarioController {
       next(error);
     }
   }
+
+  async obtenerVendedores(req, res, next) {
+    try {
+      const vendedores = await this.usuarioService.obtenerVendedores();
+      res.json(usuariosToDTO(vendedores));
+    } catch (error) {
+      next(error);
+    }
+  }
 }

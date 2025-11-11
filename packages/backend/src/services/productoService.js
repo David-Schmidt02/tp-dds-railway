@@ -87,6 +87,15 @@ export class ProductoService {
             throw error;
         }
     }
+
+    async obtenerCategorias() {
+        try {
+            return await this.productoRepository.obtenerCategoriasUnicas();
+        } catch (error) {
+            console.error('Error al obtener categorías:', error.message);
+            throw error;
+        }
+    }
 }
 
 

@@ -11,30 +11,89 @@ import Stack from '@mui/material/Stack';
 
 const ProductListingPage = ({ actualizarCarrito }) => {
   const location = useLocation();
-  const [productos, setProductos] = useState();
+  const searchParams = new URLSearchParams(location.search);
+  const queryParam = searchParams.get('q') || '';
+  const categoriaDesdeNavegacion = location.state?.categoriaSeleccionada;
+
+  const [productos, setProductos] = useState([]);
+  const [paginacion, setPaginacion] = useState({ totalPages: 1, page: 1, totalItems: 0 });
   const [filtrosAplicados, setFiltrosAplicados] = useState({
     nombre: '',
     descripcion: '',
     precioMin: '',
     precioMax: '',
-    categorias: [],
+    categorias: categoriaDesdeNavegacion ? [categoriaDesdeNavegacion] : [],
     vendedores: [],
-    vendedor: '',
     page: 1,
     limit: 10,
-    ordenar: ''
+    ordenar: '',
+    q: queryParam
   });
   const [filtrosTemp, setFiltrosTemp] = useState({ ...filtrosAplicados });
 
     const cargarProductos = async ({ filtros }) => {
-        const productosCargados = await getProductos(filtros);
-        console.log("Respuesta del backend:", productosCargados);
-        setProductos(productosCargados)
+        // Si hay múltiples vendedores, hacer requests separados
+        if (filtros.vendedores && filtros.vendedores.length > 0) {
+            const todosLosProductos = [];
+
+            for (const vendedorId of filtros.vendedores) {
+                const respuesta = await getProductos({
+                    ...filtros,
+                    idVendedor: vendedorId,
+                    vendedores: undefined
+                });
+                todosLosProductos.push(...(respuesta.items || []));
+            }
+
+            // Eliminar duplicados por _id
+            const productosUnicos = todosLosProductos.filter((producto, index, self) =>
+                index === self.findIndex(p => p._id === producto._id)
+            );
+
+            setProductos(productosUnicos);
+            setPaginacion({
+                totalPages: 1,
+                page: 1,
+                totalItems: productosUnicos.length
+            });
+        } else {
+            // Request normal sin filtro de vendedor
+            const respuesta = await getProductos(filtros);
+            setProductos(respuesta.items || []);
+            setPaginacion({
+                totalPages: respuesta.totalPages || 1,
+                page: respuesta.page || 1,
+                totalItems: respuesta.totalItems || 0
+            });
+        }
     }
-  
-    // Solo se dispara cuando se aplican los filtros
+
     useEffect(() => {
-        console.log("Filtros aplicados:", filtrosAplicados);
+        if (categoriaDesdeNavegacion) {
+            setFiltrosTemp(prev => ({
+                ...prev,
+                categorias: [categoriaDesdeNavegacion]
+            }));
+        }
+    }, [categoriaDesdeNavegacion]);
+
+    useEffect(() => {
+        // Actualizar filtros cuando cambie el parámetro de búsqueda en la URL
+        if (queryParam !== filtrosAplicados.q) {
+            setFiltrosAplicados(prev => ({
+                ...prev,
+                q: queryParam,
+                page: 1
+            }));
+            setFiltrosTemp(prev => ({
+                ...prev,
+                q: queryParam,
+                page: 1
+            }));
+        }
+    }, [queryParam]);
+
+    useEffect(() => {
         cargarProductos({ filtros: filtrosAplicados });
     }, [filtrosAplicados]);
     
@@ -50,10 +109,10 @@ const ProductListingPage = ({ actualizarCarrito }) => {
       precioMax: '',
       categorias: [],
       vendedores: [],
-      vendedor: '',
       page: 1,
       limit: 10,
-      ordenar: ''
+      ordenar: '',
+      q: ''
     };
     setFiltrosTemp(filtrosVacios);
     setFiltrosAplicados(filtrosVacios);
@@ -102,11 +161,11 @@ const ProductListingPage = ({ actualizarCarrito }) => {
             </div>
         </div>
         <Stack spacing={2} alignItems="center" sx={{ marginTop: 3 }}>
-            <Pagination 
-                count={10} 
+            <Pagination
+                count={paginacion.totalPages}
                 page={filtrosAplicados.page}
                 onChange={(event, value) => handleFiltroChange('page', value)}
-                color="primary" 
+                color="primary"
             />
         </Stack>
     </div>

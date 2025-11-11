@@ -9,15 +9,15 @@ const SortSelect = ({ value, onChange }) => {
   return (
     <div className="sort-section">
       <label htmlFor="sort-select">Ordenar por</label>
-      <select 
-        id="sort-select" 
+      <select
+        id="sort-select"
         className="custom-select"
         value={value}
         onChange={(e) => handleFiltroChange('ordenar', e.target.value)}
       >
-        <option value="precio-asc">Precio Mas Bajo</option>
-        <option value="precio-desc">Precio Mas Alto</option>
-        <option value="vendidos-asc">Más Vendidos</option>
+        <option value="">Sin ordenar</option>
+        <option value="precioAsc">Precio Mas Bajo</option>
+        <option value="precioDesc">Precio Mas Alto</option>
       </select>
     </div>
   );

@@ -94,8 +94,9 @@
   transition: all 3s ease;
 }
 
-.search-navbar-btn :hover{
-  background: var(--color-black);
+.search-navbar-btn:hover{
+  background: transparent;
+  opacity: 0.7;
 }
 
 .categorias-btn {

@@ -41,14 +41,23 @@ export class ProductoRepository {
             mongoFilters.precio = { $lte: parseFloat(filters.max) };
         }
 
-        if (filters.titulo) {
-            mongoFilters.titulo = new RegExp(filters.titulo.trim(), "i");
+        if (filters.q) {
+            const searchRegex = new RegExp(filters.q.trim(), "i");
+            mongoFilters.$or = [
+                { titulo: searchRegex },
+                { descripcion: searchRegex }
+            ];
+        } else {
+            if (filters.titulo) {
+                mongoFilters.titulo = new RegExp(filters.titulo.trim(), "i");
+            }
+            if (filters.descripcion) {
+                mongoFilters.descripcion = new RegExp(filters.descripcion.trim(), "i");
+            }
         }
-        if (filters.descripcion) {
-            mongoFilters.descripcion = new RegExp(filters.descripcion.trim(), "i");
-        }
+
         if (filters.categorias) {
-            mongoFilters.categorias = { $all: filters.categorias };
+            mongoFilters.categorias = { $in: filters.categorias };
         }
 
         const totalItems = await ProductoModel.countDocuments(mongoFilters);
@@ -83,5 +92,14 @@ export class ProductoRepository {
         totalPages,
         items
         }
+    }
+
+    async obtenerCategoriasUnicas() {
+        const categorias = await ProductoModel.aggregate([
+            { $unwind: '$categorias' },
+            { $group: { _id: '$categorias' } },
+            { $sort: { _id: 1 } }
+        ]);
+        return categorias.map(cat => cat._id);
     }
 }

@@ -3,28 +3,33 @@ import React from 'react';
 import './Home.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProductos } from '../../services/productoService.js';
+import { getProductos, getCategorias } from '../../services/productoService.js';
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 import { CircularProgress } from '@mui/material';
-import categoriasMock from '../../mockData/mockDataCategorias.js';
 
 
 const Home = ({ actualizarCarrito }) => {
 
     const navigate = useNavigate();
     const [productos, setProductos] = useState([]);
+    const [categorias, setCategorias] = useState([]);
 
 
     const cargarProductos = async () => {
-        const productosCargados = await getProductos();
-        console.log("Respuesta del backend:", productosCargados);
-        setProductos(productosCargados)
+        const respuesta = await getProductos();
+        setProductos(respuesta.items || []);
     }
 
-    // Para que cuando se monte el componente los cargue
+    const cargarCategorias = async () => {
+        const categoriasData = await getCategorias();
+        const categoriasOrdenadas = (categoriasData || []).sort((a, b) => a.localeCompare(b));
+        setCategorias(categoriasOrdenadas);
+    }
+
     useEffect(() => {
-        cargarProductos()
+        cargarProductos();
+        cargarCategorias();
     }, [])
 
 
@@ -40,7 +45,7 @@ const Home = ({ actualizarCarrito }) => {
                 <CircularProgress />
             </div> :
                 <div>
-                    <CarouselCategoria categories={categoriasMock}></CarouselCategoria>
+                    <CarouselCategoria categories={categorias}></CarouselCategoria>
                     <div className="productos-section">
                         <div className="productos-header">
                             <h1 className="productos-title">Nuestros Productos</h1>

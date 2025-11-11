@@ -66,7 +66,8 @@ export class ProductoController {
                 page = 1,
                 limit = 10,
                 orden = "masVendido",
-                idVendedor
+                idVendedor,
+                q
             } = req.query;
 
 
@@ -74,8 +75,14 @@ export class ProductoController {
             if (idVendedor) filters.vendedor = idVendedor;
             if (min) filters.min = min;
             if (max) filters.max = max;
-            if (nombre) filters.titulo = nombre;
-            if (descripcion) filters.descripcion = descripcion;
+
+            if (q) {
+                filters.q = q;
+            } else {
+                if (nombre) filters.titulo = nombre;
+                if (descripcion) filters.descripcion = descripcion;
+            }
+
             if (categorias) filters.categorias = categorias;
 
             if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1) {
@@ -103,6 +110,15 @@ export class ProductoController {
             const { id } = req.params;
             const producto = await this.productoService.obtenerProductoPorId(id);
             res.status(200).json(productoToDTO(producto));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async obtenerCategorias(req, res, next) {
+        try {
+            const categorias = await this.productoService.obtenerCategorias();
+            res.status(200).json(categorias);
         } catch (error) {
             next(error);
         }
