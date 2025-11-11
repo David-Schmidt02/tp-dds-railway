@@ -2,7 +2,7 @@ import React from 'react';
 import './Home.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProductos, getCategorias } from '../../services/productoService.js';
+import { getProductos, getCategorias } from '../../services/api.js';
 import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 import { CircularProgress } from '@mui/material';

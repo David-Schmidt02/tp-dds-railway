@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import './ProductListingPage.css';
 import Grid from '../../components/grid/grid.jsx';
-import { getProductos } from '../../services/productoService.js';
+import { getProductos } from '../../services/api.js';
 import SortSelect from './components/SortSelect.jsx';
 import ProductosFiltros from './ProductosFiltros/ProductosFiltros.jsx';
 import Pagination from '@mui/material/Pagination';

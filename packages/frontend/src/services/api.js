@@ -103,3 +103,19 @@ export const getCategorias = async () => {
         throw error;
     }
 }
+
+export const getProductoPorId = async (id) => {
+    try {
+        if (!id) {
+            throw new Error('Se requiere un id de producto');
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/productos/${id}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error fetching producto ${id}: `, error);
+        throw error;
+    }
+}

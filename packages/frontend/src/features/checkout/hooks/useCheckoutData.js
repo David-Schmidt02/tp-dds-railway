@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { postPedido } from '../../../services/productoService';
+import { postPedido } from '../../../services/api';
 
 export const useCheckoutData = (carrito, limpiarCarrito) => {
   const navigate = useNavigate();

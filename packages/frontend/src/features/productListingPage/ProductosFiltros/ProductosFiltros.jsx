@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import './ProductosFiltros.css';
-import { getVendedores, getCategorias } from '../../../services/productoService.js';
+import { getVendedores, getCategorias } from '../../../services/api.js';
 
 function ProductosFiltros({ filtros, handleFiltroChange, aplicarFiltros, limpiarFiltros }) {
     const [categorias, setCategorias] = useState([]);

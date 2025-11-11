@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import './ProductoDetailPage.css'
 import ColumnaFotos from './Components/ColumnaFotos'
+import { getProductoPorId } from '../../services/api'
 
 const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams();
 
   // Estados
@@ -13,21 +13,45 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const [fotoprincipal, setFotoprincipal] = useState('');
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    
-    if (location.state?.producto?.fotos ){
-      setItem(location.state.producto);
-      setFotoprincipal(location.state.producto.fotos[0] || '');
-      setcantidad(1);
-    } else {
-      // Si por alguna razón no viene del state, mostrar error
-      setError(new Error('No se recibieron datos del producto'));
-      setError(false);
-    }
-  }, [location.state]);
+    let isMounted = true;
 
-  if (!item) {
+    const cargarProducto = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (!id) {
+          throw new Error('No se pudo determinar el producto solicitado');
+        }
+
+        const producto = await getProductoPorId(id);
+        if (!isMounted) return;
+
+        setItem(producto);
+        setFotoprincipal(producto.fotos?.[0] || '');
+        setcantidad(1);
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarProducto();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  if (loading) {
     return (
       <div className="item-detalles-page">
         <div className="error-container">
@@ -58,13 +82,16 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
     }
   };
 
+  const itemId = item?.id || item?._id || id;
+
   const itemEnCarrito = (id) => {
+    if (!id) return { cantidad: 0 };
     const productoEnCarrito = carrito.find(prod => prod.id === id);
     return productoEnCarrito || { cantidad: 0 };
   }
 
   const crearItemCarrito = () => ({
-    id: item.id,
+    id: itemId,
     titulo: item.titulo,
     precio: item.precio,
     moneda: item.moneda,
@@ -174,7 +201,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
                 <button
                   className="btn cantidad-btn"
                   onClick={() => handleCambioCantidad(1)}
-                  disabled={cantidad + itemEnCarrito(item.id).cantidad >= item.stock}
+                  disabled={cantidad + itemEnCarrito(itemId).cantidad >= item.stock}
                   type="button"
                   aria-label="Aumentar cantidad"
                 >

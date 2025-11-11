@@ -5,16 +5,16 @@ import "./productoCard.css";
 const ProductoCard = ({ producto, actualizarCarrito}) => {
 	const [isAdded, setIsAdded] = useState(false);
 
-	const crearItemCarrito = () => {
-		return {
+	const crearItemCarrito = () => ({
 			id: producto.id,
 			titulo: producto.titulo,
 			precio: producto.precio,
+			moneda: producto.moneda,
 			cantidad: 1,
-			foto: producto.fotos[0]
-		};
-	};
-
+			foto: producto.fotos[0],
+			stock: producto.stock
+	});
+	
 	const handleAgregarAlCarrito = () => {
 		const itemCarrito = crearItemCarrito();
 		actualizarCarrito(itemCarrito);

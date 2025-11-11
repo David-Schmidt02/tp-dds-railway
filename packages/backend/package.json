@@ -5,6 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
+    "seed": "node ./scripts/seed-db.js",
+    "clean:products": "node ./scripts/clear-products.js",
     "test": "set \"NODE_OPTIONS=--experimental-vm-modules\" && jest --runInBand",
     "test:watch": "set \"NODE_OPTIONS=--experimental-vm-modules\" && jest --watch",
     "test:coverage": "set \"NODE_OPTIONS=--experimental-vm-modules\" && jest --coverage",
