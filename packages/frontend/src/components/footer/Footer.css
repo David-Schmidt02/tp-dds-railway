@@ -17,35 +17,43 @@
 .footer-section {
   flex: 1;
   min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .footer-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .footer-subtitle {
   font-size: 1.3rem;
   margin-bottom: 10px;
   font-weight: 500;
+  text-align: center;
 }
 
 .footer-text {
   color: #bbb;
   font-size: 0.9rem;
   line-height: 1.5;
+  text-align: center;
 }
 
 .footer-links {
   list-style: none;
   padding: 0;
   margin: 0;
+   text-align: center;
 }
 
 .footer-links li {
   margin-bottom: 6px;
-  text-align: left;
+  
 }
 
 .footer-links a {
@@ -55,12 +63,13 @@
 }
 
 .footer-links a:hover {
-  color: #fff;
+  color: #ffd700;
 }
 
 .footer-icons {
   display: flex;
   gap: 15px;
+  justify-content: center;
 }
 
 .footer-icons a {
@@ -81,4 +90,25 @@
   font-size: 0.85rem;
   color: #888;
   margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 50px 20px 25px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 40px;
+  }
+
+  .footer-section {
+    min-width: 100%;
+  }
+
+  .footer-text {
+    max-width: 100%;
+  }
 }

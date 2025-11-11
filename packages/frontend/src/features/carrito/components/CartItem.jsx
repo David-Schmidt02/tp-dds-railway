@@ -19,7 +19,7 @@ const CartItem = ({ producto, onIncrease, onDecrease, onDelete }) => {
 
       <div className="item-details">
         <Link to={`/producto/${producto.id}`} state={{ producto }} className="item-title-link">
-          <h3>{producto.titulo || producto.nombre}</h3>
+          <h3>{producto.titulo }</h3>
         </Link>
         <p className="item-price-unit">${producto.precio.toLocaleString('es-AR')}</p>
         <div className="quantity-controls">
