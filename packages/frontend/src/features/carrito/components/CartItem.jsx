@@ -34,6 +34,7 @@ const CartItem = ({ producto, onIncrease, onDecrease, onDelete }) => {
           <button
             className="quantity-btn"
             onClick={() => onIncrease(producto)}
+            disabled = {producto.cantidad >= producto.stock}
           >
             <AddIcon fontSize="small" />
           </button>

@@ -1,7 +1,11 @@
 export const useCartActions = (carrito, actualizarCarrito) => {
+  
   const aumentarCantidad = (producto) => {
-    const nuevoProducto = { ...producto, cantidad: (producto.cantidad || 1) + 1 };
-    actualizarCarrito(nuevoProducto);
+    if (producto.cantidad < producto.stock){
+      const nuevoProducto = { ...producto, cantidad: (producto.cantidad || 1) + 1 };
+      actualizarCarrito(nuevoProducto);
+    }
+    
   };
 
   const disminuirCantidad = (producto) => {

@@ -24,8 +24,8 @@ const Navbar = ({ carrito }) => {
     e.preventDefault();
     const query = texto.trim();
     if (query.length > 0) {
-      navigate('/productos', { state: { nombreSeleccionado: query } });
-      setTexto(''); // opcional: limpiar input después de buscar
+      navigate(`/productos?nombre=${encodeURIComponent(query)}`);
+      setTexto(''); 
     }
   };
   

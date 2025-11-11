@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ProductListingPage.css';
 import Grid from '../../components/grid/grid.jsx';
 import { getProductos } from '../../services/productoService.js';
@@ -10,25 +11,25 @@ import Stack from '@mui/material/Stack';
 
 
 const ProductListingPage = ({ actualizarCarrito }) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const queryParam = searchParams.get('q') || '';
+  const nombreParam = searchParams.get('nombre') || '';
   const categoriaDesdeNavegacion = location.state?.categoriaSeleccionada;
-  const nombreDesdeNavegacion = location.state?.nombreSeleccionado || '';
+
 
   const [productos, setProductos] = useState([]);
   const [paginacion, setPaginacion] = useState({ totalPages: 1, page: 1, totalItems: 0 });
   const [filtrosAplicados, setFiltrosAplicados] = useState({
-    nombre: nombreDesdeNavegacion ? nombreDesdeNavegacion : '',
-    descripcion: '',
+    nombre: '',
+    descripcion: nombreParam,
     precioMin: '',
     precioMax: '',
     categorias: categoriaDesdeNavegacion ? [categoriaDesdeNavegacion] : [],
     vendedores: [],
     page: 1,
     limit: 10,
-    ordenar: '',
-    q: queryParam
+    ordenar: ''
   });
   const [filtrosTemp, setFiltrosTemp] = useState({ ...filtrosAplicados });
 
@@ -78,31 +79,16 @@ const ProductListingPage = ({ actualizarCarrito }) => {
         }
     }, [categoriaDesdeNavegacion]);
 
-    useEffect(() => {
-       if (nombreDesdeNavegacion) {
-            setFiltrosTemp(prev => ({
-              ...prev,
-              nombre: nombreDesdeNavegacion,
-              page: 1
-            }));
-        }
-    }, [nombreDesdeNavegacion]);
+  
 
-    useEffect(() => {
-        // Actualizar filtros cuando cambie el parámetro de búsqueda en la URL
-        if (queryParam !== filtrosAplicados.q) {
-            setFiltrosAplicados(prev => ({
-                ...prev,
-                q: queryParam,
-                page: 1
-            }));
-            setFiltrosTemp(prev => ({
-                ...prev,
-                q: queryParam,
-                page: 1
-            }));
-        }
-    }, [queryParam]);
+   useEffect(() => {
+      const params = new URLSearchParams(location.search);
+      const nombre = params.get('nombre') || '';
+      setFiltrosAplicados(prev => ({ ...prev, descripcion : nombre, page: 1 }));
+      setFiltrosTemp(prev => ({ ...prev, descripcion : nombre, page: 1 }));
+    }, [location.search]);
+
+ 
 
     useEffect(() => {
         cargarProductos({ filtros: filtrosAplicados });
@@ -123,7 +109,6 @@ const ProductListingPage = ({ actualizarCarrito }) => {
       page: 1,
       limit: 10,
       ordenar: '',
-      q: ''
     };
     setFiltrosTemp(filtrosVacios);
     setFiltrosAplicados(filtrosVacios);

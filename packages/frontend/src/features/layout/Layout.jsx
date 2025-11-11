@@ -8,7 +8,6 @@ const Layout = ({carrito}) => {
   return(
         <>
           <Header carrito={carrito}></Header>
-          <Navbar carrito={carrito}></Navbar>
           <main style={{ minHeight: "80vh" }}>
             <Outlet /> {/* Aca se inyecta el contenido de cada página */}
           </main>

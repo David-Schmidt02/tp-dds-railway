@@ -58,6 +58,11 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
     }
   };
 
+  const itemEnCarrito = (id) => {
+    const productoEnCarrito = carrito.find(prod => prod.id === id);
+    return productoEnCarrito || { cantidad: 0 };
+  }
+
   const crearItemCarrito = () => ({
     id: item.id,
     titulo: item.titulo,
@@ -72,7 +77,8 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
     const itemCarrito = crearItemCarrito();
     actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
-    //navigate("/");
+
+    setcantidad(0);
   };
 
   const handleComprarAhora = () => {
@@ -168,7 +174,7 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
                 <button
                   className="btn cantidad-btn"
                   onClick={() => handleCambioCantidad(1)}
-                  disabled={cantidad >= item.stock}
+                  disabled={cantidad + itemEnCarrito(item.id).cantidad >= item.stock}
                   type="button"
                   aria-label="Aumentar cantidad"
                 >

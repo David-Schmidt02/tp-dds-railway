@@ -27,22 +27,3 @@
   padding: 0;
   box-sizing: border-box;
 }
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-weight: 600;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  background: transparent;
-  color: inherit;
-  transition: transform 0.3s ease;
-}
-.btn:hover{
-  cursor: pointer;
-}

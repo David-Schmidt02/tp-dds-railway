@@ -1,6 +1,6 @@
 .navbar {
-  height: 70px;
   width: 100%;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,12 +11,6 @@
   top: 0;
   left: 0;
   transition: all 0.3s ease-in-out;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-}
-
-.navbar.scrolled {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
 }
 
 .logo {
@@ -38,6 +32,9 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  min-width: 200px;
+  max-width: 600px;
+  margin: 0px 20px 0px 20px;
 }
 
 .search-box {
@@ -46,7 +43,7 @@
   background: #F5F5F5;
   border-radius: 8px;
   padding: 0 16px;
-  width: 480px;
+  width: 100%;
   height: 45px;
 }
 
@@ -122,4 +119,10 @@
 
 .categorias-texto {
   display: inline-block;
+}
+
+@media (max-width:850px) {
+  .navbar-center {
+    display: none;
+  }
 }
