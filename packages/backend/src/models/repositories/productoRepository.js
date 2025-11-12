@@ -31,7 +31,15 @@ export class ProductoRepository {
         let sort;
         const mongoFilters = {};
 
-        if (filters.vendedor) mongoFilters.vendedor = filters.vendedor;
+        // Manejo de filtro por vendedor(es)
+        if (filters.vendedor) {
+            // Si es un array, usar $in para filtrar por múltiples vendedores
+            if (Array.isArray(filters.vendedor)) {
+                mongoFilters.vendedor = { $in: filters.vendedor };
+            } else {
+                mongoFilters.vendedor = filters.vendedor;
+            }
+        }
 
         if (filters.min && filters.max) {
             mongoFilters.precio = { $gte: parseFloat(filters.min), $lte: parseFloat(filters.max) };

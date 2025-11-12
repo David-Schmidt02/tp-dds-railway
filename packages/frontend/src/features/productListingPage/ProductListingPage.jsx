@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import './ProductListingPage.css';
 import Grid from '../../components/grid/grid.jsx';
 import { getProductos } from '../../services/api.js';
@@ -11,21 +9,14 @@ import Stack from '@mui/material/Stack';
 
 
 const ProductListingPage = ({ actualizarCarrito }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const nombreParam = searchParams.get('nombre') || '';
-  const categoriaDesdeNavegacion = location.state?.categoriaSeleccionada;
-
-
   const [productos, setProductos] = useState([]);
   const [paginacion, setPaginacion] = useState({ totalPages: 1, page: 1, totalItems: 0 });
   const [filtrosAplicados, setFiltrosAplicados] = useState({
     nombre: '',
-    descripcion: nombreParam,
+    descripcion: '',
     precioMin: '',
     precioMax: '',
-    categorias: categoriaDesdeNavegacion ? [categoriaDesdeNavegacion] : [],
+    categorias: [],
     vendedores: [],
     page: 1,
     limit: 10,
@@ -34,61 +25,14 @@ const ProductListingPage = ({ actualizarCarrito }) => {
   const [filtrosTemp, setFiltrosTemp] = useState({ ...filtrosAplicados });
 
     const cargarProductos = async ({ filtros }) => {
-        // Si hay múltiples vendedores, hacer requests separados
-        if (filtros.vendedores && filtros.vendedores.length > 0) {
-            const todosLosProductos = [];
-
-            for (const vendedorId of filtros.vendedores) {
-                const respuesta = await getProductos({
-                    ...filtros,
-                    idVendedor: vendedorId,
-                    vendedores: undefined
-                });
-                todosLosProductos.push(...(respuesta.items || []));
-            }
-
-            // Eliminar duplicados por _id
-            const productosUnicos = todosLosProductos.filter((producto, index, self) =>
-                index === self.findIndex(p => p._id === producto._id)
-            );
-
-            setProductos(productosUnicos);
-            setPaginacion({
-                totalPages: 1,
-                page: 1,
-                totalItems: productosUnicos.length
-            });
-        } else {
-            // Request normal sin filtro de vendedor
-            const respuesta = await getProductos(filtros);
-            setProductos(respuesta.items || []);
-            setPaginacion({
-                totalPages: respuesta.totalPages || 1,
-                page: respuesta.page || 1,
-                totalItems: respuesta.totalItems || 0
-            });
-        }
+        const respuesta = await getProductos(filtros);
+        setProductos(respuesta.items || []);
+        setPaginacion({
+            totalPages: respuesta.totalPages || 1,
+            page: respuesta.page || 1,
+            totalItems: respuesta.totalItems || 0
+        });
     }
-
-    useEffect(() => {
-        if (categoriaDesdeNavegacion) {
-            setFiltrosTemp(prev => ({
-                ...prev,
-                categorias: [categoriaDesdeNavegacion]
-            }));
-        }
-    }, [categoriaDesdeNavegacion]);
-
-  
-
-   useEffect(() => {
-      const params = new URLSearchParams(location.search);
-      const nombre = params.get('nombre') || '';
-      setFiltrosAplicados(prev => ({ ...prev, descripcion : nombre, page: 1 }));
-      setFiltrosTemp(prev => ({ ...prev, descripcion : nombre, page: 1 }));
-    }, [location.search]);
-
- 
 
     useEffect(() => {
         cargarProductos({ filtros: filtrosAplicados });
@@ -108,7 +52,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
       vendedores: [],
       page: 1,
       limit: 10,
-      ordenar: '',
+      ordenar: ''
     };
     setFiltrosTemp(filtrosVacios);
     setFiltrosAplicados(filtrosVacios);

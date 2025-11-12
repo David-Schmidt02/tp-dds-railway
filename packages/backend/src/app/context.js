@@ -6,7 +6,7 @@ import { UsuarioRepository } from "../models/repositories/usuarioRepository.js";
 
 // Services
 import { PedidoService } from "../services/pedidoService.js";
-import { ProductoService } from "../services/api.js";
+import { ProductoService } from "../services/productoService.js";
 import { UsuarioService } from "../services/usuarioService.js";
 import { NotificacionService } from "../services/notificacionService.js";
 

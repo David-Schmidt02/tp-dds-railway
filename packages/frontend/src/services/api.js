@@ -13,7 +13,7 @@ export const getProductos = async (filtros = {}) => {
             page: filtros.page,
             limit: filtros.limit,
             orden: filtros.ordenar,
-            idVendedor: filtros.idVendedor,
+            idVendedor: filtros.vendedores, // Cambiado de idVendedor a vendedores
             q: filtros.q
         };
 
