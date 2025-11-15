@@ -99,7 +99,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
                     onChange={handleFiltroChange}                  
                     />
                 </div> 
-            <Grid productos={productos} actualizarCarrito={actualizarCarrito} />
+            <Grid productos={productos} />
             </div>
         </div>
         <div aria-label="Paginación de productos">

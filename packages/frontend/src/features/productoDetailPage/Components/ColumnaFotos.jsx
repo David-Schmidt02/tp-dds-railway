@@ -2,7 +2,6 @@ import './ColumnaFotos.css'
 const ColumnaFotos = ({ fotos, fotoprincipal, setFotoprincipal, item }) => {
   return (
     <div className="seccion-imagen">
-      {/* Thumbnails (miniaturas) */}
       <div className="columna-miniaturas" role="tablist" aria-label="Miniaturas">
         {fotos.map((foto, index) => (
               <button
@@ -24,7 +23,7 @@ const ColumnaFotos = ({ fotos, fotoprincipal, setFotoprincipal, item }) => {
       {/* Imagen principal */}
       <div className="contenedor-imagen-principal">
         <img
-          src={fotoprincipal || fotos?.[0]}
+          src={fotoprincipal }
           alt={item.titulo}
           className="imagen-principal"
         />

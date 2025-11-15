@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import "./productoCard.css";
+import { useCart } from '../../context/cartContext';
 
-const ProductoCard = ({ producto, actualizarCarrito}) => {
+const ProductoCard = ({ producto }) => {
 	const [isAdded, setIsAdded] = useState(false);
+	
+	const { actualizarCarrito, crearItemCarrito } = useCart();
+		
 
-	const crearItemCarrito = () => ({
+	const handleAgregarAlCarrito = () => {
+		const itemCarrito = crearItemCarrito({
 			id: producto.id,
 			titulo: producto.titulo,
 			precio: producto.precio,
@@ -13,10 +18,7 @@ const ProductoCard = ({ producto, actualizarCarrito}) => {
 			cantidad: 1,
 			foto: producto.fotos[0],
 			stock: producto.stock
-	});
-	
-	const handleAgregarAlCarrito = () => {
-		const itemCarrito = crearItemCarrito();
+		});
 		actualizarCarrito(itemCarrito);
 		console.log(`Agregando 1 unidad de ${producto.titulo} al carrito`);
 

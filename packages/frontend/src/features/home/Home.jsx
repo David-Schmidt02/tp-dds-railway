@@ -50,7 +50,7 @@ const Home = ({ actualizarCarrito }) => {
                             <h1 className="productos-title">Nuestros Productos</h1>
                         </div>
                         <p className="productos-descripcion">Aquí encontrarás todas las prendas disponibles.</p>
-                        <Grid productos={productos} actualizarCarrito={actualizarCarrito} />
+                        <Grid productos={productos} />
                     </div>
                     <button
                         className="ver-mas-btn"

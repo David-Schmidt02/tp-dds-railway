@@ -4,7 +4,7 @@ import './grid.css'
 
 import ProductoCard from '../productoCard/productoCard.jsx'
 
-const Grid = ({productos, actualizarCarrito}) => {
+const Grid = ({productos}) => {
 	return (
 		<div className="grid-container">
 			{productos && productos.length > 0 ? (
@@ -14,8 +14,7 @@ const Grid = ({productos, actualizarCarrito}) => {
 						nombre: String(producto.titulo || ''),
 						imagen: producto.fotos || [],
 						precio: Number(producto.precio) || 0,
-						producto: producto,
-						actualizarCarrito: actualizarCarrito
+						producto: producto
 					};
 
 					return <ProductoCard key={producto.id} {...props} />;

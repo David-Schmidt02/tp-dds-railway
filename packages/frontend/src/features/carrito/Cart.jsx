@@ -4,11 +4,27 @@ import './Cart.css';
 import CartItem from './components/CartItem';
 import CartSummary from './components/CartSummary';
 import EmptyCart from './components/EmptyCart';
-import { useCartActions } from './hooks/useCartActions';
+import { useCart } from '../../context/cartContext';
 
-const Cart = ({ carrito, eliminarDelCarrito, actualizarCarrito }) => {
+const Cart = () => {
   const navigate = useNavigate();
-  const { aumentarCantidad, disminuirCantidad, calcularTotal, cantidadTotal } = useCartActions(carrito, actualizarCarrito);
+  const { carrito, eliminarDelCarrito, actualizarCantidadCarrito } = useCart();
+
+  // Funciones para aumentar/disminuir cantidad y calcular totales
+  const aumentarCantidad = (producto) => {
+    actualizarCantidadCarrito({ id: producto.id, cantidad: producto.cantidad + 1 });
+  };
+  const disminuirCantidad = (producto) => {
+    if (producto.cantidad > 1) {
+      actualizarCantidadCarrito({ id: producto.id, cantidad: producto.cantidad - 1 });
+    }
+  };
+  const calcularTotal = () => {
+    return carrito.reduce((acc, prod) => acc + prod.precio * prod.cantidad, 0);
+  };
+  const cantidadTotal = () => {
+    return carrito.reduce((acc, prod) => acc + prod.cantidad, 0);
+  };
 
   const irCheckout = () => {
     navigate('/checkout');

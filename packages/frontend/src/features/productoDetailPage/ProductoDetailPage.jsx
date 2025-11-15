@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useCart } from '../../context/cartContext';
 import { useNavigate, useParams } from 'react-router-dom'
 import './ProductoDetailPage.css'
 import ColumnaFotos from './Components/ColumnaFotos'
 import { getProductoPorId } from '../../services/api'
 
-const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
+const ProductoDetailPage = () => {
+  const { carrito, actualizarCarrito, itemEnCarrito, crearItemCarrito } = useCart();
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -15,41 +17,26 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const cargarProducto = async () => {
+  const cargarProducto = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        if (!id) {
-          throw new Error('No se pudo determinar el producto solicitado');
-        }
-
         const producto = await getProductoPorId(id);
-        if (!isMounted) return;
-
         setItem(producto);
         setFotoprincipal(producto.fotos?.[0] || '');
         setcantidad(1);
       } catch (err) {
-        if (isMounted) {
-          setError(err);
-        }
+        setError(err);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
-    cargarProducto();
+  useEffect(() => {
 
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
+    cargarProducto();
+  }, []);
 
   if (loading) {
     return (
@@ -84,24 +71,16 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
 
   const itemId = item?.id || item?._id || id;
 
-  const itemEnCarrito = (id) => {
-    if (!id) return { cantidad: 0 };
-    const productoEnCarrito = carrito.find(prod => prod.id === id);
-    return productoEnCarrito || { cantidad: 0 };
-  }
-
-  const crearItemCarrito = () => ({
-    id: itemId,
-    titulo: item.titulo,
-    precio: item.precio,
-    moneda: item.moneda,
-    cantidad: cantidad,
-    foto: fotoprincipal || item.fotos?.[0],
-    stock: item.stock
-  });
-
   const handleAgregarAlCarrito = () => {
-    const itemCarrito = crearItemCarrito();
+    const itemCarrito = crearItemCarrito({
+      id: itemId,
+      titulo: item.titulo,
+      precio: item.precio,
+      moneda: item.moneda,
+      cantidad: cantidad,
+      foto: fotoprincipal || item.fotos?.[0],
+      stock: item.stock
+    });
     actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
 
@@ -109,7 +88,15 @@ const ProductoDetailPage = ({ carrito, actualizarCarrito }) => {
   };
 
   const handleComprarAhora = () => {
-    const itemCarrito = crearItemCarrito();
+    const itemCarrito = crearItemCarrito({
+      id: itemId,
+      titulo: item.titulo,
+      precio: item.precio,
+      moneda: item.moneda,
+      cantidad: cantidad,
+      foto: fotoprincipal || item.fotos?.[0],
+      stock: item.stock
+    });
     actualizarCarrito(itemCarrito);
     console.log(`Agregando ${cantidad} unidad(es) de ${item.titulo} al carrito`);
     navigate("/checkout");

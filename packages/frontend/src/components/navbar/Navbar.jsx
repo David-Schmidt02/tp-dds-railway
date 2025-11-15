@@ -1,19 +1,16 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-
-
+import React, { useState, useEffect } from "react";
+import { FaSearch } from "react-icons/fa";
+import TextField from "@mui/material/TextField";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from '../../context/cartContext';
 import "./Navbar.css";
-import { TextField } from "@mui/material";
-
-import { FaSearch, FaShoppingCart, FaUserAlt } from "react-icons/fa";
+import { FaShoppingCart, FaUserAlt } from "react-icons/fa";
 import Badge from "@mui/material/Badge";
-import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ carrito }) => {
+const Navbar = () => {
+  const { cantidadTotal } = useCart();
   const navigate = useNavigate();
   const [texto, setTexto] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
 
   const irACarrito = () => {
     navigate("/cart");
@@ -21,7 +18,6 @@ const Navbar = ({ carrito }) => {
 
 
   const manejarBusqueda = (e) => {
-    e.preventDefault();
     const query = texto.trim();
     if (query.length > 0) {
       navigate(`/productos?nombre=${encodeURIComponent(query)}`);
@@ -30,28 +26,11 @@ const Navbar = ({ carrito }) => {
   };
   
 
-  const cantProductosEnCarrito = () => {
-    if (!carrito || !Array.isArray(carrito)) {
-      return 0;
-    }
-    let suma = 0;
-    for (const producto of carrito) {
-      suma += producto.cantidad || 1; // Si no tiene cantidad, cuenta como 1
-    }
-    return suma;
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50); // cuando se baja más de 50px
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // cantidadTotal ya está en el contexto
 
   return (
     <nav
-      className={`navbar ${isScrolled ? "scrolled" : ""}`}
+      className={`navbar `}
       aria-label="Navegación principal"
     >
       <div className="navbar-left">
@@ -99,7 +78,7 @@ const Navbar = ({ carrito }) => {
         >
           <Badge
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            badgeContent={cantProductosEnCarrito()}
+            badgeContent={cantidadTotal()}
             color="primary"
           >
             <FaShoppingCart className="navbar-icon" id="cart-icon" />
