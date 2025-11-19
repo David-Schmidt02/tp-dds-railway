@@ -45,9 +45,9 @@ export function pedidoToDTO(pedido) {
 
 export function pedidoToDoc(pedido) {
     const pedidoDoc = {
-        usuarioId: pedido.comprador.id,
+        usuario: pedido.comprador.id,
         items: pedido.itemsPedido.map(item => ({
-            productoId: item.producto.id,
+            producto: item.producto.id,
             cantidad: item.cantidad,
             precioUnitario: item.precioUnitario
         })),
@@ -82,10 +82,10 @@ export function pedidoDocToDominio(pedidoDoc) {
         pedidoDoc.direccionEntrega.calle
     )
 
-    const comprador = usuarioDocToDominio(pedidoDoc.usuarioId);
+    const comprador = usuarioDocToDominio(pedidoDoc.usuario);
 
     const itemsPedido = pedidoDoc.items.map(item => {
-        const producto = productoDocToDominio(item.productoId);
+        const producto = productoDocToDominio(item.producto);
         return new ItemPedido(producto, item.cantidad, item.precioUnitario);
     });
 
@@ -101,7 +101,7 @@ export function pedidoDocToDominio(pedidoDoc) {
     const pedido = new Pedido(
         comprador,
         itemsPedido,
-        'PESO_ARG', // no se porque cuando consultas a la db no te trae el precio, esto hay que cambiarlo
+        'PESO_ARG',
         direccionEntrega,
         estado,
         pedidoDoc.fechaPedido,

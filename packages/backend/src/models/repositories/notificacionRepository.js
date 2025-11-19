@@ -8,12 +8,12 @@ export class NotificacionRepository {
     }
 
     async obtenerNotificacion(notificacionId) {
-    return await NotificacionModel.findById(notificacionId).populate('receptorId');
+    return await NotificacionModel.findById(notificacionId).populate('receptor');
     }
 
     async saveNotificacionNueva(notificacion) {
         const data = {
-            receptorId: notificacion.receptorId,
+            receptor: notificacion.receptor,
             mensaje: notificacion.mensaje,
             leida: notificacion.leida,
             fechaAlta: notificacion.fechaAlta || new Date(),
@@ -28,7 +28,7 @@ export class NotificacionRepository {
     async guardarNotificacion(notificacion) {
         const data = {
             mensaje: notificacion.mensaje,
-            receptorId: notificacion.receptorId,
+            receptor: notificacion.receptor,
             fechaAlta: notificacion.fechaAlta,
             leida: notificacion.leida,
             fechaLeida: notificacion.fechaLeida
@@ -46,7 +46,7 @@ export class NotificacionRepository {
                 upsert: true,
                 setDefaultsOnInsert: true
             }
-        ).populate('receptorId');
+        ).populate('receptor');
         if (!updated) {
             throw new NotificacionInexistente();
         }
@@ -59,10 +59,10 @@ export class NotificacionRepository {
 
 
     async obtenerNotificacionesDeUnUsuario(usuarioId, leida) {
-            const filtro = { receptorId: usuarioId };
+            const filtro = { receptor: usuarioId };
             if (leida !== undefined) {
                 filtro.leida = leida; // true o false
             }
-            return await NotificacionModel.find(filtro).populate('receptorId');
+            return await NotificacionModel.find(filtro).populate('receptor');
     }
 }

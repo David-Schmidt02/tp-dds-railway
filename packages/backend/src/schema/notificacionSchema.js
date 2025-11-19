@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const notificacionSchema = new mongoose.Schema({
-  receptorId: {
+  receptor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true

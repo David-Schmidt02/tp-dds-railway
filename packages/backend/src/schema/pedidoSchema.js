@@ -23,7 +23,7 @@ const cambioEstadoSchema = new mongoose.Schema({
 
 // Schema para items del pedido
 const itemPedidoSchema = new mongoose.Schema({
-  productoId: {
+  producto: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Producto',
     required: true
@@ -42,7 +42,7 @@ const itemPedidoSchema = new mongoose.Schema({
 
 // Schema principal del pedido
 const pedidoSchema = new mongoose.Schema({
-  usuarioId: {
+  usuario: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true

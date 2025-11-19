@@ -26,9 +26,9 @@ export class PedidoRepository {
             const nuevoPedido = new PedidoModel(pedidoDoc);
             const resultado = await nuevoPedido.save();
             const pedidoCompleto = await this.model.findById(resultado._id)
-                .populate('usuarioId')
+                .populate('usuario')
                 .populate({
-                    path: 'items.productoId',
+                    path: 'items.producto',
                     populate: { path: 'vendedor' }
                 });
 
@@ -49,8 +49,8 @@ export class PedidoRepository {
         }
         
         const pedido = await this.model.findById(id)
-            .populate('usuarioId') // popula el usuario, es decir trae toda la info del usuario sabiendo que el usuarioId es una referencia a otro documento
-            .populate({path: 'items.productoId',
+            .populate('usuario') // popula el usuario, es decir trae toda la info del usuario sabiendo que el usuario es una referencia a otro documento
+            .populate({path: 'items.producto',
                 populate: {
                     path: 'vendedor',
                     model: 'Usuario'
@@ -70,16 +70,16 @@ export class PedidoRepository {
             query = query.session(session);
         }
         const pedidos = await query
-            .populate('usuarioId')
-            .populate('items.productoId')
+            .populate('usuario')
+            .populate('items.producto')
             .sort({ fechaPedido: -1 });
         return pedidos.map(pedido => pedidoDocToDominio(pedido));
     }
 
     async obtenerPedidosPorUsuario(usuarioId) {
         const pedidos = await this.model.find({ usuarioId })
-            .populate('usuarioId')
-            .populate('items.productoId')
+            .populate('usuario')
+            .populate('items.producto')
             .sort({ fechaPedido: -1 });
 
         return pedidos.map(pedido => pedidoDocToDominio(pedido));
@@ -87,8 +87,8 @@ export class PedidoRepository {
 
     async obtenerPedidosPorEstado(estado) {
         const pedidos = await this.model.find({ estado })
-            .populate('usuarioId')
-            .populate('items.productoId')
+            .populate('usuario')
+            .populate('items.producto')
             .sort({ fechaPedido: -1 });
 
         return pedidos.map(pedido => pedidoDocToDominio(pedido));
@@ -111,9 +111,9 @@ export class PedidoRepository {
         );
 
         const pedidoCompleto = await this.model.findById(resultado._id)
-                .populate('usuarioId')
+                .populate('usuario')
                 .populate({
-                    path: 'items.productoId',
+                    path: 'items.producto',
                     populate: { path: 'vendedor' }
                 });
 
