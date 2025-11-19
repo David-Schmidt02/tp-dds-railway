@@ -18,6 +18,7 @@ const Navbar = () => {
 
 
   const manejarBusqueda = (e) => {
+    e.preventDefault(); 
     const query = texto.trim();
     if (query.length > 0) {
       navigate(`/productos?nombre=${encodeURIComponent(query)}`);

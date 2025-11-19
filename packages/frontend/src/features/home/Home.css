@@ -44,7 +44,7 @@ body {
   color: #F1EFEC; /* texto claro */
   background: linear-gradient(135deg, #123458 0%, #030303 100%);
   border: none;
-  border-radius: 50px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.35s ease;
   letter-spacing: 0.6px;
@@ -69,20 +69,7 @@ body {
   z-index: 1;
 }
 
-.ver-mas-btn:hover::before {
-  opacity: 1;
-}
 
-.ver-mas-btn:hover {
-  color: #030303; /* texto oscuro */
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 16px rgba(3, 3, 3, 0.3);
-}
-
-.ver-mas-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 8px rgba(3, 3, 3, 0.25);
-}
 
 
 
