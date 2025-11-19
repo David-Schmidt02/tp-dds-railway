@@ -1,30 +1,27 @@
 import mongoose from "mongoose";
-import { PedidoInexistente, EstadoPedidoInvalido, PedidoYaCancelado, PedidoYaEntregado, PedidoNoCancelable, PedidoNoModificable } from "../../excepciones/pedido.js";
+import { PedidoInexistente } from "../../excepciones/pedido.js";
 import { UsuarioInexistente } from "../../excepciones/usuario.js";
 import { PedidoModel } from "../../schema/pedidoSchema.js";
-import { Pedido } from "../entities/pedido.js";
-import { ItemPedido } from "../entities/itemPedido.js";
-import { Usuario } from "../entities/usuario.js";
-import { Producto } from "../entities/producto.js";
-import { DireccionEntrega } from "../entities/direccionEntrega.js";
-import { Moneda } from "../entities/moneda.js";
+
 import { pedidoToDoc, pedidoDocToDominio } from "../../dto/pedidoDTO.js";
 
 export class PedidoRepository {
-    constructor() {
+    constructor(productoRepository) {
         this.model = PedidoModel;
+        this.productoRepository = productoRepository;
     }
-
-    // Nota: Se usan las funciones del DTO (pedidoToDoc y pedidoDocToDominio)
-    // para mantener consistencia con el resto de repositories (ProductoRepository, etc.)
-
-
 
     async guardarPedido(pedidoData) {
         try {
             const pedidoDoc = pedidoToDoc(pedidoData);
             const nuevoPedido = new PedidoModel(pedidoDoc);
+
             const resultado = await nuevoPedido.save();
+
+            for (const item of pedidoData.getItems()) {
+                await this.productoRepository.guardarProducto(item.getProducto());
+            }
+
             const pedidoCompleto = await this.model.findById(resultado._id)
                 .populate('usuario')
                 .populate({
@@ -64,11 +61,8 @@ export class PedidoRepository {
         return pedidoDocToDominio(pedido);
     }
 
-    async obtenerPedidos(session = null) {
+    async obtenerPedidos() {
         let query = this.model.find();
-        if (session) {
-            query = query.session(session);
-        }
         const pedidos = await query
             .populate('usuario')
             .populate('items.producto')
@@ -109,6 +103,10 @@ export class PedidoRepository {
             pedidoDominio.id,
             pedidoDB,
         );
+
+        for (const item of pedidoDominio.getItems()) {
+             await this.productoRepository.guardarProducto(item.getProducto());
+        }
 
         const pedidoCompleto = await this.model.findById(resultado._id)
                 .populate('usuario')

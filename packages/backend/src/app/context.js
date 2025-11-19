@@ -21,8 +21,8 @@ import mongoose from 'mongoose';
 const DB_NAME = "local"
 
 export const buildAppContext = () => {
-    const pedidoRepository = new PedidoRepository();
     const productoRepository = new ProductoRepository();
+    const pedidoRepository = new PedidoRepository(productoRepository);
     const usuarioRepository = new UsuarioRepository();
     const notificacionRepository = new NotificacionRepository();
     

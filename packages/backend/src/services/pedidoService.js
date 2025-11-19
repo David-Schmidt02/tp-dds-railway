@@ -52,10 +52,6 @@ export class PedidoService {
             );
 
             pedidoNuevo.reservarItems(); 
-
-            for (const item of pedidoNuevo.getItems()) {
-                await this.productoRepository.guardarProducto(item.getProducto());
-            } 
                  
         } catch (error) {
             if (error instanceof ProductoNoDisponible) throw error;
@@ -88,9 +84,7 @@ export class PedidoService {
             pedido.actualizarEstado(EstadoPedido.CANCELADO, usuario, motivo);
             
             pedidoActualizado = await this.pedidoRepository.guardarPedidoModificado(pedido);
-            for (const item of pedidoActualizado.getItems()) {
-                await this.productoRepository.guardarProducto(item.getProducto());
-            }     
+    
         } catch (error) {
             if (error instanceof ProductoNoDisponible) throw error;
             if (error instanceof EstadoPedidoInvalido) throw error;
@@ -116,7 +110,6 @@ export class PedidoService {
             const item = pedido.modificarCantidadItem(idProducto, nuevaCantidad);
 
             await this.pedidoRepository.guardarPedidoModificado(pedido);
-            await this.productoRepository.guardarProducto(item.producto);
 
         } catch (error) {
             console.error('Error al cambiar cantidad de item:', error.message);
