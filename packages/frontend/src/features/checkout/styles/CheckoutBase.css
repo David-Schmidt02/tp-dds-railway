@@ -1,18 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 :root {
-  --checkout-bg: #f4f1ec;
   --checkout-card-bg: #f8f5f1;
-  --checkout-white: #ffffff;
-  --checkout-blue: #123458;
-  --checkout-red: #e32121;
-  --checkout-green: #a2e198;
   --checkout-text: #1f1c19;
   --checkout-gray: #8c8680;
 }
 
 .checkout-root {
-  background-color: var(--checkout-bg);
+  background-color: var(--color-beige-light);
   min-height: 100vh;
   padding: 80px 20px;
 }
@@ -31,7 +25,7 @@
   margin: 0 0 16px 0;
   font-size: 44px;
   letter-spacing: 6px;
-  font-family: 'Bebas Neue', cursive;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .step-indicators {
@@ -45,22 +39,26 @@
   background: transparent;
   color: var(--checkout-text);
   border: 2px solid var(--checkout-text);
-  border-radius: 999px;
-  padding: 6px 22px;
-  font-family: 'Bebas Neue', cursive;
-  font-size: 18px;
-  letter-spacing: 1px;
+  border-radius: 10px;
+  padding: 14px 36px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
   transition: background 0.2s ease, transform 0.2s ease;
   cursor: pointer;
 }
 
 .step-chip.active {
-  background-color: var(--checkout-green);
-  border-color: var(--checkout-green);
+  background-color: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white);
 }
 
 .step-chip.completed {
-  background-color: rgba(162, 225, 152, 0.35);
+  background-color: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white);
 }
 
 .step-chip.disabled,
@@ -83,7 +81,7 @@
 
 .checkout-content {
   background-color: var(--checkout-card-bg);
-  border-radius: 36px;
+  border-radius: 14px;
   padding: 48px;
   box-shadow: 0 25px 45px rgba(31, 28, 25, 0.08);
 }

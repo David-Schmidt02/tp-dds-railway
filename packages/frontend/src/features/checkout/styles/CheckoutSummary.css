@@ -11,15 +11,15 @@
 
 .summary-left {
   flex: 1;
-  background-color: var(--checkout-white);
-  border-radius: 32px;
+  background-color: var(--color-white);
+  border-radius: 14px;
   padding: 36px;
   box-shadow: 0 25px 45px rgba(31, 28, 25, 0.05);
 }
 
 .summary-block {
   border: 1px solid #e8e2db;
-  border-radius: 24px;
+  border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
   background-color: var(--checkout-card-bg);
@@ -28,7 +28,7 @@
 .summary-block h3 {
   margin: 0 0 16px 0;
   font-size: 22px;
-  font-family: 'Bebas Neue', cursive;
+  font-family: 'Montserrat', sans-serif;
   letter-spacing: 1px;
 }
 
@@ -42,9 +42,9 @@
 }
 
 .price-summary {
-  background-color: var(--checkout-blue);
-  color: var(--checkout-white);
-  border-radius: 32px;
+  background-color: var(--color-blue-primary);
+  color: var(--color-white);
+  border-radius: 14px;
   padding: 32px;
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
   margin: 0 0 10px 0;
   font-size: 26px;
   letter-spacing: 1px;
-  font-family: 'Bebas Neue', cursive;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .price-line {

@@ -27,7 +27,7 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
 
   return (
     <div className="form-section">
-      <h2>DAR DIRECCIÓN DE ENTREGA</h2>
+      <h2>Dar dirección de entrega</h2>
       <div className="form-grid">
         <CheckoutInput
           label="Calle"
@@ -81,15 +81,15 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
       </div>
 
       <div className="form-actions">
-        <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
-          ATRÁS
+        <CheckoutButton className="secondary" type="button" onClick={handleBack}>
+          Atrás
         </CheckoutButton>
         <CheckoutButton
           type="button"
           disabled={!paso2Completo}
           onClick={handleNext}
         >
-          AVANZAR
+          Avanzar
         </CheckoutButton>
       </div>
     </div>

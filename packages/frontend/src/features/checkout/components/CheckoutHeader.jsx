@@ -30,7 +30,7 @@ const CheckoutHeader = ({ stepAccess = {} }) => {
 
   return (
     <div className="checkout-header">
-      <h1>CHECKOUT</h1>
+      <h1>Checkout</h1>
       <div className="step-indicators">
         {pasos.map((paso, index) => (
           <React.Fragment key={paso.nombre}>

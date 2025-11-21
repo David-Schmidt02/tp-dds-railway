@@ -39,7 +39,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
 
   return (
     <div className="form-section">
-      <h2>INTRODUCE TUS DATOS</h2>
+      <h2>Introduce tus datos</h2>
       <div className="form-grid">
         <CheckoutInput
           label="Nombre"
@@ -86,7 +86,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
           disabled={!paso1Completo}
           onClick={handleNext}
         >
-          AVANZAR
+          Avanzar
         </CheckoutButton>
       </div>
     </div>

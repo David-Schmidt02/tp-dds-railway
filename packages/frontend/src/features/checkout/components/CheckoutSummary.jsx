@@ -15,7 +15,7 @@ const CheckoutSummary = ({
   return (
     <div className="summary-right">
       <div className="price-summary">
-        <h3>PAGO TOTAL</h3>
+        <h3>Pago total</h3>
         {rows.map((row) => (
           <div key={row.label} className="price-line">
             <span>{row.label}</span>

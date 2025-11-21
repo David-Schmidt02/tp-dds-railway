@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CheckoutButton from './ui/CheckoutButton';
 
 const formatDireccion = (direccion) => {
@@ -13,8 +13,6 @@ const formatDireccion = (direccion) => {
 };
 
 const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
-  const navigate = useNavigate();
-
   const total = (pedido?.total ?? calcularTotal()).toFixed(2);
   const fecha = pedido?.fechaCreacion
     ? new Date(pedido.fechaCreacion)
@@ -25,8 +23,6 @@ const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
     : 'PED-000000';
 
   const direccion = formatDireccion(pedido?.direccionEntrega || fallbackDireccion);
-
-  const handleVolver = () => navigate('/');
 
   return (
     <div className="confirmation-success">
@@ -54,22 +50,13 @@ const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
           </div>
         </div>
 
-        <div className="success-actions">
-          <CheckoutButton variant="ghost" type="button">
-            Ver comprobante
-          </CheckoutButton>
-          <CheckoutButton variant="success" type="button">
-            Reenviar email
-          </CheckoutButton>
-        </div>
-
         <p className="success-note">
           Te enviamos la confirmación a la casilla registrada en tu cuenta.
         </p>
 
-        <CheckoutButton variant="primary" type="button" onClick={handleVolver}>
+        <Link to="/" className="checkout-button">
           Volver al inicio
-        </CheckoutButton>
+        </Link>
       </div>
     </div>
   );

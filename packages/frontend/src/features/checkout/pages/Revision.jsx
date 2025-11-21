@@ -26,10 +26,10 @@ const Revision = ({
     <div className="summary-section">
       <div className="summary-content">
         <div className="summary-left">
-          <h2>REVISIÓN Y CONFIRMACIÓN</h2>
+          <h2>Revisión y confirmación</h2>
 
           <div className="summary-block">
-            <h3>DIRECCIÓN DE ENTREGA</h3>
+            <h3>Dirección de entrega</h3>
             <p>{`${direccion.calle} ${direccion.numero}`.trim()}</p>
             <p>{`${direccion.ciudad || ''}${direccion.ciudad ? ',' : ''} ${direccion.provincia || ''} ${direccion.codigoPostal || ''}`.trim()}</p>
             {direccion.departamento && <p>Depto: {direccion.departamento}</p>}
@@ -37,7 +37,7 @@ const Revision = ({
           </div>
 
           <div className="summary-block">
-            <h3>MÉTODO DE PAGO</h3>
+            <h3>Método de pago</h3>
             {tarjetaSeleccionada ? (
               <>
                 <p>Tarjeta de {datosTarjeta.tipoTarjeta === 'credito' ? 'crédito' : 'débito'}</p>
@@ -56,11 +56,11 @@ const Revision = ({
           </div>
 
           <div className="form-actions">
-            <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
-              ATRÁS
+            <CheckoutButton className="secondary" type="button" onClick={handleBack}>
+              Atrás
             </CheckoutButton>
-            <CheckoutButton variant="danger" type="button" onClick={handleConfirmar}>
-              ACEPTAR
+            <CheckoutButton type="button" onClick={handleConfirmar}>
+              Aceptar
             </CheckoutButton>
           </div>
         </div>

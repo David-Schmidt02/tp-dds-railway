@@ -100,7 +100,7 @@ const Pago = ({
 
   return (
     <div className="payment-section">
-      <h2>ELEGÍ TU MÉTODO DE PAGO</h2>
+      <h2>Elegí tu método de pago</h2>
 
       <div className="payment-methods">
         {paymentOptions.map(option => (
@@ -129,15 +129,15 @@ const Pago = ({
       </div>
 
       <div className="form-actions">
-        <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
-          ATRÁS
+        <CheckoutButton className="secondary" type="button" onClick={handleBack}>
+          Atrás
         </CheckoutButton>
         <CheckoutButton
           type="button"
           disabled={!paso3Completo}
           onClick={handleNext}
         >
-          AVANZAR
+          Avanzar
         </CheckoutButton>
       </div>
     </div>
