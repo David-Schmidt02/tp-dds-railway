@@ -84,7 +84,7 @@ export let factoryNotificacionPedidos = {
 
         // El receptor debe ser el id del comprador, no el objeto completo
         const receptorId = comprador?.id || comprador?._id;
-        return new Notificacion({ id: receptorId }, mensaje);
+        return new Notificacion(receptorId, mensaje);
     }
 };
 

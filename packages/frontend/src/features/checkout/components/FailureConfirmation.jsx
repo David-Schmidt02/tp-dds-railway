@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CheckoutButton from './ui/CheckoutButton';
 
 const FailureConfirmation = ({ error, onRetry }) => {
@@ -32,9 +32,9 @@ const FailureConfirmation = ({ error, onRetry }) => {
         </div>
 
         <div className="fail-actions">
-          <Link to="/" className="checkout-button secondary">
+          <button onClick={() => navigate('/')} className="checkout-button secondary">
             Volver al inicio
-          </Link>
+          </button>
           <CheckoutButton type="button" onClick={handleReintentar}>
             Reintentar
           </CheckoutButton>

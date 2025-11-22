@@ -35,6 +35,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [pedidoCreado, setPedidoCreado] = useState(null);
   const [pedidoError, setPedidoError] = useState(null);
+  const [procesandoPedido, setProcesandoPedido] = useState(false);
 
   // Funciones de cálculo
   const COSTO_ENVIO = 500;
@@ -140,6 +141,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
   // Crear pedido
   const handleCrearPedido = async () => {
+    setProcesandoPedido(true);
     try {
       const usuarioId = obtenerUsuarioId();
       const pedidoData = construirPedidoData(usuarioId);
@@ -170,6 +172,8 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
       navigate('/checkout/error');
       return null;
+    } finally {
+      setProcesandoPedido(false);
     }
   };
 
@@ -190,6 +194,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     pedidoConfirmado,
     pedidoCreado,
     pedidoError,
+    procesandoPedido,
 
     // Validaciones
     paso1Completo,

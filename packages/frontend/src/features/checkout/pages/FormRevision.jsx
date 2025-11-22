@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
 import CheckoutButton from '../components/ui/CheckoutButton';
 import CheckoutSummary from '../components/CheckoutSummary';
 
@@ -11,7 +12,8 @@ const FormRevision = ({
   calcularTotal,
   calcularSubtotal,
   calcularEnvio,
-  calcularImpuestos
+  calcularImpuestos,
+  procesandoPedido
 }) => {
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ const FormRevision = ({
 
   return (
     <div className="summary-section">
+      {procesandoPedido && <LinearProgress />}
       <div className="summary-content">
         <div className="summary-left">
           <h2>Revisión y confirmación</h2>
@@ -59,10 +62,10 @@ const FormRevision = ({
           </div>
 
           <div className="form-actions">
-            <CheckoutButton className="secondary" type="button" onClick={handleBack}>
+            <CheckoutButton className="secondary" type="button" onClick={handleBack} disabled={procesandoPedido}>
               Atrás
             </CheckoutButton>
-            <CheckoutButton type="button" onClick={handleConfirmar}>
+            <CheckoutButton type="button" onClick={handleConfirmar} disabled={procesandoPedido}>
               Aceptar
             </CheckoutButton>
           </div>

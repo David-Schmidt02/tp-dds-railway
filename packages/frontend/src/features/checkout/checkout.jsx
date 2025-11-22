@@ -31,7 +31,7 @@ const Checkout = () => {
   return (
     <div className="checkout-root">
       <div className="checkout-container">
-        <CheckoutHeader stepAccess={stepAccess} />
+        <CheckoutHeader stepAccess={stepAccess} pedidoConfirmado={checkoutData.pedidoConfirmado} />
 
         <div className="checkout-content">
           <Routes>
@@ -97,6 +97,7 @@ const Checkout = () => {
                     calcularSubtotal={checkoutData.calcularSubtotal}
                     calcularEnvio={checkoutData.calcularEnvio}
                     calcularImpuestos={checkoutData.calcularImpuestos}
+                    procesandoPedido={checkoutData.procesandoPedido}
                   />
                 ) : (
                   <Navigate to="/checkout/pago" replace />

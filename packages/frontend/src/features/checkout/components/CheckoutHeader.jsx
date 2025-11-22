@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const CheckoutHeader = ({ stepAccess = {} }) => {
+const CheckoutHeader = ({ stepAccess = {}, pedidoConfirmado = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname;
@@ -24,7 +24,7 @@ const CheckoutHeader = ({ stepAccess = {} }) => {
   };
 
   const handleStepClick = (paso, index) => {
-    if (!canAccess(index)) return;
+    if (!canAccess(index) || pedidoConfirmado) return;
     navigate(paso.ruta);
   };
 
@@ -43,10 +43,10 @@ const CheckoutHeader = ({ stepAccess = {} }) => {
               className={`step-chip ${
                 checkoutFinalizado || index < indexActivo ? 'completed' : ''
               } ${index === indexActivo && !checkoutFinalizado ? 'active' : ''} ${
-                canAccess(index) ? '' : 'disabled'
+                canAccess(index) && !pedidoConfirmado ? '' : 'disabled'
               }`}
               onClick={() => handleStepClick(paso, index)}
-              disabled={!canAccess(index)}
+              disabled={!canAccess(index) || pedidoConfirmado}
             >
               <span>{paso.nombre}</span>
             </button>
