@@ -6,7 +6,6 @@ const CheckoutSelect = ({
   options = [],
   placeholder = 'Seleccionar',
   className = '',
-  children,
   ...props
 }) => (
   <label className={`checkout-field ${className}`.trim()} htmlFor={id}>
@@ -15,12 +14,11 @@ const CheckoutSelect = ({
       <option value="" disabled>
         {placeholder}
       </option>
-      {children ||
-        options.map(({ value, label: text }) => (
-          <option key={value} value={value}>
-            {text}
-          </option>
-        ))}
+      {options.map(({ value, label: text }) => (
+        <option key={value} value={value}>
+          {text}
+        </option>
+      ))}
     </select>
   </label>
 );

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import CheckoutButton from './ui/CheckoutButton';
 
+// Formatea dirección en 3 partes separadas por " · " (ej: "Calle 123 · Buenos Aires, CABA · CP 1000")
+// Elimina partes vacías con filter(Boolean)
 const formatDireccion = (direccion) => {
   if (!direccion) return 'Sin dirección registrada';
   const partes = [

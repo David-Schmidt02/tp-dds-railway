@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CheckoutButton from '../components/ui/CheckoutButton';
 import CheckoutSummary from '../components/CheckoutSummary';
 
-const Revision = ({
+const FormRevision = ({
   direccion,
   metodoPago,
   datosTarjeta,
@@ -16,6 +16,8 @@ const Revision = ({
   const navigate = useNavigate();
 
   const handleBack = () => navigate('/checkout/pago');
+
+  // Es trivial, pero mantiene consistencia
   const handleConfirmar = async () => {
     await handleCrearPedido();
   };
@@ -31,6 +33,7 @@ const Revision = ({
           <div className="summary-block">
             <h3>Dirección de entrega</h3>
             <p>{`${direccion.calle} ${direccion.numero}`.trim()}</p>
+            {/* Formato: "Ciudad, Provincia CP" - solo agrega coma si hay ciudad */}
             <p>{`${direccion.ciudad || ''}${direccion.ciudad ? ',' : ''} ${direccion.provincia || ''} ${direccion.codigoPostal || ''}`.trim()}</p>
             {direccion.departamento && <p>Depto: {direccion.departamento}</p>}
             {direccion.referencias && <p>Ref: {direccion.referencias}</p>}
@@ -76,4 +79,4 @@ const Revision = ({
   );
 };
 
-export default Revision;
+export default FormRevision;

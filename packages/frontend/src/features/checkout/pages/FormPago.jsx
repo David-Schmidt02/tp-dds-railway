@@ -10,7 +10,7 @@ const paymentOptions = [
   { value: 'efectivo', label: 'Efectivo / Pago en ventanilla' }
 ];
 
-const Pago = ({
+const FormPago = ({
   metodoPago,
   setMetodoPago,
   aceptaTerminos,
@@ -144,4 +144,4 @@ const Pago = ({
   );
 };
 
-export default Pago;
+export default FormPago;

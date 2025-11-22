@@ -36,6 +36,10 @@ const CheckoutHeader = ({ stepAccess = {} }) => {
           <React.Fragment key={paso.nombre}>
             <button
               type="button"
+              // Clases CSS dinámicas según estado: -> Modifican los estilos de los indicadores superiores del checkout
+              // - 'completed': paso ya completado (checkout finalizado o índice menor al actual)
+              // - 'active': paso actual en progreso (no finalizado)
+              // - 'disabled': paso no accesible aún
               className={`step-chip ${
                 checkoutFinalizado || index < indexActivo ? 'completed' : ''
               } ${index === indexActivo && !checkoutFinalizado ? 'active' : ''} ${

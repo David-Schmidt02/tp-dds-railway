@@ -16,9 +16,8 @@ const FailureConfirmation = ({ error, onRetry }) => {
     navigate('/checkout/revision');
   };
 
-  const handleVolver = () => {
-    if (onRetry) onRetry();
-  };
+  // No se llama a onRetry() aquí porque al navegar a "/" el componente Checkout
+  // se desmonta completamente, destruyendo el hook y limpiando el error automáticamente
 
   return (
     <div className="confirmation-fail">
@@ -33,7 +32,7 @@ const FailureConfirmation = ({ error, onRetry }) => {
         </div>
 
         <div className="fail-actions">
-          <Link to="/" className="checkout-button secondary" onClick={handleVolver}>
+          <Link to="/" className="checkout-button secondary">
             Volver al inicio
           </Link>
           <CheckoutButton type="button" onClick={handleReintentar}>

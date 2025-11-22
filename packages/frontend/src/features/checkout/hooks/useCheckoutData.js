@@ -33,12 +33,14 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   });
 
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
-  const [pedidoId, setPedidoId] = useState(null);
   const [pedidoCreado, setPedidoCreado] = useState(null);
   const [pedidoError, setPedidoError] = useState(null);
 
   // Funciones de cálculo
-  const calcularTotal = () => {
+  const COSTO_ENVIO = 500;
+  const TASA_IMPUESTOS = 0.21;
+
+  const calcularSubtotal = () => {
     if (!carrito || carrito.length === 0) return 0;
     return carrito.reduce((total, producto) => {
       const precio = producto.precio || 0;
@@ -47,31 +49,55 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     }, 0);
   };
 
-  const calcularSubtotal = () => calcularTotal();
-  const calcularEnvio = () => 0;
-  const calcularImpuestos = () => 0;
+  const calcularEnvio = () => COSTO_ENVIO;
 
-  // Validaciones por paso
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const telefonoRegex = /^\d{8,15}$/;
+  const calcularImpuestos = () => {
+    const subtotal = calcularSubtotal();
+    return subtotal * TASA_IMPUESTOS;
+  };
 
-  const paso1Completo = datos.nombre &&
-                        datos.nombre.length >= 2 &&
-                        datos.apellido &&
-                        datos.apellido.length >= 2 &&
-                        datos.email &&
-                        emailRegex.test(datos.email) &&
-                        datos.telefono &&
-                        telefonoRegex.test(datos.telefono);
+  const calcularTotal = () => {
+    return calcularSubtotal() + calcularEnvio() + calcularImpuestos();
+  };
 
-  const paso2Completo = direccion.calle &&
-                        direccion.numero &&
-                        !isNaN(Number(direccion.numero)) &&
-                        Number(direccion.numero) > 0 &&
-                        direccion.ciudad &&
-                        direccion.codigoPostal &&
-                        !isNaN(Number(direccion.codigoPostal)) &&
-                        Number(direccion.codigoPostal) > 0;
+  // Validaciones reutilizables
+  const validaciones = {
+    emailRegex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    telefonoRegex: /^\d{8,15}$/,
+
+    esEmailValido: (email) => {
+      if (!email) return false;
+      return validaciones.emailRegex.test(email);
+    },
+
+    esTelefonoValido: (telefono) => {
+      if (!telefono) return false;
+      return validaciones.telefonoRegex.test(telefono);
+    },
+
+    esTextoValido: (texto, minLength = 2) => {
+      if (!texto) return false;
+      return texto.length >= minLength;
+    },
+
+    esNumeroValido: (valor) => {
+      if (!valor) return false;
+      const num = Number(valor);
+      return !isNaN(num) && num > 0;
+    }
+  };
+
+  const paso1Completo =
+    validaciones.esTextoValido(datos.nombre, 2) &&
+    validaciones.esTextoValido(datos.apellido, 2) &&
+    validaciones.esEmailValido(datos.email) &&
+    validaciones.esTelefonoValido(datos.telefono);
+
+  const paso2Completo =
+    direccion.calle &&
+    validaciones.esNumeroValido(direccion.numero) &&
+    direccion.ciudad &&
+    validaciones.esNumeroValido(direccion.codigoPostal);
 
   const tarjetaCompleta = metodoPago !== 'tarjeta' || (
     datosTarjeta.numeroTarjeta &&
@@ -84,31 +110,23 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
   // Preparar datos para backend
   const prepararItemsPedido = () => {
-    console.log('Carrito en prepararItemsPedido:', carrito);
-    return carrito.map(producto => {
-      console.log('Producto:', producto, 'ID extraído:', producto.id);
-      return {
-        productoId: producto.id,
-        cantidad: producto.cantidad || 1
-      };
-    });
+    return carrito.map(producto => ({
+      productoId: producto.id,
+      cantidad: producto.cantidad || 1
+    }));
   };
 
   const prepararDireccionEntrega = () => {
-    console.log('Dirección antes de preparar:', direccion);
-
-    const direccionPreparada = {
+    return {
       calle: direccion.calle,
       numero: parseInt(direccion.numero) || 1,
       codigoPostal: parseInt(direccion.codigoPostal) || 1000,
       ciudad: direccion.ciudad
     };
-    console.log('Dirección preparada:', direccionPreparada);
-    return direccionPreparada;
   };
 
   const obtenerUsuarioId = () => {
-    return "68f78d0265e233d704ba3900"; // ObjectId válido hardcodeado
+    return "690ec5610179aefbee3e53b1"; // ObjectId válido hardcodeado
   };
 
   const construirPedidoData = (usuarioId) => {
@@ -126,12 +144,9 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
       const usuarioId = obtenerUsuarioId();
       const pedidoData = construirPedidoData(usuarioId);
 
-      console.log('Enviando pedido:', pedidoData);
-
       const pedidoCreado = await postPedido(pedidoData);
 
       setPedidoError(null);
-      setPedidoId(pedidoCreado.id);
       setPedidoCreado(pedidoCreado);
       setPedidoConfirmado(true);
       limpiarCarrito();
@@ -140,23 +155,13 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
       return pedidoCreado;
     } catch (error) {
-      console.error('Error al crear pedido:', error);
-
       const respuesta = error.response?.data;
       const mensajeBackend =
         typeof respuesta === 'string'
           ? respuesta
           : respuesta?.message || respuesta?.error;
 
-      const mensajeError =
-        mensajeBackend ||
-        (error.message.includes('400')
-          ? 'Datos del pedido inválidos. Verifique la información ingresada.'
-          : error.message.includes('401')
-          ? 'No tiene autorización para realizar esta operación.'
-          : error.message.includes('500')
-          ? 'Error interno del servidor. Intente más tarde.'
-          : 'Error al procesar el pedido. Por favor intente nuevamente.');
+      const mensajeError = mensajeBackend || 'Error no especificado del backend';
 
       setPedidoError({
         message: mensajeError,
@@ -183,7 +188,6 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
     datosTarjeta,
     setDatosTarjeta,
     pedidoConfirmado,
-    pedidoId,
     pedidoCreado,
     pedidoError,
 
@@ -200,6 +204,9 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
 
     // Funciones
     handleCrearPedido,
-    clearPedidoError
+    clearPedidoError,
+
+    // Validaciones reutilizables
+    validaciones
   };
 };
