@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CheckoutButton from './ui/CheckoutButton';
 
+// Formatea dirección en 3 partes separadas por " · " (ej: "Calle 123 · Buenos Aires, CABA · CP 1000")
+// Elimina partes vacías con filter(Boolean)
 const formatDireccion = (direccion) => {
   if (!direccion) return 'Sin dirección registrada';
   const partes = [
@@ -14,7 +16,6 @@ const formatDireccion = (direccion) => {
 
 const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
   const navigate = useNavigate();
-
   const total = (pedido?.total ?? calcularTotal()).toFixed(2);
   const fecha = pedido?.fechaCreacion
     ? new Date(pedido.fechaCreacion)
@@ -25,8 +26,6 @@ const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
     : 'PED-000000';
 
   const direccion = formatDireccion(pedido?.direccionEntrega || fallbackDireccion);
-
-  const handleVolver = () => navigate('/');
 
   return (
     <div className="confirmation-success">
@@ -54,22 +53,13 @@ const SuccessConfirmation = ({ pedido, calcularTotal, fallbackDireccion }) => {
           </div>
         </div>
 
-        <div className="success-actions">
-          <CheckoutButton variant="ghost" type="button">
-            Ver comprobante
-          </CheckoutButton>
-          <CheckoutButton variant="success" type="button">
-            Reenviar email
-          </CheckoutButton>
-        </div>
-
         <p className="success-note">
           Te enviamos la confirmación a la casilla registrada en tu cuenta.
         </p>
 
-        <CheckoutButton variant="primary" type="button" onClick={handleVolver}>
+        <button onClick={() => navigate('/')} className="checkout-button">
           Volver al inicio
-        </CheckoutButton>
+        </button>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import CheckoutInput from '../components/ui/CheckoutInput';
 import CheckoutButton from '../components/ui/CheckoutButton';
 import CheckoutCheckbox from '../components/ui/CheckoutCheckbox';
 
-const Usuario = ({ datos, setDatos, paso1Completo }) => {
+const FormUsuario = ({ datos, setDatos, paso1Completo, validaciones }) => {
   const navigate = useNavigate();
 
   const handleNext = () => {
@@ -13,8 +13,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
 
   const getEmailError = () => {
     if (!datos.email) return '';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(datos.email)) {
+    if (!validaciones.esEmailValido(datos.email)) {
       return 'Formato de email inválido';
     }
     return '';
@@ -22,8 +21,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
 
   const getTelefonoError = () => {
     if (!datos.telefono) return '';
-    const telefonoRegex = /^\d{8,15}$/;
-    if (!telefonoRegex.test(datos.telefono)) {
+    if (!validaciones.esTelefonoValido(datos.telefono)) {
       return 'Debe contener entre 8 y 15 dígitos';
     }
     return '';
@@ -31,7 +29,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
 
   const getTextFieldError = (value, minLength = 2) => {
     if (!value) return '';
-    if (value.length < minLength) {
+    if (!validaciones.esTextoValido(value, minLength)) {
       return `Debe tener al menos ${minLength} caracteres`;
     }
     return '';
@@ -39,7 +37,7 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
 
   return (
     <div className="form-section">
-      <h2>INTRODUCE TUS DATOS</h2>
+      <h2>Introduce tus datos</h2>
       <div className="form-grid">
         <CheckoutInput
           label="Nombre"
@@ -86,11 +84,11 @@ const Usuario = ({ datos, setDatos, paso1Completo }) => {
           disabled={!paso1Completo}
           onClick={handleNext}
         >
-          AVANZAR
+          Avanzar
         </CheckoutButton>
       </div>
     </div>
   );
 };
 
-export default Usuario;
+export default FormUsuario;

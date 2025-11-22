@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
 import CheckoutButton from '../components/ui/CheckoutButton';
 import CheckoutSummary from '../components/CheckoutSummary';
 
-const Revision = ({
+const FormRevision = ({
   direccion,
   metodoPago,
   datosTarjeta,
@@ -11,11 +12,14 @@ const Revision = ({
   calcularTotal,
   calcularSubtotal,
   calcularEnvio,
-  calcularImpuestos
+  calcularImpuestos,
+  procesandoPedido
 }) => {
   const navigate = useNavigate();
 
   const handleBack = () => navigate('/checkout/pago');
+
+  // Es trivial, pero mantiene consistencia
   const handleConfirmar = async () => {
     await handleCrearPedido();
   };
@@ -24,20 +28,22 @@ const Revision = ({
 
   return (
     <div className="summary-section">
+      {procesandoPedido && <LinearProgress />}
       <div className="summary-content">
         <div className="summary-left">
-          <h2>REVISIÓN Y CONFIRMACIÓN</h2>
+          <h2>Revisión y confirmación</h2>
 
           <div className="summary-block">
-            <h3>DIRECCIÓN DE ENTREGA</h3>
+            <h3>Dirección de entrega</h3>
             <p>{`${direccion.calle} ${direccion.numero}`.trim()}</p>
+            {/* Formato: "Ciudad, Provincia CP" - solo agrega coma si hay ciudad */}
             <p>{`${direccion.ciudad || ''}${direccion.ciudad ? ',' : ''} ${direccion.provincia || ''} ${direccion.codigoPostal || ''}`.trim()}</p>
             {direccion.departamento && <p>Depto: {direccion.departamento}</p>}
             {direccion.referencias && <p>Ref: {direccion.referencias}</p>}
           </div>
 
           <div className="summary-block">
-            <h3>MÉTODO DE PAGO</h3>
+            <h3>Método de pago</h3>
             {tarjetaSeleccionada ? (
               <>
                 <p>Tarjeta de {datosTarjeta.tipoTarjeta === 'credito' ? 'crédito' : 'débito'}</p>
@@ -56,11 +62,11 @@ const Revision = ({
           </div>
 
           <div className="form-actions">
-            <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
-              ATRÁS
+            <CheckoutButton className="secondary" type="button" onClick={handleBack} disabled={procesandoPedido}>
+              Atrás
             </CheckoutButton>
-            <CheckoutButton variant="danger" type="button" onClick={handleConfirmar}>
-              ACEPTAR
+            <CheckoutButton type="button" onClick={handleConfirmar} disabled={procesandoPedido}>
+              Aceptar
             </CheckoutButton>
           </div>
         </div>
@@ -76,4 +82,4 @@ const Revision = ({
   );
 };
 
-export default Revision;
+export default FormRevision;

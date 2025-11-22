@@ -46,9 +46,8 @@ const CartItem = ({ producto, onIncrease, onDecrease, onDelete }) => {
         <span className="price">
           ${(producto.precio * (producto.cantidad || 1)).toLocaleString('es-AR')}
         </span>
-        <button className="delete-btn" onClick={() => onDelete(producto.id)}>
-          <DeleteIcon fontSize="small" />
-          Eliminar
+        <button className="delete-btn" onClick={() => onDelete(producto.id)} aria-label="Eliminar producto">
+          <DeleteIcon fontSize="medium" />
         </button>
       </div>
     </div>

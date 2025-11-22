@@ -14,7 +14,7 @@ const CartSummary = ({ cantidadTotal, total, onCheckout }) => {
           <span>${total.toFixed(2)}</span>
         </div>
         <button className="checkout-btn" onClick={onCheckout}>
-          Proceder al Checkout
+          Continuar Compra
         </button>
       </div>
     </div>

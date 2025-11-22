@@ -5,14 +5,12 @@ import ProductoDetailPage from './features/productoDetailPage/ProductoDetailPage
 import Checkout from './features/checkout/checkout';
 import Cart from './features/carrito/Cart';
 import ProductListingPage from './features/productListingPage/ProductListingPage';
-// Ya no se necesita useState/useEffect para carrito aquí
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}> {/* Elimina prop carrito */}
+        <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/producto/:id" element={<ProductoDetailPage />} />
           <Route path="/cart" element={<Cart />} />

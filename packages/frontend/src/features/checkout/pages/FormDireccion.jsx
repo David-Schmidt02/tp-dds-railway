@@ -11,7 +11,7 @@ const ciudades = [
   { value: 'La Plata', label: 'La Plata' }
 ];
 
-const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
+const FormDireccion = ({ direccion, setDireccion, paso2Completo, validaciones }) => {
   const navigate = useNavigate();
 
   const handleNext = () => navigate('/checkout/pago');
@@ -19,7 +19,7 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
 
   const getNumericFieldError = (fieldValue) => {
     if (!fieldValue) return '';
-    if (isNaN(Number(fieldValue)) || Number(fieldValue) <= 0) {
+    if (!validaciones.esNumeroValido(fieldValue)) {
       return 'Debe ser un número mayor a 0';
     }
     return '';
@@ -27,7 +27,7 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
 
   return (
     <div className="form-section">
-      <h2>DAR DIRECCIÓN DE ENTREGA</h2>
+      <h2>Dar dirección de entrega</h2>
       <div className="form-grid">
         <CheckoutInput
           label="Calle"
@@ -38,8 +38,6 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
         <CheckoutInput
           label="Altura"
           id="altura"
-          type="number"
-          min="1"
           value={direccion.numero}
           onChange={e => setDireccion({ ...direccion, numero: e.target.value })}
           error={getNumericFieldError(direccion.numero)}
@@ -55,8 +53,6 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
           <CheckoutInput
             label="Código postal"
             id="codigo-postal"
-            type="number"
-            min="1"
             value={direccion.codigoPostal}
             onChange={e => setDireccion({ ...direccion, codigoPostal: e.target.value })}
             className="form-field-half"
@@ -81,19 +77,19 @@ const Direccion = ({ direccion, setDireccion, paso2Completo }) => {
       </div>
 
       <div className="form-actions">
-        <CheckoutButton variant="secondary" type="button" onClick={handleBack}>
-          ATRÁS
+        <CheckoutButton className="secondary" type="button" onClick={handleBack}>
+          Atrás
         </CheckoutButton>
         <CheckoutButton
           type="button"
           disabled={!paso2Completo}
           onClick={handleNext}
         >
-          AVANZAR
+          Avanzar
         </CheckoutButton>
       </div>
     </div>
   );
 };
 
-export default Direccion;
+export default FormDireccion;

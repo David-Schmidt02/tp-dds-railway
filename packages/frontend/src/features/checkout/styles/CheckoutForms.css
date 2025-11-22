@@ -1,8 +1,8 @@
 .form-section,
 .payment-section,
 .summary-section {
-  background-color: var(--checkout-white);
-  border-radius: 32px;
+  background-color: var(--color-white);
+  border-radius: 14px;
   padding: 40px;
   box-shadow: 0 25px 45px rgba(31, 28, 25, 0.05);
 }
@@ -14,7 +14,7 @@
   margin-bottom: 32px;
   font-size: 28px;
   letter-spacing: 1px;
-  font-family: 'Bebas Neue', cursive;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .form-grid {
@@ -51,9 +51,9 @@
 .checkout-select {
   width: 100%;
   height: 52px;
-  border-radius: 16px;
+  border-radius: 10px;
   border: 1px solid #dad3cb;
-  background-color: var(--checkout-white);
+  background-color: var(--color-white);
   padding: 0 18px;
   font-size: 16px;
   color: var(--checkout-text);
@@ -63,8 +63,8 @@
 .checkout-select {
   appearance: none;
   background-image:
-    linear-gradient(45deg, transparent 50%, var(--checkout-blue) 50%),
-    linear-gradient(135deg, var(--checkout-blue) 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--color-blue-dark) 50%),
+    linear-gradient(135deg, var(--color-blue-dark) 50%, transparent 50%);
   background-position:
     calc(100% - 18px) calc(50% - 3px),
     calc(100% - 12px) calc(50% - 3px);
@@ -75,7 +75,7 @@
 .checkout-input:focus,
 .checkout-select:focus {
   outline: none;
-  border-color: var(--checkout-blue);
+  border-color: var(--color-blue-dark);
   box-shadow: 0 0 0 3px rgba(18, 52, 88, 0.15);
 }
 
@@ -111,7 +111,7 @@
 .checkout-checkbox input {
   width: 20px;
   height: 20px;
-  accent-color: var(--checkout-blue);
+  accent-color: var(--color-blue-dark);
 }
 
 .form-actions {
@@ -123,14 +123,22 @@
 
 .checkout-button {
   border: none;
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 14px 36px;
   font-size: 14px;
   letter-spacing: 0.08em;
   font-weight: 700;
-  text-transform: uppercase;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--color-blue-primary);
+  color: var(--color-white);
+  box-shadow: 0 4px 12px rgba(11, 121, 255, 0.3);
+}
+
+.checkout-button:hover:not(:disabled) {
+  background-color: #0966d6;
+  box-shadow: 0 6px 16px rgba(11, 121, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .checkout-button:disabled {
@@ -138,41 +146,18 @@
   cursor: not-allowed;
 }
 
-.checkout-button--primary {
-  background-color: var(--checkout-blue);
-  color: var(--checkout-white);
-  box-shadow: 0 12px 20px rgba(18, 52, 88, 0.25);
-}
-
-.checkout-button--secondary {
+.checkout-button.secondary {
   background-color: transparent;
-  color: #8B2635;
-  border: 2px solid #8B2635;
+  color: #8c8680;
+  border: 2px solid #8c8680;
+  box-shadow: none;
 }
 
-.checkout-button--secondary:hover {
-  background-color: #8B2635;
-  color: white;
-}
-
-.checkout-button--danger {
-  background-color: var(--checkout-red);
-  color: var(--checkout-white);
-}
-
-.checkout-button--success {
-  background-color: #2f9d4d;
-  color: var(--checkout-white);
-}
-
-.checkout-button--ghost {
-  background-color: var(--checkout-white);
-  color: var(--checkout-blue);
-  border: 2px solid rgba(18, 52, 88, 0.15);
-}
-
-.checkout-button:not(:disabled):hover {
-  transform: translateY(-1px);
+.checkout-button.secondary:hover:not(:disabled) {
+  background-color: rgba(140, 134, 128, 0.1);
+  color: #6b6560;
+  border-color: #6b6560;
+  box-shadow: none;
 }
 
 .payment-methods {
@@ -183,7 +168,7 @@
 
 .payment-option {
   border: 1px solid #e2dbd3;
-  border-radius: 24px;
+  border-radius: 10px;
   padding: 18px 24px;
   background-color: var(--checkout-card-bg);
 }
@@ -204,17 +189,17 @@
 .checkout-radio input {
   width: 18px;
   height: 18px;
-  accent-color: var(--checkout-blue);
+  accent-color: var(--color-blue-dark);
 }
 
 .checkout-radio.checked {
-  color: var(--checkout-blue);
+  color: var(--color-blue-dark);
 }
 
 .card-details {
   margin-top: 18px;
-  background-color: var(--checkout-white);
-  border-radius: 20px;
+  background-color: var(--color-white);
+  border-radius: 10px;
   padding: 20px;
   border: 1px solid #d3d0cb;
 }

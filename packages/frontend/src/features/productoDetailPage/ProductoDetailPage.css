@@ -168,12 +168,12 @@
 
 .comprar-ahora-btn {
   background: transparent;
-  color: #0b79ff;
-  border: 2px solid #0b79ff;
+  color: var(--color-blue-primary);
+  border: 2px solid var(--color-blue-primary);
 }
 
 .comprar-ahora-btn:hover:not(:disabled) {
-  background: #0b79ff;
+  background: var(--color-blue-primary);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(11, 121, 255, 0.3);

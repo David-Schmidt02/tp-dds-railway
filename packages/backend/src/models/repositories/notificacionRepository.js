@@ -13,7 +13,7 @@ export class NotificacionRepository {
 
     async saveNotificacionNueva(notificacion) {
         const data = {
-            receptor: notificacion.receptor,
+            receptor: notificacion.receptorId,
             mensaje: notificacion.mensaje,
             leida: notificacion.leida,
             fechaAlta: notificacion.fechaAlta || new Date(),
@@ -28,7 +28,7 @@ export class NotificacionRepository {
     async guardarNotificacion(notificacion) {
         const data = {
             mensaje: notificacion.mensaje,
-            receptor: notificacion.receptor,
+            receptor: notificacion.receptorId,
             fechaAlta: notificacion.fechaAlta,
             leida: notificacion.leida,
             fechaLeida: notificacion.fechaLeida

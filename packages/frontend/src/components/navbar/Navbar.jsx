@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaSearch, FaShoppingCart, FaUserAlt } from "react-icons/fa";
 import TextField from "@mui/material/TextField";
+import Badge from "@mui/material/Badge";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from '../../context/cartContext';
 import "./Navbar.css";
-import { FaShoppingCart, FaUserAlt } from "react-icons/fa";
-import Badge from "@mui/material/Badge";
 
 const Navbar = () => {
   const { cantidadTotal } = useCart();
@@ -17,28 +16,25 @@ const Navbar = () => {
   };
 
 
-  const manejarBusqueda = (e) => {
+  const manejarBusqueda = (e) => {    
     e.preventDefault(); 
     const query = texto.trim();
     if (query.length > 0) {
       navigate(`/productos?nombre=${encodeURIComponent(query)}`);
-      setTexto(''); 
+      setTexto('');
     }
   };
-  
-
-  // cantidadTotal ya está en el contexto
 
   return (
     <nav
-      className={`navbar `}
+      className="navbar"
       aria-label="Navegación principal"
     >
       <div className="navbar-left">
-        <Link to={`/`} style={{ textDecoration: "none", color: "inherit" }}>
+        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
           <div className="logo" aria-label="Logo de Tienda Sol">
             <img
-              src={"images/tituloTiendaSol.png"}
+              src="images/tituloTiendaSol.png"
               alt="Logo de Tienda Sol"
               className="logo-image"
               role="img"
@@ -82,7 +78,7 @@ const Navbar = () => {
             badgeContent={cantidadTotal()}
             color="primary"
           >
-            <FaShoppingCart className="navbar-icon" id="cart-icon" />
+            <FaShoppingCart className="navbar-icon" />
           </Badge>
         </button>
         <button className="btn login-btn" aria-label="Ingresar a la cuenta">

@@ -1,20 +1,22 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useCheckoutData } from './hooks/useCheckoutData';
+import { useCart } from '../../context/cartContext';
 import CheckoutHeader from './components/CheckoutHeader';
 import SuccessConfirmation from './components/SuccessConfirmation';
 import FailureConfirmation from './components/FailureConfirmation';
-import Usuario from './pages/Usuario';
-import Direccion from './pages/Direccion';
-import Pago from './pages/Pago';
-import Revision from './pages/Revision';
+import FormUsuario from './pages/FormUsuario';
+import FormDireccion from './pages/FormDireccion';
+import FormPago from './pages/FormPago';
+import FormRevision from './pages/FormRevision';
 import './styles/CheckoutBase.css';
 import './styles/CheckoutForms.css';
 import './styles/CheckoutSummary.css';
 import './styles/CheckoutConfirmation.css';
 import './styles/CheckoutResponsive.css';
 
-const Checkout = ({ carrito, limpiarCarrito }) => {
+const Checkout = () => {
+  const { carrito, limpiarCarrito } = useCart();
   const checkoutData = useCheckoutData(carrito, limpiarCarrito);
 
   const stepAccess = {
@@ -29,7 +31,7 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
   return (
     <div className="checkout-root">
       <div className="checkout-container">
-        <CheckoutHeader stepAccess={stepAccess} />
+        <CheckoutHeader stepAccess={stepAccess} pedidoConfirmado={checkoutData.pedidoConfirmado} />
 
         <div className="checkout-content">
           <Routes>
@@ -38,10 +40,11 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
             <Route
               path="usuario"
               element={
-                <Usuario
+                <FormUsuario
                   datos={checkoutData.datos}
                   setDatos={checkoutData.setDatos}
                   paso1Completo={checkoutData.paso1Completo}
+                  validaciones={checkoutData.validaciones}
                 />
               }
             />
@@ -50,10 +53,11 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
               path="direccion"
               element={
                 stepAccess.direccion ? (
-                  <Direccion
+                  <FormDireccion
                     direccion={checkoutData.direccion}
                     setDireccion={checkoutData.setDireccion}
                     paso2Completo={checkoutData.paso2Completo}
+                    validaciones={checkoutData.validaciones}
                   />
                 ) : (
                   <Navigate to="/checkout/usuario" replace />
@@ -65,7 +69,7 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
               path="pago"
               element={
                 stepAccess.pago ? (
-                  <Pago
+                  <FormPago
                     metodoPago={checkoutData.metodoPago}
                     setMetodoPago={checkoutData.setMetodoPago}
                     aceptaTerminos={checkoutData.aceptaTerminos}
@@ -84,7 +88,7 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
               path="revision"
               element={
                 stepAccess.revision ? (
-                  <Revision
+                  <FormRevision
                     direccion={checkoutData.direccion}
                     metodoPago={checkoutData.metodoPago}
                     datosTarjeta={checkoutData.datosTarjeta}
@@ -93,6 +97,7 @@ const Checkout = ({ carrito, limpiarCarrito }) => {
                     calcularSubtotal={checkoutData.calcularSubtotal}
                     calcularEnvio={checkoutData.calcularEnvio}
                     calcularImpuestos={checkoutData.calcularImpuestos}
+                    procesandoPedido={checkoutData.procesandoPedido}
                   />
                 ) : (
                   <Navigate to="/checkout/pago" replace />
