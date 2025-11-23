@@ -41,8 +41,8 @@ body {
   font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  color: #F1EFEC; /* texto claro */
-  background: linear-gradient(135deg, #123458 0%, #030303 100%);
+  color: var(--color-white);
+  background-color: var(--color-blue-primary);
   border: none;
   border-radius: 10px;
   cursor: pointer;

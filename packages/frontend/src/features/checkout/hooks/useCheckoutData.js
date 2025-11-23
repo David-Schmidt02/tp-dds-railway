@@ -127,7 +127,7 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   };
 
   const obtenerUsuarioId = () => {
-    return "690ec5610179aefbee3e53b1"; // ObjectId válido hardcodeado
+    return "6560f1a1e4b0a1b2c3d4e5f3"; // ObjectId válido hardcodeado
   };
 
   const construirPedidoData = (usuarioId) => {
