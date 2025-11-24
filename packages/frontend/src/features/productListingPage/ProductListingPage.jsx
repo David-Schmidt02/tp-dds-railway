@@ -63,8 +63,9 @@ const ProductListingPage = ({ actualizarCarrito }) => {
   };
 
   const limpiarFiltros = () => {
-    setSearchParams({});
-  };
+  const page = searchParams.get("page") || 1; // conservar el valor actual (o 1)
+  setSearchParams({ page });
+};
 
   return (
     <div className="ProductListingPage" role="main" aria-labelledby="products-heading">

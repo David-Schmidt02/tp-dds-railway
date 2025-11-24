@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { FormGroup, FormControlLabel, Checkbox } from '@mui/material';
 import './ProductosFiltros.css';
 import { getVendedores, getCategorias } from '../../../services/api.js';
-import { useSearchParams, useSetSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
-    const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [categorias, setCategorias] = useState([]);
   const [vendedores, setVendedores] = useState([]);
 
   const [precioMinTemp, setPrecioMinTemp] = useState(filtros.precioMin || '');
   const [precioMaxTemp, setPrecioMaxTemp] = useState(filtros.precioMax || '');
+
+  const [mostrarMasCategorias, setMostrarMasCategorias] = useState(false);
+  const [mostrarMasVendedores, setMostrarMasVendedores] = useState(false);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -52,7 +55,6 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
     else newParams.delete('precioMax');
 
     newParams.set('page', 1);
-
     setSearchParams(newParams);
   };
 
@@ -84,7 +86,7 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
       <div className="filtros-seccion">
         <label className="filtros-label">Categorías:</label>
         <FormGroup>
-          {categorias.map((cat) => (
+          {(mostrarMasCategorias ? categorias : categorias.slice(0, 5)).map((cat) => (
             <FormControlLabel
               key={cat}
               control={
@@ -104,12 +106,21 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
             />
           ))}
         </FormGroup>
+
+        {categorias.length > 5 && (
+          <button
+            className="ver-mas-btn"
+            onClick={() => setMostrarMasCategorias(!mostrarMasCategorias)}
+          >
+            {mostrarMasCategorias ? "Ver menos" : "Ver más"}
+          </button>
+        )}
       </div>
 
       <div className="filtros-seccion">
         <label className="filtros-label">Vendedores:</label>
         <FormGroup>
-          {vendedores.map((ven) => (
+          {(mostrarMasVendedores ? vendedores : vendedores.slice(0, 5)).map((ven) => (
             <FormControlLabel
               key={ven.id}
               control={
@@ -129,6 +140,15 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
             />
           ))}
         </FormGroup>
+
+        {vendedores.length > 5 && (
+          <button
+            className="ver-mas-btn"
+            onClick={() => setMostrarMasVendedores(!mostrarMasVendedores)}
+          >
+            {mostrarMasVendedores ? "Ver menos" : "Ver más"}
+          </button>
+        )}
       </div>
 
       <div className="filtros-botones">
