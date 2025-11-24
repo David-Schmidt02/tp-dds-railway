@@ -23,7 +23,7 @@ const ProductoCard = ({ producto }) => {
 		console.log(`Agregando 1 unidad de ${producto.titulo} al carrito`);
 
 		setIsAdded(true);
-  		setTimeout(() => setIsAdded(false), 3000);
+  		setTimeout(() => setIsAdded(false), 1500);
 	};
 
 	return (
