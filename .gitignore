@@ -2,7 +2,9 @@ node_modules/
 /packages/**/node_modules/
 
 *.md
+!SEED-README.md
 scripts/
+!packages/backend/src/scripts/
 .claude/
 images
 
