@@ -148,31 +148,31 @@
   font-family: inherit;
 }
 
-.agregar-al-carrito-btn {
-  background: #111827;
+.comprar-ahora-btn {
+  background: var(--color-blue-primary);
   color: #fff;
-  border: 2px solid #111827;
+  border: 2px solid transparent;
 }
 
-.agregar-al-carrito-btn:hover:not(:disabled) {
+.comprar-ahora-btn:hover:not(:disabled) {
   background: #1f2937;
   border-color: #1f2937;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(17, 24, 39, 0.3);
 }
 
-.agregar-al-carrito-btn:disabled {
+.comprar-ahora-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.comprar-ahora-btn {
+.agregar-al-carrito-btn {
   background: transparent;
   color: var(--color-blue-primary);
   border: 2px solid var(--color-blue-primary);
 }
 
-.comprar-ahora-btn:hover:not(:disabled) {
+.agregar-al-carrito-btn:hover:not(:disabled) {
   background: var(--color-blue-primary);
   color: #fff;
   transform: translateY(-2px);
@@ -192,11 +192,11 @@
 /* Tags */
 .tags-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
 .tag-pill {
-  background:var( --color-btn-primary-cyan);
+  background:var( --color-blue-dark);
   color:var(--color-white);
   padding:6px 10px;
   border-radius:10px;
-  font-weight:700;
+  font-weight:400;
   font-size:13px;
 }
 
@@ -206,7 +206,7 @@
   margin: 40px auto;
   background: #fff;
   padding: 28px;
-  border-radius: 12px;
+  border-radius: 10px;
   text-align: center;
   box-shadow: 0 8px 24px rgba(16,24,40,0.05);
 }
@@ -286,3 +286,4 @@
     gap: 0.5rem;
   }
 }
+

@@ -198,6 +198,15 @@ const ProductoDetailPage = () => {
             </div>
 
             <button
+              className="btn comprar-ahora-btn"
+              onClick={handleComprarAhora}
+              disabled={!item.activo || item.stock === 0}
+              type="button"
+            >
+              Comprar ahora
+            </button>
+
+            <button
               className="btn agregar-al-carrito-btn"
               onClick={handleAgregarAlCarrito}
               disabled={!item.activo || item.stock === 0}
@@ -206,14 +215,7 @@ const ProductoDetailPage = () => {
               Agregar al carrito
             </button>
 
-            <button
-              className="btn comprar-ahora-btn"
-              onClick={handleComprarAhora}
-              disabled={!item.activo || item.stock === 0}
-              type="button"
-            >
-              Comprar ahora
-            </button>
+            
           </div>
 
           {/* Información adicional */}

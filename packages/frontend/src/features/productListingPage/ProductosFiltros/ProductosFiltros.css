@@ -68,21 +68,22 @@
   transform: translateX(2px);
 }
 
-.filtros-container .ver-mas-btn {
+.ver-mas-btn-filtro {
   background: none;
   border: none;
-  color: var(--color-blue-dark);
-  cursor: pointer;
-  margin-top: 4px;
   padding: 0;
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--color-blue-dark);
+  cursor: pointer;
+  text-decoration: none;
   transition: color .2s ease;
 }
 
-.filtros-container .ver-mas-btn:hover {
-  color: #1d4e82;
+.ver-mas-btn-filtro:hover {
+  color: var(--color-blue-dark-hover);
 }
+
 
 .filtros-botones {
   display: flex;

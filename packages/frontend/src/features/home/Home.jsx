@@ -3,7 +3,6 @@ import './Home.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProductos, getCategorias } from '../../services/api.js';
-import CarouselCategoria from './components/carouselCategoria/CarouselCategoria.jsx';
 import Grid from "../../components/grid/grid.jsx";
 import { CircularProgress } from '@mui/material';
 
@@ -44,7 +43,6 @@ const Home = ({ actualizarCarrito }) => {
                 <CircularProgress />
             </div> :
                 <div>
-                    <CarouselCategoria categories={categorias}></CarouselCategoria>
                     <div className="productos-section">
                         <div className="productos-header">
                             <h1 className="productos-title">Nuestros Productos</h1>
@@ -54,7 +52,10 @@ const Home = ({ actualizarCarrito }) => {
                     </div>
                     <button
                         className="ver-mas-btn"
-                        onClick={() => navigate("/productos")}
+                        onClick={() => {
+                        navigate("/productos");
+                        window.scrollTo(0, 0);    
+                        }}
                     >
                         <span>Ver más</span>
                     </button>

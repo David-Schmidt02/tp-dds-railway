@@ -13,7 +13,7 @@ const ProductListingPage = ({ actualizarCarrito }) => {
   const [productos, setProductos] = useState([]);
   const [paginacion, setPaginacion] = useState({ totalPages: 1, page: 1, totalItems: 0 });
 
-  // Leer filtros desde URL
+  
   const filtrosDesdeURL = {
     nombre: '',
     descripcion: searchParams.get('nombre') || '',
@@ -97,7 +97,15 @@ const ProductListingPage = ({ actualizarCarrito }) => {
             count={paginacion.totalPages}
             page={filtrosDesdeURL.page}
             onChange={(event, value) => handleFiltroChange('page', value)}
-            color="primary"
+            sx={{
+                  "& .MuiPaginationItem-root": {
+                    color: "var(--color-blue-dark)", 
+                  },
+                  "& .Mui-selected": {
+                    backgroundColor: "var(--color-blue-dark) !important", 
+                    color: "#fff",
+                  }
+                }}
             aria-label="Paginación"
           />
         </Stack>

@@ -109,10 +109,10 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
 
         {categorias.length > 5 && (
           <button
-            className="ver-mas-btn"
+            className="ver-mas-btn-filtro"
             onClick={() => setMostrarMasCategorias(!mostrarMasCategorias)}
           >
-            {mostrarMasCategorias ? "Ver menos" : "Ver más"}
+            {mostrarMasCategorias ? "Ver menos ▴" : "Ver más ▾"}
           </button>
         )}
       </div>
@@ -143,10 +143,10 @@ function ProductosFiltros({ filtros, handleFiltroChange, limpiarFiltros }) {
 
         {vendedores.length > 5 && (
           <button
-            className="ver-mas-btn"
+            className="ver-mas-btn-filtro"
             onClick={() => setMostrarMasVendedores(!mostrarMasVendedores)}
           >
-            {mostrarMasVendedores ? "Ver menos" : "Ver más"}
+            {mostrarMasVendedores ? "Ver menos ▴" : "Ver más ▾"}
           </button>
         )}
       </div>
