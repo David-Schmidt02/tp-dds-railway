@@ -8,8 +8,8 @@ COPY package*.json ./
 # Copiamos package.json del frontend
 COPY packages/frontend/package*.json ./packages/frontend/
 
-# Instalamos dependencias solo para frontend
-RUN npm install --workspace=frontend
+# Instalamos todas las dependencias del monorepo (están en el package.json raíz)
+RUN npm install
 
 # Copiamos el código del frontend
 COPY packages/frontend ./packages/frontend
