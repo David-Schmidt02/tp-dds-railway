@@ -127,7 +127,8 @@ export const useCheckoutData = (carrito, limpiarCarrito) => {
   };
 
   const obtenerUsuarioId = () => {
-    return "6560f1a1e4b0a1b2c3d4e5f3"; // ObjectId válido hardcodeado
+    // Obtiene el ID del usuario desde variable de entorno
+    return process.env.REACT_APP_DEFAULT_USER_ID;
   };
 
   const construirPedidoData = (usuarioId) => {
